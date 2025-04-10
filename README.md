@@ -11,23 +11,41 @@ said code each time I found a way to improve said code.
 To add this library to your mod, add the following dependency to your `build.gradle` file:
 ```groovy
 repositories {
+    // HudRendererLib
     maven {
-        maven { url = uri("file:///path/to/hudrendererlib/build/libs-maven") }
+        url = "https://maven.pkg.github.com/brainage04/HudRendererLib"
+        credentials {
+            username = "<github_username>"
+            password = System.getenv("GITHUB_TOKEN")
+        }
     }
 }
 
 dependencies {
-    modImplementation "io.github.brainage04:hudrendererlib:<version>"
+    modImplementation "io.github.brainage04:hudrendererlib:1.0.0-<minecraft_version>"
 }
 ```
 
-Replace `<version>` with the appropriate version:
-- `1.0.0` for 1.21.4
-- `1.0.1` for 1.21.5
+Replace `<github_username>` with your GitHub username.
 
-You will need to clone this repository and replace `path/to/hudrendererlib` in the URI to the path that you cloned this repository to.
-Then you will want to run `./gradlew publish` to create a local Maven repository.
-This is a workaround until I figure out how to publish this repository to Maven Central.
+You will also need a "Personal access token (classic)" token
+from [this](https://github.com/settings/tokens) page
+with the `read:packages` permission in order to download this package.
+
+Once you have generated the token,
+you can export it to your system environment like so:
+
+Linux/MacOS: `export GITHUB_TOKEN=<github_token>`
+
+Windows: `setx GITHUB_TOKEN <github_token>`
+
+Where `<github_token>` is the GitHub token that you created.
+
+Note: The Linux/MacOS command is not persistent in between terminal instances.
+To achieve persistence, you should append this command to the end of
+the `/etc/environment` file and then reload the changes with `source /etc/environment`. 
+
+Replace `<minecraft_version>` with `1.21.4` or `1.21.5` depending on what Minecraft version you are working with.
 
 The first thing you need to do is register your config class with HudRendererLib in your `onInitializeClient` method like so:
 
