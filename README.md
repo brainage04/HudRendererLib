@@ -15,7 +15,7 @@ repositories {
     maven {
         url = "https://maven.pkg.github.com/brainage04/HudRendererLib"
         credentials {
-            username = "<github_username>"
+            username = System.getenv("GITHUB_USERNAME")
             password = System.getenv("GITHUB_TOKEN")
         }
     }
@@ -26,22 +26,30 @@ dependencies {
 }
 ```
 
-Replace `<github_username>` with your GitHub username.
-
 You will also need a "Personal access token (classic)" token
 from [this](https://github.com/settings/tokens) page
 with the `read:packages` permission in order to download this package.
 
 Once you have generated the token,
-you can export it to your system environment like so:
+you can export it (and your username)
+to your system environment like so:
 
-Linux/MacOS: `export GITHUB_TOKEN=<github_token>`
+Linux/macOS:
+```bash
+export GITHUB_USERNAME=<github_username>
+export GITHUB_TOKEN=<github_token>
+```
 
-Windows: `setx GITHUB_TOKEN <github_token>`
+Windows:
+```bash
+setx GITHUB_USERNAME <github_username>
+setx GITHUB_TOKEN <github_token>
+```
 
-Where `<github_token>` is the GitHub token that you created.
+Where `<github_username>` is your GitHub username,
+and `<github_token>` is the GitHub token that you created.
 
-Note: The Linux/MacOS command is not persistent in between terminal instances.
+Note: The Linux/macOS command is not persistent in between terminal instances.
 To achieve persistence, you should append this command to the end of
 the `/etc/environment` file and then reload the changes with `source /etc/environment`. 
 
