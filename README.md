@@ -22,6 +22,7 @@ repositories {
 }
 
 dependencies {
+    // HudRendererLib
     modImplementation "io.github.brainage04:hudrendererlib:1.0.0-<minecraft_version>"
 }
 ```
