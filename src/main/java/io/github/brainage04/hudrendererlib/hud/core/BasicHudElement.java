@@ -1,9 +1,8 @@
 package io.github.brainage04.hudrendererlib.hud.core;
 
 import io.github.brainage04.hudrendererlib.config.core.ICoreSettingsContainer;
-
-import java.util.List;
+import io.github.brainage04.hudrendererlib.util.TextList;
 
 public interface BasicHudElement<T extends ICoreSettingsContainer> extends HudElement<T> {
-    List<String> getLines();
+    TextList getLines();
 }

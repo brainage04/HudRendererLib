@@ -5,6 +5,7 @@ import io.github.brainage04.hudrendererlib.config.core.CoreSettings;
 import io.github.brainage04.hudrendererlib.config.core.ICoreSettingsContainer;
 import io.github.brainage04.hudrendererlib.config.core.ElementAnchor;
 import io.github.brainage04.hudrendererlib.config.core.ElementCorners;
+import io.github.brainage04.hudrendererlib.util.TextList;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -18,7 +19,7 @@ import static io.github.brainage04.hudrendererlib.util.ConfigUtils.getConfig;
 public class HudRenderer {
     public static final List<HudElement<? extends ICoreSettingsContainer>> REGISTERED_ELEMENTS = new ArrayList<>();
 
-    public static void renderElement(TextRenderer renderer, DrawContext drawContext, List<String> lines, CoreSettings coreSettings) {
+    public static void renderElement(TextRenderer renderer, DrawContext drawContext, TextList lines, CoreSettings coreSettings) {
         int elementWidth = 0;
 
         int elementPadding = HudRendererLib.getPadding(coreSettings);

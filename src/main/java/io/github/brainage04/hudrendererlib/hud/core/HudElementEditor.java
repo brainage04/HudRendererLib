@@ -3,6 +3,7 @@ package io.github.brainage04.hudrendererlib.hud.core;
 import io.github.brainage04.hudrendererlib.config.core.*;
 import io.github.brainage04.hudrendererlib.util.ConfigUtils;
 import io.github.brainage04.hudrendererlib.util.MathUtils;
+import io.github.brainage04.hudrendererlib.util.TextList;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -35,7 +36,7 @@ public class HudElementEditor extends Screen {
     private Integer previousMenuBackgroundBlurriness;
 
     public HudElementEditor() {
-        super(Text.of("HUD Element Editor"));
+        super(Text.literal("HUD Element Editor"));
 
         populateCoreSettingsElements();
 
@@ -228,14 +229,13 @@ public class HudElementEditor extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         highlightedElementIndex = mouseInElement(mouseX, mouseY);
 
-        List<Text> lines = new ArrayList<>(List.of(
-                title,
-                Text.literal("Click to select, hold click and drag to move"),
-                Text.literal("Arrow keys for precise movement, Ctrl = x5, Shift = x10"),
-                Text.literal("Space to cycle alignment"),
-                Text.literal("Escape to close without saving"),
-                Text.empty()
-        ));
+        TextList lines = new TextList();
+        lines.addHeader(title);
+        lines.add("Click to select, hold click and drag to move");
+        lines.add("Arrow keys for precise movement, Ctrl = x5, Shift = x10");
+        lines.add("Space to cycle alignment");
+        lines.add("Escape to close without saving");
+        lines.addEmpty();
 
         // render backdrops
         // if both indices are the same, use highlighted
@@ -278,22 +278,22 @@ public class HudElementEditor extends Screen {
             CoreSettingsElement coreSettingsElement = CORE_SETTINGS_ELEMENTS.get(highlightedElementIndex);
             CoreSettings coreSettings = coreSettingsElement.coreSettings;
 
-            lines.add(Text.of(coreSettings.elementName));
-            lines.add(Text.of("X: %d Y: %d".formatted(coreSettings.x, coreSettings.y)));
-            lines.add(Text.of("Anchor: %s".formatted(coreSettings.elementAnchor.toString())));
+            lines.add(coreSettings.elementName);
+            lines.add("X: %d Y: %d".formatted(coreSettings.x, coreSettings.y));
+            lines.add("Anchor: %s".formatted(coreSettings.elementAnchor.toString()));
 
             if (highlightedElementIndex == selectedElementIndex) {
-                lines.add(Text.of("Highlighted & Selected"));
+                lines.add("Highlighted & Selected");
             } else {
-                lines.add(Text.of("Highlighted"));
+                lines.add("Highlighted");
             }
         } else if (selectedElementIndex != -1) {
             CoreSettings coreSettings = CORE_SETTINGS_ELEMENTS.get(selectedElementIndex).coreSettings;
 
-            lines.add(Text.of(coreSettings.elementName));
-            lines.add(Text.of("X: %d Y: %d".formatted(coreSettings.x, coreSettings.y)));
-            lines.add(Text.of("Anchor: %s".formatted(coreSettings.elementAnchor.toString())));
-            lines.add(Text.of("Selected"));
+            lines.add(coreSettings.elementName);
+            lines.add("X: %d Y: %d".formatted(coreSettings.x, coreSettings.y));
+            lines.add("Anchor: %s".formatted(coreSettings.elementAnchor.toString()));
+            lines.add("Selected");
         }
 
         for (int i = 0; i < lines.size(); i++) {
