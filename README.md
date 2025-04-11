@@ -23,7 +23,7 @@ repositories {
 
 dependencies {
     // HudRendererLib
-    modImplementation "io.github.brainage04:hudrendererlib:1.0.0-<minecraft_version>"
+    modImplementation "io.github.brainage04:hudrendererlib:1.0.0-${project.minecraft_version}"
 }
 ```
 
@@ -54,7 +54,7 @@ Note: The Linux/macOS command is not persistent in between terminal instances.
 To achieve persistence, you should append this command to the end of
 the `/etc/environment` file and then reload the changes with `source /etc/environment`. 
 
-Replace `<minecraft_version>` with `1.21.4` or `1.21.5` depending on what Minecraft version you are working with.
+Supported Minecraft versions include `1.21.4` and `1.21.5` (for now).
 
 The first thing you need to do is register your config class with HudRendererLib in your `onInitializeClient` method like so:
 
