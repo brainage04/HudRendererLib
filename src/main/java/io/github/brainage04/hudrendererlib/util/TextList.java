@@ -5,28 +5,25 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class TextList extends ArrayList<Text> {
-    private final List<Text> list = new ArrayList<>();
-
     @SuppressWarnings("UnusedReturnValue")
     public boolean add(String string) {
-        return list.add(Text.literal(string));
+        return add(Text.literal(string));
     }
 
     @SuppressWarnings("UnusedReturnValue")
     public boolean addEmpty() {
-        return list.add(Text.empty());
+        return add(Text.empty());
     }
 
     @SuppressWarnings("UnusedReturnValue")
     public boolean addHeader(Text text) {
-        return list.add(Text.empty().append(text).formatted(Formatting.BOLD));
+        return add(Text.empty().append(text).formatted(Formatting.BOLD));
     }
 
     public boolean addHeader(MutableText text) {
-        return list.add(text.formatted(Formatting.BOLD));
+        return add(text.formatted(Formatting.BOLD));
     }
 
     @SuppressWarnings("unused")
