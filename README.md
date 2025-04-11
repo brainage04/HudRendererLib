@@ -32,8 +32,8 @@ from [this](https://github.com/settings/tokens) page
 with the `read:packages` permission in order to download this package.
 
 Once you have generated the token,
-you can export it (and your username)
-to your system environment like so:
+you can export your username and token
+as environment variables like so:
 
 Linux/macOS:
 ```bash
@@ -51,8 +51,8 @@ Where `<github_username>` is your GitHub username,
 and `<github_token>` is the GitHub token that you created.
 
 Note: The Linux/macOS command is not persistent in between terminal instances.
-To achieve persistence, you should append this command to the end of
-the `/etc/environment` file and then reload the changes with `source /etc/environment`. 
+To achieve persistence, you should append this command to the end of the
+`/etc/environment` file and then reload the changes by logging out and back in. 
 
 Supported Minecraft versions include `1.21.4` and `1.21.5` (for now).
 
