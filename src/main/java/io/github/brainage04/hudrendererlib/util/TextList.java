@@ -10,14 +10,17 @@ import java.util.List;
 public class TextList extends ArrayList<Text> {
     private final List<Text> list = new ArrayList<>();
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean add(String string) {
         return list.add(Text.literal(string));
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean addEmpty() {
         return list.add(Text.empty());
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean addHeader(Text text) {
         return list.add(Text.empty().append(text).formatted(Formatting.BOLD));
     }
@@ -26,6 +29,7 @@ public class TextList extends ArrayList<Text> {
         return list.add(text.formatted(Formatting.BOLD));
     }
 
+    @SuppressWarnings("unused")
     public boolean addHeader(String string) {
         return addHeader(Text.literal(string));
     }
