@@ -3,7 +3,7 @@
 	"id": "hudrendererlib",
 	"version": "${version}",
 	"name": "HudRendererLib",
-	"description": "A library for rendering HUD elements in Fabric mods.",
+	"description": "A library for rendering HUD elements.",
 	"authors": [
 		"brainage04"
 	],
