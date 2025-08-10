@@ -1,10 +1,7 @@
 package io.github.brainage04.hudrendererlib.hud.core;
 
 import io.github.brainage04.hudrendererlib.HudRendererLib;
-import io.github.brainage04.hudrendererlib.config.core.CoreSettings;
-import io.github.brainage04.hudrendererlib.config.core.ICoreSettingsContainer;
-import io.github.brainage04.hudrendererlib.config.core.ElementAnchor;
-import io.github.brainage04.hudrendererlib.config.core.ElementCorners;
+import io.github.brainage04.hudrendererlib.config.core.*;
 import io.github.brainage04.hudrendererlib.util.TextList;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -55,7 +52,13 @@ public class HudRenderer {
 
         // adjust for padding
         ElementCorners corners = getCornersWithPadding(posX, posY, posX + elementWidth, posY + elementHeight, coreSettings);
-        HudElementEditor.CORE_SETTINGS_ELEMENTS.get(coreSettings.elementId).corners = corners;
+
+        CoreSettingsElement coreSettingsElement = HudElementEditor.CORE_SETTINGS_ELEMENTS.get(coreSettings.elementId);
+        if (coreSettingsElement == null) {
+            HudRendererLib.LOGGER.error("Core settings element with index {} in HudElementEditor.CORE_SETTINGS_ELEMENTS does not exist - this shouldn't happen!", coreSettings.elementId);
+        } else {
+            coreSettingsElement.corners = corners;
+        }
 
         // render backdrop
         int backdropOpacity = HudRendererLib.getOpacity(coreSettings);

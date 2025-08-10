@@ -1,5 +1,6 @@
 package io.github.brainage04.hudrendererlib.util;
 
+import io.github.brainage04.hudrendererlib.config.core.CoreSettingsIdAssigner;
 import io.github.brainage04.hudrendererlib.config.core.HudRendererLibConfig;
 import io.github.brainage04.hudrendererlib.hud.core.HudElementEditor;
 import me.shedaniel.autoconfig.AutoConfig;
@@ -19,6 +20,9 @@ public class ConfigUtils {
 
     @SuppressWarnings({"SameReturnValue", "unused"})
     public static <T extends ConfigData> ActionResult saveLoad(ConfigHolder<T> configHolder, T config) {
+        // refresh element IDs
+        CoreSettingsIdAssigner.assignElementIds(config);
+
         HudElementEditor.populateCoreSettingsElements();
 
         return ActionResult.SUCCESS;

@@ -2,6 +2,7 @@ package io.github.brainage04.hudrendererlib;
 
 import io.github.brainage04.hudrendererlib.command.ModCommands;
 import io.github.brainage04.hudrendererlib.config.core.CoreSettings;
+import io.github.brainage04.hudrendererlib.config.core.CoreSettingsIdAssigner;
 import io.github.brainage04.hudrendererlib.config.core.HudRendererLibConfig;
 import io.github.brainage04.hudrendererlib.config.core.ICoreSettingsContainer;
 import io.github.brainage04.hudrendererlib.hud.core.HudElement;
@@ -55,6 +56,8 @@ public class HudRendererLib implements ClientModInitializer {
     public static <T extends ConfigData> void register(Class<T> configClass, ConfigSerializer.Factory<T> serializerFactory) {
         AutoConfig.register(configClass, serializerFactory);
         ConfigUtils.addConfigClass(configClass);
+
+        CoreSettingsIdAssigner.assignElementIds(AutoConfig.getConfigHolder(configClass).getConfig());
 
         AutoConfig.getConfigHolder(configClass).registerSaveListener(ConfigUtils::saveLoad);
         AutoConfig.getConfigHolder(configClass).registerLoadListener(ConfigUtils::saveLoad);
