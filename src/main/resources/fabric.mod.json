@@ -1,33 +1,32 @@
 {
 	"schemaVersion": 1,
-	"id": "hudrendererlib",
+	"id": "${archives_base_name}",
 	"version": "${version}",
-	"name": "HudRendererLib",
+	"name": "${mod_name}",
 	"description": "A library for rendering HUD elements.",
 	"authors": [
 		"brainage04"
 	],
 	"contact": {
-		"homepage": "https://github.com/brainage04/HudRendererLib",
-		"sources": "https://github.com/brainage04/HudRendererLib"
+		"homepage": "https://github.com/brainage04/${mod_name}",
+		"sources": "https://github.com/brainage04/${mod_name}"
 	},
 	"license": "MIT",
-	"icon": "assets/hudrendererlib/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"client": [
 			"io.github.brainage04.hudrendererlib.HudRendererLib"
 		],
 		"fabric-datagen": [
-			"io.github.brainage04.hudrendererlib.HudRendererLibDataGenerator"
+			"io.github.brainage04.hudrendererlib.datagen.DataGenerator"
 		],
 		"modmenu": [
 			"io.github.brainage04.hudrendererlib.modmenu.ModMenuIntegration"
 		]
 	},
 	"depends": {
-		"fabricloader": ">=0.16.13",
-		"minecraft": "~1.21.4",
+		"fabricloader": ">=${loader_version}",
+		"minecraft": "~${minecraft_version}",
 		"java": ">=21",
 		"fabric-api": "*"
 	},

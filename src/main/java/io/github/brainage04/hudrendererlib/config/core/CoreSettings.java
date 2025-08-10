@@ -5,19 +5,18 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 
 @SuppressWarnings("CanBeFinal")
 public class CoreSettings {
-    @ConfigEntry.Gui.Excluded public final int elementId;
-    @ConfigEntry.Gui.Excluded public final String elementName;
+    @ConfigEntry.Gui.Excluded public transient int elementId;
+    public final String elementName;
 
     public boolean enabled;
     public int x;
     public int y;
     public ElementAnchor elementAnchor;
 
-    @ConfigEntry.Gui.CollapsibleObject
-    public ElementOverrides elementOverrides;
+    @ConfigEntry.Gui.CollapsibleObject public ElementOverrides elementOverrides;
 
-    public CoreSettings(int elementId, String elementName, boolean enabled, int x, int y, ElementAnchor elementAnchor) {
-        this.elementId = elementId;
+    public CoreSettings(String elementName, boolean enabled, int x, int y, ElementAnchor elementAnchor) {
+        this.elementId = CoreSettingsIdAssigner.assignIdIfUnset(this.elementId);
         this.elementName = elementName;
 
         this.enabled = enabled;

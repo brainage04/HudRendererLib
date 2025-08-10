@@ -14,16 +14,19 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import static io.github.brainage04.hudrendererlib.config.core.CoreSettingsIdAssigner.INVALID_ID;
 
 public class HudElementEditor extends Screen {
-    public static final List<CoreSettingsElement> CORE_SETTINGS_ELEMENTS = new ArrayList<>();
+    // element id -> core settings element
+    public static final Map<Integer, CoreSettingsElement> CORE_SETTINGS_ELEMENTS = new HashMap<>();
     static {
         populateCoreSettingsElements();
     }
 
-    public int selectedElementIndex = -1;
+    public int selectedElementIndex = INVALID_ID;
 
     public double selectedElementX = -1;
     public double selectedElementY = -1;
@@ -31,7 +34,7 @@ public class HudElementEditor extends Screen {
     public double selectedMouseX = -1;
     public double selectedMouseY = -1;
 
-    public int highlightedElementIndex = -1;
+    public int highlightedElementIndex = INVALID_ID;
 
     private Integer previousMenuBackgroundBlurriness;
 
@@ -48,7 +51,10 @@ public class HudElementEditor extends Screen {
         CORE_SETTINGS_ELEMENTS.clear();
 
         for (HudElement<? extends ICoreSettingsContainer> hudElement : HudRenderer.REGISTERED_ELEMENTS) {
-            CORE_SETTINGS_ELEMENTS.add(new CoreSettingsElement(new ElementCorners(), hudElement.getElementConfig().getCoreSettings()));
+            CORE_SETTINGS_ELEMENTS.put(
+                    hudElement.getElementConfig().getCoreSettings().elementId,
+                    new CoreSettingsElement(new ElementCorners(), hudElement.getElementConfig().getCoreSettings())
+            );
         }
     }
 
@@ -67,7 +73,7 @@ public class HudElementEditor extends Screen {
     }
 
     public int mouseInElement(double mouseX, double mouseY) {
-        for (int i = 0; i < CORE_SETTINGS_ELEMENTS.size(); i++) {
+        for (int i : CORE_SETTINGS_ELEMENTS.keySet()) {
             ElementCorners corners = CORE_SETTINGS_ELEMENTS.get(i).corners;
 
             if (mouseInRect(
@@ -82,7 +88,7 @@ public class HudElementEditor extends Screen {
             }
         }
 
-        return -1;
+        return INVALID_ID;
     }
 
     public final ButtonWidget button1 = ButtonWidget.builder(Text.literal("Undo & Close"), button -> closeWithoutSaving())
@@ -151,7 +157,7 @@ public class HudElementEditor extends Screen {
             return true;
         }
 
-        if (selectedElementIndex != -1) {
+        if (selectedElementIndex != INVALID_ID) {
             CoreSettingsElement coreSettingsElement = CORE_SETTINGS_ELEMENTS.get(selectedElementIndex);
             CoreSettings coreSettings = coreSettingsElement.coreSettings;
 
@@ -240,7 +246,7 @@ public class HudElementEditor extends Screen {
         // render backdrops
         // if both indices are the same, use highlighted
         // otherwise, render separately
-        if (highlightedElementIndex != -1 && highlightedElementIndex == selectedElementIndex) {
+        if (highlightedElementIndex != INVALID_ID && highlightedElementIndex == selectedElementIndex) {
             ElementCorners corners = CORE_SETTINGS_ELEMENTS.get(highlightedElementIndex).corners;
             context.fill(
                     corners.left,
@@ -250,7 +256,7 @@ public class HudElementEditor extends Screen {
                     0x7fffffff
             );
         } else {
-            if (highlightedElementIndex != -1) {
+            if (highlightedElementIndex != INVALID_ID) {
                 ElementCorners corners = CORE_SETTINGS_ELEMENTS.get(highlightedElementIndex).corners;
                 context.fill(
                         corners.left,
@@ -261,7 +267,7 @@ public class HudElementEditor extends Screen {
                 );
             }
 
-            if (selectedElementIndex != -1) {
+            if (selectedElementIndex != INVALID_ID) {
                 ElementCorners corners = CORE_SETTINGS_ELEMENTS.get(selectedElementIndex).corners;
                 context.fill(
                         corners.left,
@@ -274,7 +280,7 @@ public class HudElementEditor extends Screen {
         }
 
         // render element information
-        if (highlightedElementIndex != -1) {
+        if (highlightedElementIndex != INVALID_ID) {
             CoreSettingsElement coreSettingsElement = CORE_SETTINGS_ELEMENTS.get(highlightedElementIndex);
             CoreSettings coreSettings = coreSettingsElement.coreSettings;
 
@@ -287,7 +293,7 @@ public class HudElementEditor extends Screen {
             } else {
                 lines.add("Highlighted");
             }
-        } else if (selectedElementIndex != -1) {
+        } else if (selectedElementIndex != INVALID_ID) {
             CoreSettings coreSettings = CORE_SETTINGS_ELEMENTS.get(selectedElementIndex).coreSettings;
 
             lines.add(coreSettings.elementName);
@@ -307,7 +313,7 @@ public class HudElementEditor extends Screen {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         selectedElementIndex = mouseInElement(mouseX, mouseY);
 
-        if (selectedElementIndex != -1) {
+        if (selectedElementIndex != INVALID_ID) {
             CoreSettings coreSettings = CORE_SETTINGS_ELEMENTS.get(selectedElementIndex).coreSettings;
 
             selectedElementX = coreSettings.x;
@@ -322,7 +328,7 @@ public class HudElementEditor extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (selectedElementIndex != -1) {
+        if (selectedElementIndex != INVALID_ID) {
             updateElementPosition((int) (selectedMouseX - mouseX), (int) (selectedMouseY - mouseY));
         }
 

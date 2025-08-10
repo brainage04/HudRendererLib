@@ -41,9 +41,19 @@ dependencies {
 
 processResources {
 	inputs.property "version", project.version
+	inputs.property "archives_base_name", project.base.archivesName
+	inputs.property "mod_name", project.properties.mod_name
+	inputs.property "loader_version", project.properties.loader_version
+	inputs.property "minecraft_version", project.properties.minecraft_version
 
 	filesMatching("fabric.mod.json") {
-		expand "version": inputs.properties.version
+		expand([
+				"version": inputs.properties.version,
+				"archives_base_name": inputs.properties.archives_base_name,
+				"mod_name": inputs.properties.mod_name,
+				"loader_version": inputs.properties.loader_version,
+				"minecraft_version": inputs.properties.minecraft_version,
+		])
 	}
 }
 
@@ -75,13 +85,21 @@ publishing {
 	}
 
 	repositories {
-		maven {
-			name = "GitHubPackages"
-			url = "https://maven.pkg.github.com/brainage04/HudRendererLib"
-			credentials {
-				username = System.getenv("GITHUB_USERNAME")
-				password = System.getenv("GITHUB_TOKEN")
-			}
-		}
+        def testingLocally = false
+
+        if (testingLocally) {
+            maven {
+                url = uri("${buildDir}/local-repo")
+            }
+        } else {
+            maven {
+                name = "GitHubPackages"
+                url = "https://maven.pkg.github.com/brainage04/HudRendererLib"
+                credentials {
+                    username = System.getenv("GITHUB_USERNAME")
+                    password = System.getenv("GITHUB_TOKEN")
+                }
+            }
+        }
 	}
 }
