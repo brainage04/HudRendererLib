@@ -59,7 +59,7 @@ public class EnglishLangProvider extends FabricLanguageProvider {
                         "openConfig",
                         "openElementEditor"
                 },
-                "keybind",
+                "key",
                 translationBuilder
         );
 
