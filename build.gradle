@@ -89,7 +89,7 @@ publishing {
 
         if (testingLocally) {
             maven {
-                url = uri("${buildDir}/local-repo")
+                url = layout.buildDirectory.dir("local-repo")
             }
         } else {
             maven {
