@@ -7,6 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.RenderTickCounter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
 import static io.github.brainage04.hudrendererlib.util.ConfigUtils.getConfig;
 
 public class HudRenderer {
-    public static final List<HudElement<? extends ICoreSettingsContainer>> REGISTERED_ELEMENTS = new ArrayList<>();
+    public static final List<CoreHudElement<? extends ICoreSettingsContainer>> REGISTERED_ELEMENTS = new ArrayList<>();
 
     public static void renderElement(TextRenderer renderer, DrawContext drawContext, TextList lines, CoreSettings coreSettings) {
         if (lines.isEmpty()) return;
@@ -69,7 +70,6 @@ public class HudRenderer {
                     corners.top,
                     corners.right,
                     corners.bottom,
-                    -1,
                     backdropOpacity << 24
             );
         }
@@ -128,16 +128,17 @@ public class HudRenderer {
         return posY;
     }
 
-    public static void render(DrawContext drawContext, HudElement<? extends ICoreSettingsContainer> hudElement) {
-        if (!hudElement.getElementConfig().getCoreSettings().enabled) return;
+    public static void render(DrawContext drawContext, RenderTickCounter tickCounter, CoreHudElement<? extends ICoreSettingsContainer> coreHudElement) {
+        if (!coreHudElement.getElementConfig().getCoreSettings().enabled) return;
 
-        TextRenderer renderer = MinecraftClient.getInstance().textRenderer;
-
-        if (hudElement instanceof BasicHudElement<?> basicHudElement) {
-            renderElement(renderer, drawContext, basicHudElement.getLines(), hudElement.getElementConfig().getCoreSettings());
-        } else if (hudElement instanceof CustomHudElement<?> customHudElement) {
-            customHudElement.render(renderer, drawContext);
-        }
+        if (coreHudElement instanceof BasicCoreHudElement<?> basicHudElement) {
+            renderElement(
+                    MinecraftClient.getInstance().textRenderer,
+                    drawContext,
+                    basicHudElement.getLines(),
+                    coreHudElement.getElementConfig().getCoreSettings()
+            );
+        } else coreHudElement.render(drawContext, tickCounter);
     }
 
     public static ElementCorners getCornersWithPadding(int left, int top, int right, int bottom, CoreSettings coreSettings) {

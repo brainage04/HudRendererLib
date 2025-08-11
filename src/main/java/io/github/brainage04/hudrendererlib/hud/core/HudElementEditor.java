@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static io.github.brainage04.hudrendererlib.config.core.CoreSettingsIdAssigner.INVALID_ID;
+import static io.github.brainage04.hudrendererlib.util.ConfigUtils.getConfig;
 
 public class HudElementEditor extends Screen {
     // element id -> core settings element
@@ -50,10 +51,10 @@ public class HudElementEditor extends Screen {
     public static void populateCoreSettingsElements() {
         CORE_SETTINGS_ELEMENTS.clear();
 
-        for (HudElement<? extends ICoreSettingsContainer> hudElement : HudRenderer.REGISTERED_ELEMENTS) {
+        for (CoreHudElement<? extends ICoreSettingsContainer> coreHudElement : HudRenderer.REGISTERED_ELEMENTS) {
             CORE_SETTINGS_ELEMENTS.put(
-                    hudElement.getElementConfig().getCoreSettings().elementId,
-                    new CoreSettingsElement(new ElementCorners(), hudElement.getElementConfig().getCoreSettings())
+                    coreHudElement.getElementConfig().getCoreSettings().elementId,
+                    new CoreSettingsElement(new ElementCorners(), coreHudElement.getElementConfig().getCoreSettings())
             );
         }
     }
@@ -108,25 +109,25 @@ public class HudElementEditor extends Screen {
         int elementHeight = corners.bottom - corners.top;
 
         int minX = switch (coreSettings.elementAnchor) {
-            case TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> ConfigUtils.getConfig().screenMargin - (HudRenderer.getScaledWidth() - elementWidth);
-            case TOP, CENTER, BOTTOM -> ConfigUtils.getConfig().screenMargin - (HudRenderer.getScaledWidth() - elementWidth) / 2;
-            default -> ConfigUtils.getConfig().screenMargin;
+            case TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> getConfig().screenMargin - (HudRenderer.getScaledWidth() - elementWidth);
+            case TOP, CENTER, BOTTOM -> getConfig().screenMargin - (HudRenderer.getScaledWidth() - elementWidth) / 2;
+            default -> getConfig().screenMargin;
         };
         int minY = switch (coreSettings.elementAnchor) {
-            case BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT -> ConfigUtils.getConfig().screenMargin - (HudRenderer.getScaledHeight() - elementHeight);
-            case LEFT, CENTER, RIGHT -> ConfigUtils.getConfig().screenMargin - (HudRenderer.getScaledHeight() - elementHeight) / 2;
-            default -> ConfigUtils.getConfig().screenMargin;
+            case BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT -> getConfig().screenMargin - (HudRenderer.getScaledHeight() - elementHeight);
+            case LEFT, CENTER, RIGHT -> getConfig().screenMargin - (HudRenderer.getScaledHeight() - elementHeight) / 2;
+            default -> getConfig().screenMargin;
         };
 
         coreSettings.x = (int) (MathHelper.clamp(
                 selectedElementX - deltaX,
                 minX,
-                minX + HudRenderer.getScaledWidth() - elementWidth - ConfigUtils.getConfig().screenMargin * 2
+                minX + HudRenderer.getScaledWidth() - elementWidth - getConfig().screenMargin * 2
         ));
         coreSettings.y = (int) (MathHelper.clamp(
                 selectedElementY - deltaY,
                 minY,
-                minY + HudRenderer.getScaledHeight() - elementHeight - ConfigUtils.getConfig().screenMargin * 2
+                minY + HudRenderer.getScaledHeight() - elementHeight - getConfig().screenMargin * 2
         ));
     }
 
@@ -303,7 +304,13 @@ public class HudElementEditor extends Screen {
         }
 
         for (int i = 0; i < lines.size(); i++) {
-            context.drawCenteredTextWithShadow(textRenderer, lines.get(i), width / 2, 10 + (textRenderer.fontHeight + 2) * i, 0xffffff);
+            context.drawCenteredTextWithShadow(
+                    textRenderer,
+                    lines.get(i),
+                    width / 2,
+                    10 + (textRenderer.fontHeight + 2) * i,
+                    0xFF_00_00_00 + getConfig().textColour
+            );
         }
 
         super.render(context, mouseX, mouseY, delta);
