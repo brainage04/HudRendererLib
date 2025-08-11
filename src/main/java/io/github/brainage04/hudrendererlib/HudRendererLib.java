@@ -5,7 +5,7 @@ import io.github.brainage04.hudrendererlib.config.core.CoreSettings;
 import io.github.brainage04.hudrendererlib.config.core.CoreSettingsIdAssigner;
 import io.github.brainage04.hudrendererlib.config.core.HudRendererLibConfig;
 import io.github.brainage04.hudrendererlib.config.core.ICoreSettingsContainer;
-import io.github.brainage04.hudrendererlib.hud.core.HudElement;
+import io.github.brainage04.hudrendererlib.hud.core.CoreHudElement;
 import io.github.brainage04.hudrendererlib.hud.core.HudRenderer;
 import io.github.brainage04.hudrendererlib.keys.ModKeys;
 import io.github.brainage04.hudrendererlib.util.ConfigUtils;
@@ -18,9 +18,9 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.LayeredDrawer;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Identifier;
@@ -90,23 +90,20 @@ public class HudRendererLib implements ClientModInitializer {
     }
 
     @SuppressWarnings("unused")
-    public static void registerHudElement(HudElement<? extends ICoreSettingsContainer> hudElement) {
+    public static void registerHudElement(CoreHudElement<? extends ICoreSettingsContainer> coreHudElement) {
         Identifier layerId = Identifier.of(MOD_ID, "hud-layer-%d".formatted(HudRenderer.REGISTERED_ELEMENTS.size()));
 
-        HudRenderer.REGISTERED_ELEMENTS.add(hudElement);
+        HudRenderer.REGISTERED_ELEMENTS.add(coreHudElement);
 
-        HudLayerRegistrationCallback.EVENT.register(layeredDrawer -> {
-            TriConsumer<Identifier, Identifier, LayeredDrawer.Layer> attachAction = hudElement.getLayerInfo().before()
-                    ? layeredDrawer::attachLayerBefore
-                    : layeredDrawer::attachLayerAfter;
+        TriConsumer<Identifier, Identifier, HudElement> attachAction = coreHudElement.getLayerInfo().before()
+                ? HudElementRegistry::attachElementBefore
+                : HudElementRegistry::attachElementAfter;
 
-            attachAction.accept(
-                    hudElement.getLayerInfo().layer(),
-                    layerId,
-                    (context, tickCounter) ->
-                            HudRenderer.render(context, hudElement)
-            );
-        });
+        attachAction.accept(
+                coreHudElement.getLayerInfo().layer(),
+                layerId,
+                coreHudElement
+        );
     }
 
     // override util methods
@@ -128,9 +125,9 @@ public class HudRendererLib implements ClientModInitializer {
 
     public static int getTextColour(CoreSettings coreSettings) {
         if (coreSettings.elementOverrides.textColour.enabled) {
-            return coreSettings.elementOverrides.textColour.value;
+            return 0xFF_00_00_00 + coreSettings.elementOverrides.textColour.value;
         } else {
-            return ConfigUtils.getConfig().textColour;
+            return 0xFF_00_00_00 + ConfigUtils.getConfig().textColour;
         }
     }
 
