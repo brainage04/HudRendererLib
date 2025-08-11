@@ -1,6 +1,6 @@
 {
-  "keybind.hudrendererlib.openConfig": "Open Config",
-  "keybind.hudrendererlib.openElementEditor": "Open Element Editor",
+  "key.hudrendererlib.openConfig": "Open Config",
+  "key.hudrendererlib.openElementEditor": "Open Element Editor",
   "text.autoconfig.hudrendererlib.option.adjustTopRightElementsWithStatusEffects": "Adjust Top Right Elements With Status Effects",
   "text.autoconfig.hudrendererlib.option.adjustTopRightElementsWithStatusEffects.@Tooltip": "Shifts elements with the \"Top Right\" alignment down by the specified amount of pixels below if potion effects are being overlayed in the top right.",
   "text.autoconfig.hudrendererlib.option.adjustTopRightElementsWithStatusEffectsAmount": "Adjust Top Right Elements With Status Effects Amount",
