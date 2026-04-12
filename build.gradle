@@ -1,10 +1,23 @@
+import java.nio.charset.StandardCharsets
+
 plugins {
 	id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
+	id 'signing'
 }
 
 version = "${project.mod_version}-${project.minecraft_version}"
 group = project.maven_group
+
+def githubRepositoryUrl = "https://github.com/brainage04/HudRendererLib"
+def centralPortalUsername = providers.environmentVariable("CENTRAL_PORTAL_USERNAME")
+def centralPortalPassword = providers.environmentVariable("CENTRAL_PORTAL_PASSWORD")
+def signingKey = providers.environmentVariable("SIGNING_KEY")
+def signingPassword = providers.environmentVariable("SIGNING_PASSWORD")
+def centralNamespace = providers.gradleProperty("centralNamespace")
+		.orElse(project.group.toString())
+def centralPublishingType = providers.gradleProperty("centralPublishingType")
+		.orElse("user_managed")
 
 base {
 	archivesName = project.archives_base_name
@@ -68,6 +81,11 @@ java {
 	targetCompatibility = JavaVersion.VERSION_21
 }
 
+tasks.register("javadocJar", Jar) {
+	archiveClassifier = "javadoc"
+	from("README.md")
+}
+
 jar {
 	inputs.property "archivesName", project.base.archivesName
 
@@ -81,25 +99,104 @@ publishing {
 		create("mavenJava", MavenPublication) {
 			artifactId = project.archives_base_name
 			from components.java
+			artifact tasks.named("javadocJar")
+
+			pom {
+				name = project.properties.mod_name
+				description = "A library for rendering Heads-Up Display (HUD) elements in Fabric mods for Minecraft."
+				url = githubRepositoryUrl
+
+				licenses {
+					license {
+						name = "MIT License"
+						url = "https://opensource.org/license/mit"
+						distribution = "repo"
+					}
+				}
+
+				developers {
+					developer {
+						id = "brainage04"
+						name = "brainage04"
+						url = "https://github.com/brainage04"
+					}
+				}
+
+				scm {
+					connection = "scm:git:${githubRepositoryUrl}.git"
+					developerConnection = "scm:git:ssh://git@github.com/brainage04/HudRendererLib.git"
+					url = githubRepositoryUrl
+				}
+			}
 		}
 	}
 
 	repositories {
-        def testingLocally = false
+		maven {
+			name = "central"
+			url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
+			credentials {
+				username = centralPortalUsername.getOrNull()
+				password = centralPortalPassword.getOrNull()
+			}
+		}
+	}
+}
 
-        if (testingLocally) {
-            maven {
-                url = layout.buildDirectory.dir("local-repo")
-            }
-        } else {
-            maven {
-                name = "GitHubPackages"
-                url = "https://maven.pkg.github.com/brainage04/HudRendererLib"
-                credentials {
-                    username = System.getenv("GITHUB_USERNAME")
-                    password = System.getenv("GITHUB_TOKEN")
-                }
-            }
-        }
+signing {
+	if (signingKey.present && signingPassword.present) {
+		useInMemoryPgpKeys(signingKey.get(), signingPassword.get())
+	}
+	sign publishing.publications.mavenJava
+}
+
+tasks.withType(Sign).configureEach {
+	doFirst {
+		if (!signingKey.present || !signingPassword.present) {
+			throw new GradleException("Set SIGNING_KEY and SIGNING_PASSWORD to publish signed artifacts to Maven Central.")
+		}
+	}
+}
+
+tasks.register("publishToMavenCentral") {
+	group = "publishing"
+	description = "Publishes artifacts to Sonatype Central and uploads the staged deployment to the Central Portal."
+	dependsOn(tasks.named("publishMavenJavaPublicationToCentralRepository"))
+
+	doLast {
+		if (!centralPortalUsername.present || !centralPortalPassword.present) {
+			throw new GradleException("Set CENTRAL_PORTAL_USERNAME and CENTRAL_PORTAL_PASSWORD before publishing to Maven Central.")
+		}
+
+		def publishingType = centralPublishingType.get()
+		if (!(publishingType in ["user_managed", "automatic", "portal_api"])) {
+			throw new GradleException("Unsupported centralPublishingType '${publishingType}'. Use one of: user_managed, automatic, portal_api.")
+		}
+
+		def namespace = centralNamespace.get()
+		def bearerToken = Base64.encoder.encodeToString(
+				"${centralPortalUsername.get()}:${centralPortalPassword.get()}".getBytes(StandardCharsets.UTF_8)
+		)
+		def uploadUrl = new URL(
+				"https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/${namespace}" +
+						"?publishing_type=${URLEncoder.encode(publishingType, StandardCharsets.UTF_8)}"
+		)
+		def connection = (HttpURLConnection) uploadUrl.openConnection()
+
+		connection.requestMethod = "POST"
+		connection.doOutput = true
+		connection.setRequestProperty("Authorization", "Bearer ${bearerToken}")
+		connection.setRequestProperty("Accept", "application/json")
+
+		def responseCode = connection.responseCode
+		def responseText = (responseCode >= 200 && responseCode < 300
+				? connection.inputStream
+				: connection.errorStream)?.getText(StandardCharsets.UTF_8.name()) ?: ""
+
+		if (responseCode < 200 || responseCode >= 300) {
+			throw new GradleException("Central upload request failed with HTTP ${responseCode}: ${responseText}")
+		}
+
+		logger.lifecycle("Central deployment uploaded for namespace '${namespace}'. Response: ${responseText ?: responseCode}")
 	}
 }

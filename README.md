@@ -11,50 +11,17 @@ said code each time I found a way to improve said code.
 To add this library to your mod, add the following dependency to your `build.gradle` file:
 ```groovy
 repositories {
-    // HudRendererLib
-    maven {
-        url = "https://maven.pkg.github.com/brainage04/HudRendererLib"
-        credentials {
-            username = System.getenv("GITHUB_USERNAME")
-            password = System.getenv("GITHUB_TOKEN")
-        }
-    }
+    mavenCentral()
 }
 
 dependencies {
-    // HudRendererLib
-    modImplementation "io.github.brainage04:hudrendererlib:1.0.0-1.21.4"
+    modImplementation "io.github.brainage04:hudrendererlib:1.0.2-1.21.8"
 }
 ```
 
-You will also need a "Personal access token (classic)" token
-from [this](https://github.com/settings/tokens) page
-with the `read:packages` permission in order to download this package.
+Supported mod versions:
+- 1.0.2-1.21.8
 
-Once you have generated the token,
-you can export your username and token
-as environment variables like so:
-
-Linux/macOS:
-```bash
-export GITHUB_USERNAME=<github_username>
-export GITHUB_TOKEN=<github_token>
-```
-
-Windows:
-```bash
-setx GITHUB_USERNAME <github_username>
-setx GITHUB_TOKEN <github_token>
-```
-
-Where `<github_username>` is your GitHub username,
-and `<github_token>` is the GitHub token that you created.
-
-Note: The Linux/macOS command is not persistent in between terminal instances.
-To achieve persistence, you should append this command to the end of the
-`/etc/environment` file and then reload the changes by logging out and back in. 
-
-Supported Minecraft versions include 1.21.4 and 1.21.5 (`1.21.4` is used for both).
 Each library version may support several different Minecraft versions.
 When changes are made to the Minecraft and/or Fabric rendering APIs,
 the Minecraft version in the library version will be updated.
