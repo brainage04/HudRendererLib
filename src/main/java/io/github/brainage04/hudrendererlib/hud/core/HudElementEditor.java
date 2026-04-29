@@ -4,18 +4,20 @@ import io.github.brainage04.hudrendererlib.config.core.*;
 import io.github.brainage04.hudrendererlib.util.ConfigUtils;
 import io.github.brainage04.hudrendererlib.util.MathUtils;
 import io.github.brainage04.hudrendererlib.util.TextList;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.option.SimpleOption;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.OptionInstance;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 
 import static io.github.brainage04.hudrendererlib.config.core.CoreSettingsIdAssigner.INVALID_ID;
 import static io.github.brainage04.hudrendererlib.util.ConfigUtils.getConfig;
@@ -40,7 +42,7 @@ public class HudElementEditor extends Screen {
     private Integer previousMenuBackgroundBlurriness;
 
     public HudElementEditor() {
-        super(Text.literal("HUD Element Editor"));
+        super(Component.literal("HUD Element Editor"));
 
         populateCoreSettingsElements();
 
@@ -64,13 +66,13 @@ public class HudElementEditor extends Screen {
     }
 
     public void disableBlur() {
-        SimpleOption<Integer> menuBackgroundBlurriness = MinecraftClient.getInstance().options.getMenuBackgroundBlurriness();
-        previousMenuBackgroundBlurriness = menuBackgroundBlurriness.getValue();
-        menuBackgroundBlurriness.setValue(0);
+        OptionInstance<Integer> menuBackgroundBlurriness = Minecraft.getInstance().options.menuBackgroundBlurriness();
+        previousMenuBackgroundBlurriness = menuBackgroundBlurriness.get();
+        menuBackgroundBlurriness.set(0);
     }
 
     public void revertBlur() {
-        MinecraftClient.getInstance().options.getMenuBackgroundBlurriness().setValue(previousMenuBackgroundBlurriness);
+        Minecraft.getInstance().options.menuBackgroundBlurriness().set(previousMenuBackgroundBlurriness);
     }
 
     public int mouseInElement(double mouseX, double mouseY) {
@@ -92,13 +94,13 @@ public class HudElementEditor extends Screen {
         return INVALID_ID;
     }
 
-    public final ButtonWidget button1 = ButtonWidget.builder(Text.literal("Undo & Close"), button -> closeWithoutSaving())
-            .dimensions(HudRenderer.getScaledWidth() / 2 - 210, HudRenderer.getScaledHeight() - 40, 200, 20)
-            .tooltip(Tooltip.of(Text.literal("Reverts the current positions to what they were before and closes the screen.")))
+    public final Button button1 = Button.builder(Component.literal("Undo & Close"), button -> closeWithoutSaving())
+            .bounds(HudRenderer.getScaledWidth() / 2 - 210, HudRenderer.getScaledHeight() - 40, 200, 20)
+            .tooltip(Tooltip.create(Component.literal("Reverts the current positions to what they were before and closes the screen.")))
             .build();
-    public final ButtonWidget button2 = ButtonWidget.builder(Text.literal("Save & Close"), button -> this.close())
-            .dimensions(HudRenderer.getScaledWidth() / 2 + 10, HudRenderer.getScaledHeight() - 40, 200, 20)
-            .tooltip(Tooltip.of(Text.literal("Saves the current positions and closes the screen.")))
+    public final Button button2 = Button.builder(Component.literal("Save & Close"), button -> this.onClose())
+            .bounds(HudRenderer.getScaledWidth() / 2 + 10, HudRenderer.getScaledHeight() - 40, 200, 20)
+            .tooltip(Tooltip.create(Component.literal("Saves the current positions and closes the screen.")))
             .build();
 
     public void updateElementPosition(int deltaX, int deltaY) {
@@ -119,12 +121,12 @@ public class HudElementEditor extends Screen {
             default -> getConfig().screenMargin;
         };
 
-        coreSettings.x = (int) (MathHelper.clamp(
+        coreSettings.x = (int) (Mth.clamp(
                 selectedElementX - deltaX,
                 minX,
                 minX + HudRenderer.getScaledWidth() - elementWidth - getConfig().screenMargin * 2
         ));
-        coreSettings.y = (int) (MathHelper.clamp(
+        coreSettings.y = (int) (Mth.clamp(
                 selectedElementY - deltaY,
                 minY,
                 minY + HudRenderer.getScaledHeight() - elementHeight - getConfig().screenMargin * 2
@@ -133,25 +135,28 @@ public class HudElementEditor extends Screen {
 
     @Override
     protected void init() {
-        addDrawableChild(button1);
-        addDrawableChild(button2);
+        addRenderableWidget(button1);
+        addRenderableWidget(button2);
     }
 
     @Override
-    public void close() {
+    public void onClose() {
         ConfigUtils.saveConfigClasses();
         revertBlur();
-        super.close();
+        super.onClose();
     }
 
     public void closeWithoutSaving() {
         ConfigUtils.loadConfigClasses();
         revertBlur();
-        super.close();
+        super.onClose();
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(KeyEvent event) {
+        int keyCode = event.key();
+        int modifiers = event.modifiers();
+
         // from net.minecraft.client.gui.screen.Screen
         if (keyCode == GLFW.GLFW_KEY_ESCAPE && this.shouldCloseOnEsc()) {
             closeWithoutSaving();
@@ -204,7 +209,7 @@ public class HudElementEditor extends Screen {
 
                 // if no arrow keys were pressed, return
                 if (xDirection == 0 && yDirection == 0) {
-                    return super.keyPressed(keyCode, scanCode, modifiers);
+                    return super.keyPressed(event);
                 }
 
                 // deal with modifiers here
@@ -229,11 +234,11 @@ public class HudElementEditor extends Screen {
             }
         }
 
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(event);
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
         highlightedElementIndex = mouseInElement(mouseX, mouseY);
 
         TextList lines = new TextList();
@@ -304,20 +309,23 @@ public class HudElementEditor extends Screen {
         }
 
         for (int i = 0; i < lines.size(); i++) {
-            context.drawCenteredTextWithShadow(
-                    textRenderer,
+            context.centeredText(
+                    font,
                     lines.get(i),
                     width / 2,
-                    10 + (textRenderer.fontHeight + 2) * i,
+                    10 + (font.lineHeight + 2) * i,
                     0xFF_00_00_00 + getConfig().textColour
             );
         }
 
-        super.render(context, mouseX, mouseY, delta);
+        super.extractRenderState(context, mouseX, mouseY, delta);
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        double mouseX = event.x();
+        double mouseY = event.y();
+
         selectedElementIndex = mouseInElement(mouseX, mouseY);
 
         if (selectedElementIndex != INVALID_ID) {
@@ -330,15 +338,17 @@ public class HudElementEditor extends Screen {
             selectedMouseY = mouseY;
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+    public boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY) {
         if (selectedElementIndex != INVALID_ID) {
+            double mouseX = event.x();
+            double mouseY = event.y();
             updateElementPosition((int) (selectedMouseX - mouseX), (int) (selectedMouseY - mouseY));
         }
 
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        return super.mouseDragged(event, deltaX, deltaY);
     }
 }

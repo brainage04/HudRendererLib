@@ -3,42 +3,41 @@ package io.github.brainage04.hudrendererlib.hud.core;
 import io.github.brainage04.hudrendererlib.HudRendererLib;
 import io.github.brainage04.hudrendererlib.config.core.*;
 import io.github.brainage04.hudrendererlib.util.TextList;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.RenderTickCounter;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.player.LocalPlayer;
 
 import static io.github.brainage04.hudrendererlib.util.ConfigUtils.getConfig;
 
 public class HudRenderer {
     public static final List<CoreHudElement<? extends ICoreSettingsContainer>> REGISTERED_ELEMENTS = new ArrayList<>();
 
-    public static void renderElement(TextRenderer renderer, DrawContext drawContext, TextList lines, CoreSettings coreSettings) {
+    public static void renderElement(Font renderer, GuiGraphicsExtractor drawContext, TextList lines, CoreSettings coreSettings) {
         if (lines.isEmpty()) return;
 
         int elementWidth = 0;
 
         int elementPadding = HudRendererLib.getPadding(coreSettings);
 
-        int lineHeight = renderer.fontHeight + elementPadding;
+        int lineHeight = renderer.lineHeight + elementPadding;
         int elementHeight = lineHeight * lines.size() + elementPadding;
 
         // vertical adjustments
         int posY = getPosY(coreSettings, elementHeight);
 
         for (int i = 0; i < lines.size(); i++) {
-            int lineWidth = renderer.getWidth(lines.get(i));
+            int lineWidth = renderer.width(lines.get(i));
 
             elementWidth = Math.max(elementWidth, lineWidth);
 
             // horizontal adjustments (for line)
             int posX = getPosX(coreSettings, lineWidth);
 
-            drawContext.drawText(
+            drawContext.text(
                     renderer,
                     lines.get(i),
                     posX,
@@ -119,8 +118,8 @@ public class HudRenderer {
         int posY = coreSettings.y + getYOffset(coreSettings, elementHeight);
 
         if (coreSettings.elementAnchor == ElementAnchor.TOP_RIGHT) {
-            ClientPlayerEntity player = MinecraftClient.getInstance().player;
-            if (player != null && !player.getStatusEffects().isEmpty() && getConfig().adjustTopRightElementsWithStatusEffects) {
+            LocalPlayer player = Minecraft.getInstance().player;
+            if (player != null && !player.getActiveEffects().isEmpty() && getConfig().adjustTopRightElementsWithStatusEffects) {
                 posY += getConfig().adjustTopRightElementsWithStatusEffectsAmount;
             }
         }
@@ -128,12 +127,12 @@ public class HudRenderer {
         return posY;
     }
 
-    public static void render(DrawContext drawContext, RenderTickCounter tickCounter, CoreHudElement<? extends ICoreSettingsContainer> coreHudElement) {
+    public static void render(GuiGraphicsExtractor drawContext, DeltaTracker tickCounter, CoreHudElement<? extends ICoreSettingsContainer> coreHudElement) {
         if (!coreHudElement.getElementConfig().getCoreSettings().enabled) return;
 
         if (coreHudElement instanceof BasicCoreHudElement<?> basicHudElement) {
             renderElement(
-                    MinecraftClient.getInstance().textRenderer,
+                    Minecraft.getInstance().font,
                     drawContext,
                     basicHudElement.getLines(),
                     coreHudElement.getElementConfig().getCoreSettings()
@@ -153,10 +152,10 @@ public class HudRenderer {
     }
 
     public static int getScaledWidth() {
-        return MinecraftClient.getInstance().getWindow().getScaledWidth();
+        return Minecraft.getInstance().getWindow().getGuiScaledWidth();
     }
 
     public static int getScaledHeight() {
-        return MinecraftClient.getInstance().getWindow().getScaledHeight();
+        return Minecraft.getInstance().getWindow().getGuiScaledHeight();
     }
 }

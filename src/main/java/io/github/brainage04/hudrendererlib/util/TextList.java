@@ -1,33 +1,32 @@
 package io.github.brainage04.hudrendererlib.util;
 
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
 import java.util.ArrayList;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
-public class TextList extends ArrayList<Text> {
+public class TextList extends ArrayList<Component> {
     @SuppressWarnings("UnusedReturnValue")
     public boolean add(String string) {
-        return add(Text.literal(string));
+        return add(Component.literal(string));
     }
 
     @SuppressWarnings("UnusedReturnValue")
     public boolean addEmpty() {
-        return add(Text.empty());
+        return add(Component.empty());
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public boolean addHeader(Text text) {
-        return add(Text.empty().append(text).formatted(Formatting.BOLD));
+    public boolean addHeader(Component text) {
+        return add(Component.empty().append(text).withStyle(ChatFormatting.BOLD));
     }
 
-    public boolean addHeader(MutableText text) {
-        return add(text.formatted(Formatting.BOLD));
+    public boolean addHeader(MutableComponent text) {
+        return add(text.withStyle(ChatFormatting.BOLD));
     }
 
     @SuppressWarnings("unused")
     public boolean addHeader(String string) {
-        return addHeader(Text.literal(string));
+        return addHeader(Component.literal(string));
     }
 }
