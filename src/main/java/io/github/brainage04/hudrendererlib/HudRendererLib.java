@@ -1,5 +1,6 @@
 package io.github.brainage04.hudrendererlib;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.github.brainage04.hudrendererlib.command.ModCommands;
 import io.github.brainage04.hudrendererlib.config.core.CoreSettings;
 import io.github.brainage04.hudrendererlib.config.core.CoreSettingsIdAssigner;
@@ -15,15 +16,14 @@ import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.serializer.ConfigSerializer;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -33,6 +33,7 @@ public class HudRendererLib implements ClientModInitializer {
     public static final String MOD_ID = "hudrendererlib";
     public static final String MOD_NAME = "HudRendererLib";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+    public static final KeyMapping.Category KEY_CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(MOD_ID, "keys"));
 
     @Override
     public void onInitializeClient() {
@@ -66,9 +67,9 @@ public class HudRendererLib implements ClientModInitializer {
     @SuppressWarnings("unused")
     public static void registerConfigCommand(Class<? extends ConfigData> configClass, String modId) {
         ClientCommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess) ->
-                dispatcher.register(ClientCommandManager.literal(modId + "config")
+                dispatcher.register(ClientCommands.literal(modId + "config")
                         .executes(context -> {
-                            MinecraftClient.getInstance().send(() -> ScreenUtils.openConfig(context.getSource().getClient(), configClass));
+                            Minecraft.getInstance().schedule(() -> ScreenUtils.openConfig(context.getSource().getClient(), configClass));
 
                             return 1;
                         })
@@ -79,11 +80,11 @@ public class HudRendererLib implements ClientModInitializer {
     @SuppressWarnings("unused")
     public static void registerConfigKey(Class<? extends ConfigData> configClass, int keycode, String modId, String modName) {
         ModKeys.openConfigKeyMap.put(
-                KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                KeyMappingHelper.registerKeyMapping(new KeyMapping(
                         "key.%s.openConfig".formatted(modId),
-                        InputUtil.Type.KEYSYM,
+                        InputConstants.Type.KEYSYM,
                         keycode,
-                        modName
+                        KEY_CATEGORY
                 )),
                 configClass
         );
@@ -91,7 +92,7 @@ public class HudRendererLib implements ClientModInitializer {
 
     @SuppressWarnings("unused")
     public static void registerHudElement(CoreHudElement<? extends ICoreSettingsContainer> coreHudElement) {
-        Identifier layerId = Identifier.of(MOD_ID, "hud-layer-%d".formatted(HudRenderer.REGISTERED_ELEMENTS.size()));
+        Identifier layerId = Identifier.fromNamespaceAndPath(MOD_ID, "hud-layer-%d".formatted(HudRenderer.REGISTERED_ELEMENTS.size()));
 
         HudRenderer.REGISTERED_ELEMENTS.add(coreHudElement);
 

@@ -6,8 +6,7 @@ import io.github.brainage04.hudrendererlib.hud.core.HudElementEditor;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.ConfigHolder;
-import net.minecraft.util.ActionResult;
-
+import net.minecraft.world.InteractionResult;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,13 +18,13 @@ public class ConfigUtils {
     }
 
     @SuppressWarnings({"SameReturnValue", "unused"})
-    public static <T extends ConfigData> ActionResult saveLoad(ConfigHolder<T> configHolder, T config) {
+    public static <T extends ConfigData> InteractionResult saveLoad(ConfigHolder<T> configHolder, T config) {
         // refresh element IDs
         CoreSettingsIdAssigner.assignElementIds(config);
 
         HudElementEditor.populateCoreSettingsElements();
 
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     public static HudRendererLibConfig getConfig() {
