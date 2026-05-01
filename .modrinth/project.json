@@ -1,0 +1,12 @@
+{
+  "slug": "hudrendererlib",
+  "categories": [
+    "library"
+  ],
+  "additional_categories": [],
+  "dependency_overrides": {
+    "cloth-config": {
+      "project_slug": "cloth-config"
+    }
+  }
+}
