@@ -6,7 +6,7 @@ plugins {
 	id 'signing'
 }
 
-version = "${project.mod_version}-${project.minecraft_version}"
+version = project.mod_version
 group = project.maven_group
 
 def githubRepositoryUrl = "https://github.com/brainage04/HudRendererLib"
@@ -24,11 +24,20 @@ base {
 }
 
 repositories {
+	// Loom / Minecraft / Fabric
+	mavenCentral()
+	mavenLocal()
+	maven { url "https://libraries.minecraft.net" }
+	maven { url "https://maven.fabricmc.net/" }
+
+	// DevAuth
+	maven { url = "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1" }
+
 	// Cloth Config
 	maven { url "https://maven.shedaniel.me/" }
 
-	// Mod Menu
-	maven { url "https://maven.terraformersmc.com/releases/" }
+	// ModMenu
+	maven { url "https://maven.terraformersmc.com/" }
 }
 
 fabricApi {
@@ -40,44 +49,50 @@ fabricApi {
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
+
+	// DevAuth
+	runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.2")
 
 	// Cloth Config
-	implementation("me.shedaniel.cloth:cloth-config-fabric:26.1.154") {
+	implementation("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
 		exclude(group: "net.fabricmc.fabric-api")
 	}
 
-	// Mod Menu
-	implementation "com.terraformersmc:modmenu:18.0.0-alpha.8"
+	// ModMenu
+	implementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 }
 
 processResources {
-	inputs.property "version", project.version
-	inputs.property "archives_base_name", project.base.archivesName
+	inputs.property "mod_id", project.properties.mod_id
+	inputs.property "mod_version", project.version
 	inputs.property "mod_name", project.properties.mod_name
 	inputs.property "loader_version", project.properties.loader_version
 	inputs.property "minecraft_version", project.properties.minecraft_version
+	inputs.property "java_version", project.properties.java_version
 
 	filesMatching("fabric.mod.json") {
 		expand([
-				"version": inputs.properties.version,
-				"archives_base_name": inputs.properties.archives_base_name,
+				"mod_id": inputs.properties.mod_id,
+				"mod_version": inputs.properties.mod_version,
 				"mod_name": inputs.properties.mod_name,
 				"loader_version": inputs.properties.loader_version,
 				"minecraft_version": inputs.properties.minecraft_version,
+				"java_version": inputs.properties.java_version,
 		])
 	}
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 25
+	it.options.release = project.java_version.toInteger()
 }
 
 java {
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_25
-	targetCompatibility = JavaVersion.VERSION_25
+	sourceCompatibility = JavaVersion.toVersion(project.java_version)
+	targetCompatibility = JavaVersion.toVersion(project.java_version)
 }
 
 tasks.register("javadocJar", Jar) {
@@ -89,7 +104,7 @@ jar {
 	inputs.property "archivesName", project.base.archivesName
 
 	from("LICENSE") {
-		rename { "${it}_${inputs.properties.archivesName}"}
+		rename { "${it}_${inputs.properties.archivesName}" }
 	}
 }
 
@@ -208,4 +223,9 @@ tasks.register("publishToMavenCentral") {
 
 		logger.lifecycle("Central deployment uploaded for namespace '${namespace}'. Response: ${responseText ?: responseCode}")
 	}
+}
+
+test {
+	useJUnitPlatform()
+	systemProperty "fabric.side", "client"
 }
