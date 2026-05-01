@@ -51,6 +51,8 @@ jobs:
           mkdir -p release-artifacts
           cp build/libs/*.jar release-artifacts/
           rm -f release-artifacts/*-dev.jar
+          rm -f release-artifacts/*-sources.jar
+          rm -f release-artifacts/*-javadoc.jar
 
       - name: upload release artifacts
         uses: actions/upload-artifact@v7

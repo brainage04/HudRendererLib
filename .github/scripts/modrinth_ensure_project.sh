@@ -96,6 +96,7 @@ if project_id="$(resolve_project_id "$project_slug")"; then
   echo "Modrinth project already exists: ${project_id}"
 else
   project_created="true"
+  project_payload_file="$(mktemp)"
   project_payload="$(
     jq -n \
       --arg repo_url "$repo_url" \
@@ -136,10 +137,11 @@ else
         | with_entries(select(.value != null))
       '
   )"
+  printf '%s\n' "$project_payload" >"$project_payload_file"
 
   response_file="$(mktemp)"
   curl_args=(
-    -F "data=${project_payload};type=application/json"
+    -F "data=@${project_payload_file};type=application/json"
   )
 
   if [ -n "$icon_path" ] && [ -f "$icon_path" ]; then

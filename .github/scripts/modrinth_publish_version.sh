@@ -54,7 +54,7 @@ if jq -e --arg version_number "$mod_version" '.[] | select(.version_number == $v
   exit 0
 fi
 
-mapfile -t release_jars < <(find "$MODRINTH_RELEASE_JAR_DIR" -maxdepth 1 -type f -name '*.jar' ! -name '*-dev.jar' ! -name '*-sources.jar' | sort)
+mapfile -t release_jars < <(find "$MODRINTH_RELEASE_JAR_DIR" -maxdepth 1 -type f -name '*.jar' ! -name '*-dev.jar' ! -name '*-sources.jar' ! -name '*-javadoc.jar' | sort)
 
 if [ "${#release_jars[@]}" -eq 0 ]; then
   echo "No release jar found in ${MODRINTH_RELEASE_JAR_DIR}" >&2
@@ -182,10 +182,12 @@ version_payload="$(
       }
     '
 )"
+version_payload_file="$(mktemp)"
+printf '%s\n' "$version_payload" >"$version_payload_file"
 
 response_file="$(mktemp)"
 status="$(modrinth_request POST "/version" "$response_file" \
-  -F "data=${version_payload};type=application/json" \
+  -F "data=@${version_payload_file};type=application/json" \
   -F "primary=@${release_jars[0]}")"
 
 if [ "$status" != "200" ]; then
