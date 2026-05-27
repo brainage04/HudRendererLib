@@ -30,21 +30,7 @@ public class HudRenderer {
         int posY = getPosY(coreSettings, elementHeight);
 
         for (int i = 0; i < lines.size(); i++) {
-            int lineWidth = renderer.width(lines.get(i));
-
-            elementWidth = Math.max(elementWidth, lineWidth);
-
-            // horizontal adjustments (for line)
-            int posX = getPosX(coreSettings, lineWidth);
-
-            drawContext.text(
-                    renderer,
-                    lines.get(i),
-                    posX,
-                    posY + (lineHeight * i),
-                    HudRendererLib.getTextColour(coreSettings),
-                    HudRendererLib.getTextShadows(coreSettings)
-            );
+            elementWidth = Math.max(elementWidth, renderer.width(lines.get(i)));
         }
 
         // horizontal adjustments (for element)
@@ -70,6 +56,22 @@ public class HudRenderer {
                     corners.right,
                     corners.bottom,
                     backdropOpacity << 24
+            );
+        }
+
+        for (int i = 0; i < lines.size(); i++) {
+            int lineWidth = renderer.width(lines.get(i));
+
+            // horizontal adjustments (for line)
+            int linePosX = getPosX(coreSettings, lineWidth);
+
+            drawContext.text(
+                    renderer,
+                    lines.get(i),
+                    linePosX,
+                    posY + (lineHeight * i),
+                    HudRendererLib.getTextColour(coreSettings),
+                    HudRendererLib.getTextShadows(coreSettings)
             );
         }
     }
