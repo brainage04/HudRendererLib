@@ -10,6 +10,8 @@ public class ElementOverrides {
     @ConfigEntry.Gui.CollapsibleObject
     public IntegerOverride padding = new IntegerOverride(false, 2);
     @ConfigEntry.Gui.CollapsibleObject
+    public IntegerOverride maxWidth = new IntegerOverride(false, 0);
+    @ConfigEntry.Gui.CollapsibleObject
     public BooleanOverride textShadows = new BooleanOverride(false, true);
     @ConfigEntry.Gui.CollapsibleObject
     public ColourOverride textColour = new ColourOverride(false, 0xffffff);
