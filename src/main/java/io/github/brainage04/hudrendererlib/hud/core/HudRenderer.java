@@ -10,6 +10,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 
 import static io.github.brainage04.hudrendererlib.util.ConfigUtils.getConfig;
 
@@ -22,15 +24,16 @@ public class HudRenderer {
         int elementWidth = 0;
 
         int elementPadding = HudRendererLib.getPadding(coreSettings);
+        List<WrappedLine> wrappedLines = wrapLines(renderer, lines, HudRendererLib.getMaxWidth(coreSettings));
 
         int lineHeight = renderer.lineHeight + elementPadding;
-        int elementHeight = lineHeight * lines.size() + elementPadding;
+        int elementHeight = lineHeight * wrappedLines.size() + elementPadding;
 
         // vertical adjustments
         int posY = getPosY(coreSettings, elementHeight);
 
-        for (int i = 0; i < lines.size(); i++) {
-            elementWidth = Math.max(elementWidth, renderer.width(lines.get(i)));
+        for (WrappedLine line : wrappedLines) {
+            elementWidth = Math.max(elementWidth, line.width());
         }
 
         // horizontal adjustments (for element)
@@ -59,21 +62,42 @@ public class HudRenderer {
             );
         }
 
-        for (int i = 0; i < lines.size(); i++) {
-            int lineWidth = renderer.width(lines.get(i));
-
+        for (int i = 0; i < wrappedLines.size(); i++) {
+            WrappedLine line = wrappedLines.get(i);
             // horizontal adjustments (for line)
-            int linePosX = getPosX(coreSettings, lineWidth);
+            int linePosX = getPosX(coreSettings, line.width());
 
             drawContext.text(
                     renderer,
-                    lines.get(i),
+                    line.text(),
                     linePosX,
                     posY + (lineHeight * i),
                     HudRendererLib.getTextColour(coreSettings),
                     HudRendererLib.getTextShadows(coreSettings)
             );
         }
+    }
+
+    private static List<WrappedLine> wrapLines(Font renderer, TextList lines, int maxWidth) {
+        int wrapWidth = Math.max(1, maxWidth);
+        List<WrappedLine> wrappedLines = new ArrayList<>();
+
+        for (Component line : lines) {
+            List<FormattedCharSequence> splitLines = maxWidth > 0
+                    ? renderer.split(line, wrapWidth)
+                    : List.of(line.getVisualOrderText());
+
+            if (splitLines.isEmpty()) {
+                wrappedLines.add(new WrappedLine(FormattedCharSequence.EMPTY, 0));
+                continue;
+            }
+
+            for (FormattedCharSequence splitLine : splitLines) {
+                wrappedLines.add(new WrappedLine(splitLine, renderer.width(splitLine)));
+            }
+        }
+
+        return wrappedLines;
     }
 
     public static int getXOffset(CoreSettings coreSettings, int elementWidth) {
@@ -159,5 +183,8 @@ public class HudRenderer {
 
     public static int getScaledHeight() {
         return Minecraft.getInstance().getWindow().getGuiScaledHeight();
+    }
+
+    private record WrappedLine(FormattedCharSequence text, int width) {
     }
 }

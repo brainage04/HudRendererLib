@@ -116,6 +116,14 @@ public class HudRendererLib implements ClientModInitializer {
         }
     }
 
+    public static int getMaxWidth(CoreSettings coreSettings) {
+        if (coreSettings.elementOverrides.maxWidth.enabled) {
+            return coreSettings.elementOverrides.maxWidth.value;
+        } else {
+            return ConfigUtils.getConfig().maxElementWidth;
+        }
+    }
+
     public static boolean getTextShadows(CoreSettings coreSettings) {
         if (coreSettings.elementOverrides.textShadows.enabled) {
             return coreSettings.elementOverrides.textShadows.value;

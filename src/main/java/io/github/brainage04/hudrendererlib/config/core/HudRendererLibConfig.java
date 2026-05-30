@@ -12,6 +12,7 @@ public class HudRendererLibConfig implements ConfigData {
 
     // global element settings
     public int elementPadding = 2;
+    public int maxElementWidth = 0;
     public boolean textShadows = true;
     @ConfigEntry.ColorPicker
     public int textColour = 0xffffff;
