@@ -15,19 +15,14 @@ repositories {
 }
 
 dependencies {
-    modImplementation "io.github.brainage04:hudrendererlib:1.0.2-1.21.8"
+    modImplementation "io.github.brainage04:hudrendererlib:1.0.4"
 }
 ```
 
 Supported mod versions:
-- 1.0.2-1.21.8
+- 1.0.4 — Minecraft 26.1.2
 
-Each library version may support several different Minecraft versions.
-When changes are made to the Minecraft and/or Fabric rendering APIs,
-the Minecraft version in the library version will be updated.
-This means that each library version supports a range of Minecraft versions,
-from the Minecraft version specified in the library version (such as `1.21.4`)
-to the Minecraft version before the one specified in the next library version. 
+The library version and supported Minecraft version are tracked separately in `gradle.properties` and `fabric.mod.json`. Check the release metadata before using HudRendererLib with another Minecraft version.
 
 The first thing you need to do is register your config class with HudRendererLib in your `onInitializeClient` method like so:
 
