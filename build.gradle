@@ -1,7 +1,8 @@
 
 plugins {
 	id 'net.fabricmc.fabric-loom' version "${loom_version}"
-	id 'io.github.brainage04.maven-central-publishing' version "${maven_central_publishing_version}"
+	id 'io.github.brainage04.maven-central-publishing' version "${fabricmoddingconventions_version}"
+	id 'io.github.brainage04.mod-publishing' version "${fabricmoddingconventions_version}"
 }
 
 version = project.mod_version
