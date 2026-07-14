@@ -48,11 +48,12 @@ jobs:
               "${BASE_URL}.${extension}"
           done
 
-      - name: publish Modrinth project and version
+      - name: publish Modrinth version
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_REPOSITORY_DESCRIPTION: ${{ github.event.repository.description }}
           MOD_PUBLISHING_RELEASE_JAR: release-artifacts/hudrendererlib-1.0.4.jar
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           RELEASE_BODY: |
             HudRendererLib 1.0.4
@@ -62,4 +63,4 @@ jobs:
             - Adopt reusable GitHub, Modrinth, and CurseForge publishing workflows.
           RELEASE_PRERELEASE: 'false'
           RELEASE_TAG: v1.0.4
-        run: ./gradlew syncModrinthIcon publishModrinth -PpublishModrinth=true
+        run: ./gradlew publishModrinth -PpublishModrinth=true
