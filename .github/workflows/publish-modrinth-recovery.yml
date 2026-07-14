@@ -35,6 +35,19 @@ jobs:
             --output release-artifacts/hudrendererlib-1.0.4.jar \
             https://github.com/brainage04/HudRendererLib/releases/download/v1.0.4/hudrendererlib-1.0.4.jar
 
+      - name: cache ModMenu from flaky upstream
+        env:
+          MODMENU_VERSION: 18.0.0-alpha.8
+        run: |
+          MODULE_DIR="${HOME}/.m2/repository/com/terraformersmc/modmenu/${MODMENU_VERSION}"
+          BASE_URL="https://maven.terraformersmc.com/releases/com/terraformersmc/modmenu/${MODMENU_VERSION}/modmenu-${MODMENU_VERSION}"
+          mkdir -p "${MODULE_DIR}"
+          for extension in jar pom module; do
+            curl --fail --location --retry 10 --retry-all-errors \
+              --output "${MODULE_DIR}/modmenu-${MODMENU_VERSION}.${extension}" \
+              "${BASE_URL}.${extension}"
+          done
+
       - name: publish Modrinth project and version
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
