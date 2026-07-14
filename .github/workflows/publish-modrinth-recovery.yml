@@ -1,0 +1,52 @@
+name: publish Modrinth recovery
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v5
+
+      - name: validate gradle wrapper
+        uses: gradle/actions/wrapper-validation@v5
+
+      - name: setup jdk
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: microsoft
+
+      - name: setup gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: make gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: download exact GitHub release artifact
+        run: |
+          mkdir -p release-artifacts
+          curl --fail --location --retry 3 \
+            --output release-artifacts/hudrendererlib-1.0.4.jar \
+            https://github.com/brainage04/HudRendererLib/releases/download/v1.0.4/hudrendererlib-1.0.4.jar
+
+      - name: publish Modrinth project and version
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REPOSITORY_DESCRIPTION: ${{ github.event.repository.description }}
+          MOD_PUBLISHING_RELEASE_JAR: release-artifacts/hudrendererlib-1.0.4.jar
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          RELEASE_BODY: |
+            HudRendererLib 1.0.4
+
+            - Add configurable maximum HUD element width.
+            - Fix the Goal Choices HUD backdrop.
+            - Adopt reusable GitHub, Modrinth, and CurseForge publishing workflows.
+          RELEASE_PRERELEASE: 'false'
+          RELEASE_TAG: v1.0.4
+        run: ./gradlew syncModrinthIcon publishModrinth -PpublishModrinth=true

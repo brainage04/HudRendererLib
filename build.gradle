@@ -33,7 +33,7 @@ repositories {
 	maven { url "https://maven.shedaniel.me/" }
 
 	// ModMenu
-	maven { url "https://maven.terraformersmc.com/" }
+	maven { url "https://maven.terraformersmc.com/releases/" }
 }
 
 fabricApi {
