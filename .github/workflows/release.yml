@@ -12,7 +12,9 @@ jobs:
   prepare:
     permissions:
       contents: write
-    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-release-prepare.yml@v2.2.0
+    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-release-prepare.yml@v2.3.4
+    with:
+      additional_artifact_pattern: hudrendererlib-neoforge-*.jar
     secrets:
       release_token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -20,31 +22,137 @@ jobs:
     needs: prepare
     permissions:
       contents: write
-    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-github.yml@v2.2.0
+    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-github.yml@v2.3.4
     with:
       artifact_file: ${{ needs.prepare.outputs.artifact_file }}
+      additional_artifact_file: ${{ needs.prepare.outputs.additional_artifact_file }}
+      publish_with_gradle: false
       release_body: ${{ needs.prepare.outputs.release_body }}
+      release_name: ${{ format('HudRendererLib {0}', github.ref_name) }}
     secrets:
       release_token: ${{ secrets.GITHUB_TOKEN }}
 
-  modrinth:
+  maven-central:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    steps:
+      - name: check Maven Central publication
+        id: config
+        env:
+          CENTRAL_PORTAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
+          CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+        run: |
+          RELEASE_VERSION="${GITHUB_REF_NAME#v}"
+          FABRIC_POM_URL="https://repo1.maven.org/maven2/io/github/brainage04/hudrendererlib/${RELEASE_VERSION}/hudrendererlib-${RELEASE_VERSION}.pom"
+          NEOFORGE_POM_URL="https://repo1.maven.org/maven2/io/github/brainage04/hudrendererlib-neoforge/${RELEASE_VERSION}/hudrendererlib-neoforge-${RELEASE_VERSION}.pom"
+          FABRIC_EXISTS=false
+          NEOFORGE_EXISTS=false
+          if curl --fail --silent --head "${FABRIC_POM_URL}" >/dev/null; then FABRIC_EXISTS=true; fi
+          if curl --fail --silent --head "${NEOFORGE_POM_URL}" >/dev/null; then NEOFORGE_EXISTS=true; fi
+          if [ "${FABRIC_EXISTS}" = true ] && [ "${NEOFORGE_EXISTS}" = true ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping Maven Central publication because both HudRendererLib ${RELEASE_VERSION} artifacts are already published."
+          elif [ "${FABRIC_EXISTS}" = true ] || [ "${NEOFORGE_EXISTS}" = true ]; then
+            echo "One HudRendererLib loader artifact already exists on Maven Central while the other is missing; refusing a partial re-publication."
+            exit 1
+          elif [ -z "${CENTRAL_PORTAL_USERNAME}" ] \
+            || [ -z "${CENTRAL_PORTAL_PASSWORD}" ] \
+            || [ -z "${SIGNING_KEY}" ] \
+            || [ -z "${SIGNING_PASSWORD}" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping Maven Central publication because one or more credentials are not configured."
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: checkout repository
+        if: steps.config.outputs.enabled == 'true'
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+
+      - name: validate gradle wrapper
+        if: steps.config.outputs.enabled == 'true'
+        uses: gradle/actions/wrapper-validation@v5
+
+      - name: setup jdk
+        if: steps.config.outputs.enabled == 'true'
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: microsoft
+
+      - name: setup gradle
+        if: steps.config.outputs.enabled == 'true'
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: publish both loader artifacts to Maven Central
+        if: steps.config.outputs.enabled == 'true'
+        env:
+          CENTRAL_PORTAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
+          CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --no-daemon publishAllToMavenCentral -PcentralPublishingType=automatic
+
+  modrinth-fabric:
     needs: prepare
     permissions:
       contents: read
-    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-modrinth.yml@v2.2.0
+    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-modrinth.yml@v2.3.4
     with:
       artifact_file: ${{ needs.prepare.outputs.artifact_file }}
+      gradle_task: :fabric:publishModrinth
+      sync_gradle_task: :fabric:syncModrinthIcon
+      sync_state_file: fabric/build/mod-publishing/modrinth-project-state.json
       release_body: ${{ needs.prepare.outputs.release_body }}
       project_id: ${{ vars.MODRINTH_PROJECT_ID }}
     secrets:
       modrinth_token: ${{ secrets.MODRINTH_TOKEN }}
-  curseforge:
+
+  modrinth-neoforge:
+    needs:
+      - prepare
+      - modrinth-fabric
+    permissions:
+      contents: read
+    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-modrinth.yml@v2.3.4
+    with:
+      artifact_file: ${{ needs.prepare.outputs.additional_artifact_file }}
+      gradle_task: :neoforge:publishModrinth
+      sync_project: false
+      release_body: ${{ needs.prepare.outputs.release_body }}
+      project_id: ${{ needs.modrinth-fabric.outputs.project_id }}
+    secrets:
+      modrinth_token: ${{ secrets.MODRINTH_TOKEN }}
+
+  curseforge-fabric:
     needs: prepare
     permissions:
       contents: read
-    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-curseforge.yml@v2.2.0
+    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-curseforge.yml@v2.3.4
     with:
       artifact_file: ${{ needs.prepare.outputs.artifact_file }}
+      gradle_task: :fabric:publishCurseforge
+      release_body: ${{ needs.prepare.outputs.release_body }}
+      project_id: ${{ vars.CURSEFORGE_PROJECT_ID }}
+      project_slug: hudrendererlib
+    secrets:
+      curseforge_token: ${{ secrets.CURSEFORGE_TOKEN }}
+
+  curseforge-neoforge:
+    needs: prepare
+    permissions:
+      contents: read
+    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-curseforge.yml@v2.3.4
+    with:
+      artifact_file: ${{ needs.prepare.outputs.additional_artifact_file }}
+      gradle_task: :neoforge:publishCurseforge
       release_body: ${{ needs.prepare.outputs.release_body }}
       project_id: ${{ vars.CURSEFORGE_PROJECT_ID }}
       project_slug: hudrendererlib

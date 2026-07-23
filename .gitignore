@@ -43,4 +43,6 @@ replay_*.log
 
 src/main/generated/.cache
 
+.env
+
 .codex

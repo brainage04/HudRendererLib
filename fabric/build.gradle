@@ -1,0 +1,93 @@
+plugins {
+	id 'io.github.brainage04.fabric-mod-conventions' version "${fabricmoddingconventions_version}"
+	id 'io.github.brainage04.maven-central-publishing' version "${fabricmoddingconventions_version}"
+	id 'io.github.brainage04.mod-publishing' version "${fabricmoddingconventions_version}"
+}
+
+base {
+	archivesName = rootProject.archives_base_name
+}
+
+loom {
+	mods {
+		main {
+			sourceSet sourceSets.main
+			sourceSet project(':common').sourceSets.main
+		}
+	}
+}
+
+configurations {
+	common {
+		canBeResolved = true
+		canBeConsumed = false
+	}
+	compileClasspath.extendsFrom common
+	runtimeClasspath.extendsFrom common
+	developmentFabric.extendsFrom common
+}
+
+mavenCentralPublishing {
+	repository.set('brainage04/HudRendererLib')
+	publicationName.set(rootProject.mod_name)
+	description.set('A library for rendering Heads-Up Display (HUD) elements in Fabric mods for Minecraft.')
+	localRepository.set(rootProject.layout.buildDirectory.dir('local-repo'))
+}
+
+modPublishing {
+	curseforge.client.set(true)
+	curseforge.server.set(false)
+}
+
+tasks.named('publishToMavenCentral') {
+	dependsOn ':neoforge:publishMavenJavaPublicationToCentralRepository'
+}
+
+fabricModConventions {
+	additionalFabricModJsonProperties.add('cloth_config_version')
+}
+
+fabricApi {
+	configureDataGeneration {
+		client = true
+	}
+}
+
+dependencies {
+	common(project(':common')) { transitive false }
+
+	implementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+	testImplementation "net.fabricmc:fabric-loader-junit:${rootProject.loader_version}"
+	implementation("me.shedaniel.cloth:cloth-config-fabric:${rootProject.cloth_config_version}") {
+		exclude group: 'net.fabricmc.fabric-api'
+	}
+	compileOnly "com.terraformersmc:modmenu:${rootProject.modmenu_version}"
+}
+
+tasks.register('javadocJar', Jar) {
+	archiveClassifier = 'javadoc'
+	from rootProject.file('README.md')
+}
+
+tasks.named('jar') {
+	from project(':common').sourceSets.main.output
+}
+
+tasks.named('sourcesJar') {
+	from project(':common').sourceSets.main.allSource
+}
+
+publishing {
+	publications {
+		create('mavenJava', MavenPublication) {
+			artifactId = rootProject.archives_base_name
+			from components.java
+			artifact tasks.named('javadocJar')
+		}
+	}
+}
+
+test {
+	useJUnitPlatform()
+	systemProperty 'fabric.side', 'client'
+}
