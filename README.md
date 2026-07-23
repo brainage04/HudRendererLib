@@ -1,5 +1,5 @@
 # About
-HudRendererLib is a library for rendering Heads-Up Display (HUD) elements in Fabric mods for Minecraft.
+HudRendererLib is a library for rendering Heads-Up Display (HUD) elements in Fabric and NeoForge mods for Minecraft.
 
 This mod integrates with Cloth Config's AutoConfig system, and uses annotations from it.
 
@@ -8,23 +8,46 @@ I was using for rendering HUD elements, and didn't want to have to maintain all 
 said code each time I found a way to improve said code.
 
 # Setup
-To add this library to your mod, add the following dependency to your `build.gradle` file:
+
+HudRendererLib 1.0.6 targets Minecraft 26.2 on both loaders.
+
+## Fabric Loom
+
+HudRendererLib 1.0.6 is published on Maven Central:
+
 ```groovy
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    modImplementation "io.github.brainage04:hudrendererlib:1.0.4"
+    modImplementation "io.github.brainage04:hudrendererlib:1.0.6"
 }
 ```
 
-Supported mod versions:
-- 1.0.4 — Minecraft 26.1.2
+## NeoForge with Architectury Loom
 
-The library version and supported Minecraft version are tracked separately in `gradle.properties` and `fabric.mod.json`. Check the release metadata before using HudRendererLib with another Minecraft version.
+The NeoForge artifact is also published on Maven Central:
 
-The first thing you need to do is register your config class with HudRendererLib in your `onInitializeClient` method like so:
+```groovy
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "io.github.brainage04:hudrendererlib-neoforge:1.0.6"
+}
+```
+
+For local workspace development, publish both loader artifacts to the sibling Maven repository with:
+
+```bash
+./gradlew :fabric:publishAllPublicationsToLocalRepository :neoforge:publishAllPublicationsToLocalRepository
+```
+
+The library version and supported Minecraft version are tracked separately in `gradle.properties`, `fabric.mod.json`, and `neoforge.mods.toml`. Check the loader-specific release metadata before using HudRendererLib with another Minecraft version.
+
+For Fabric, register your config class in `onInitializeClient`; on NeoForge, make the same call from your client-only mod initialization path:
 
 ```java
 @Override

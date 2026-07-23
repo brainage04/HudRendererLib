@@ -1,13 +1,13 @@
 # Modrinth publishing
 
-This template includes optional Modrinth publishing as part of `.github/workflows/release.yml`.
+This repository includes optional Modrinth publishing as part of `.github/workflows/release.yml`.
 
-After the GitHub release is created, a second job in the same workflow does two things:
+The release workflow publishes two versions to the same Modrinth project:
 
-1. Creates the Modrinth project if a project with slug `mod_id` does not already exist.
-2. Uploads the built release jar as a Modrinth version if that `mod_version` has not already been uploaded.
+1. The Fabric artifact uses `mod_version` as its version number and synchronizes the project metadata and icon.
+2. The NeoForge artifact uses `<mod_version>-neoforge`, runs after the Fabric publication, and reuses the resolved project id.
 
-The Modrinth job is skipped unless the repository has a `MODRINTH_TOKEN` secret configured.
+Both jobs are skipped unless the repository has a `MODRINTH_TOKEN` secret configured.
 
 ## Required secret
 
@@ -16,7 +16,9 @@ Create a Modrinth personal access token and add it as a repository secret to the
 Minimum useful scopes:
 
 - `PROJECT_CREATE`
+- `PROJECT_READ`
 - `PROJECT_WRITE`
+- `VERSION_READ`
 - `VERSION_CREATE`
 
 The release workflow uses the Modrinth API directly:
@@ -83,11 +85,11 @@ Valid values for `categories` and `additional_categories` are as follows:
 
 If you do not need any overrides, you can remove `.modrinth/project.json` entirely and the workflow will fall back to defaults.
 
-Modrinth categories are separate from loaders. Do not use `fabric` in `categories` or `additional_categories`; keep Fabric in `version.loaders` if you need to override loaders.
+Modrinth categories are separate from loaders. Do not use `fabric` or `neoforge` in `categories` or `additional_categories`; each loader-specific publication supplies its loader explicitly.
 
 ## Version dependencies
 
-Version dependencies are inferred from `src/main/resources/fabric.mod.json`:
+Fabric version dependencies are inferred from `fabric/src/main/resources/fabric.mod.json`; NeoForge dependencies are declared in `.modrinth/neoforge-dependencies.json`:
 
 - `depends` becomes Modrinth `required`
 - `recommends` and `suggests` become Modrinth `optional`
@@ -145,8 +147,7 @@ The release workflow fetches the remote tag object before reading notes so annot
 
 ## Notes
 
-- The workflow uploads the main release jar from `build/libs` and ignores `*-dev.jar` and `*-sources.jar`.
+- Release preparation collects exactly one Fabric JAR and one NeoForge JAR from `build/libs`; development, sources, and Javadoc artifacts are excluded.
 - If the Modrinth project already exists, it is reused instead of recreated. When a project is newly created, the separate icon sync step is skipped for that release because the create request already uploads the icon.
-- If an existing Modrinth project icon must change and Modrinth rejects the icon replacement, the workflow still publishes the Modrinth version, then fails the job at the end so the stale icon remains visible.
-- If the Modrinth version already exists for the current `mod_version`, publishing is skipped.
-- The Modrinth scripts can also be run locally for validation. When they run outside GitHub Actions, `GITHUB_ENV` is optional and no step output file is written.
+- If an existing Modrinth project icon must change and Modrinth rejects the icon replacement, the Fabric publication fails after version upload; the NeoForge job does not run.
+- Existing Fabric or NeoForge version numbers are skipped independently.
