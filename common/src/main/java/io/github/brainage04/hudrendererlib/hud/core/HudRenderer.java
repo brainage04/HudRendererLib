@@ -40,27 +40,11 @@ public class HudRenderer {
         int posX = getPosX(coreSettings, elementWidth);
 
         // adjust for padding
-        ElementCorners corners = getCornersWithPadding(posX, posY, posX + elementWidth, posY + elementHeight, coreSettings);
-
-        CoreSettingsElement coreSettingsElement = HudElementEditor.CORE_SETTINGS_ELEMENTS.get(coreSettings.elementId);
-        if (coreSettingsElement == null) {
-            HudRendererLib.LOGGER.error("Core settings element with index {} in HudElementEditor.CORE_SETTINGS_ELEMENTS does not exist - this shouldn't happen!", coreSettings.elementId);
-        } else {
-            coreSettingsElement.corners = corners;
-        }
-
-        // render backdrop
-        int backdropOpacity = HudRendererLib.getOpacity(coreSettings);
-
-        if (backdropOpacity > 0) {
-            drawContext.fill(
-                    corners.left,
-                    corners.top,
-                    corners.right,
-                    corners.bottom,
-                    backdropOpacity << 24
-            );
-        }
+        ElementCorners corners = setElementBounds(
+                coreSettings,
+                getCornersWithPadding(posX, posY, posX + elementWidth, posY + elementHeight, coreSettings)
+        );
+        renderBackdrop(drawContext, corners, coreSettings);
 
         for (int i = 0; i < wrappedLines.size(); i++) {
             WrappedLine line = wrappedLines.get(i);
@@ -164,6 +148,38 @@ public class HudRenderer {
                     coreHudElement.getElementConfig().getCoreSettings()
             );
         } else coreHudElement.render(drawContext, tickCounter);
+    }
+
+    public static int alignContentX(CoreSettings coreSettings, int elementX, int elementWidth, int contentWidth) {
+        return switch (coreSettings.elementAnchor) {
+            case TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> elementX + elementWidth - contentWidth;
+            case TOP, CENTER, BOTTOM -> elementX + (elementWidth - contentWidth) / 2;
+            default -> elementX;
+        };
+    }
+
+    public static ElementCorners setElementBounds(CoreSettings coreSettings, int left, int top, int right, int bottom) {
+        return setElementBounds(coreSettings, new ElementCorners(left, top, right, bottom));
+    }
+
+    public static ElementCorners setElementBounds(CoreSettings coreSettings, ElementCorners corners) {
+        CoreSettingsElement coreSettingsElement = HudElementEditor.CORE_SETTINGS_ELEMENTS.get(coreSettings.elementId);
+        if (coreSettingsElement == null) {
+            HudRendererLib.LOGGER.error(
+                    "Core settings element with element ID {} in HudElementEditor.CORE_SETTINGS_ELEMENTS does not exist - this shouldn't happen!",
+                    coreSettings.elementId
+            );
+        } else {
+            coreSettingsElement.corners = corners;
+        }
+        return corners;
+    }
+
+    public static void renderBackdrop(GuiGraphicsExtractor drawContext, ElementCorners corners, CoreSettings coreSettings) {
+        int backdropOpacity = HudRendererLib.getOpacity(coreSettings);
+        if (backdropOpacity > 0) {
+            drawContext.fill(corners.left, corners.top, corners.right, corners.bottom, backdropOpacity << 24);
+        }
     }
 
     public static ElementCorners getCornersWithPadding(int left, int top, int right, int bottom, CoreSettings coreSettings) {
