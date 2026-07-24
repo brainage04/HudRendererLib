@@ -12,7 +12,7 @@ jobs:
   prepare:
     permissions:
       contents: write
-    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-release-prepare.yml@v2.3.6
+    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-release-prepare.yml@v2.3.7
     with:
       additional_artifact_pattern: hudrendererlib-neoforge-*.jar
       resolve_release_notes_with_gradle: false
@@ -23,7 +23,7 @@ jobs:
     needs: prepare
     permissions:
       contents: write
-    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-github.yml@v2.3.6
+    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-github.yml@v2.3.7
     with:
       artifact_file: ${{ needs.prepare.outputs.artifact_file }}
       additional_artifact_file: ${{ needs.prepare.outputs.additional_artifact_file }}
@@ -105,7 +105,7 @@ jobs:
     needs: prepare
     permissions:
       contents: read
-    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-modrinth.yml@v2.3.6
+    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-modrinth.yml@v2.3.7
     with:
       artifact_file: ${{ needs.prepare.outputs.artifact_file }}
       gradle_task: :fabric:publishModrinth
@@ -122,7 +122,7 @@ jobs:
       - modrinth-fabric
     permissions:
       contents: read
-    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-modrinth.yml@v2.3.6
+    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-modrinth.yml@v2.3.7
     with:
       artifact_file: ${{ needs.prepare.outputs.additional_artifact_file }}
       gradle_task: :neoforge:publishModrinth
@@ -136,7 +136,7 @@ jobs:
     needs: prepare
     permissions:
       contents: read
-    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-curseforge.yml@v2.3.6
+    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-curseforge.yml@v2.3.7
     with:
       artifact_file: ${{ needs.prepare.outputs.artifact_file }}
       gradle_task: :fabric:publishCurseforge
@@ -150,7 +150,7 @@ jobs:
     needs: prepare
     permissions:
       contents: read
-    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-curseforge.yml@v2.3.6
+    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-publish-curseforge.yml@v2.3.7
     with:
       artifact_file: ${{ needs.prepare.outputs.additional_artifact_file }}
       gradle_task: :neoforge:publishCurseforge
