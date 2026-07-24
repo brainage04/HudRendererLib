@@ -14,7 +14,7 @@
 	"license": "MIT",
 	"environment": "client",
 	"entrypoints": {
-		"client": [
+		"main": [
 			"io.github.brainage04.hudrendererlib.fabric.HudRendererLibFabric"
 		],
 		"fabric-datagen": [
