@@ -11,4 +11,4 @@ permissions:
 
 jobs:
   build:
-    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-mod-build.yml@v2.3.6
+    uses: brainage04/FabricModdingConventions/.github/workflows/reusable-mod-build.yml@v2.3.7
