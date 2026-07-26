@@ -33,6 +33,18 @@ subprojects {
 	}
 }
 
+tasks.register('runClientGameTest') {
+	group = 'verification'
+	description = 'Runs the Fabric client GameTests.'
+	dependsOn ':fabric:runClientGameTest'
+}
+
+tasks.register('recordClientGameTest') {
+	group = 'verification'
+	description = 'Records the Fabric client GameTests.'
+	dependsOn ':fabric:recordClientGameTest'
+}
+
 tasks.register('stageFabricReleaseArtifact', Copy) {
 	dependsOn ':fabric:jar'
 	from project(':fabric').layout.buildDirectory.file(
