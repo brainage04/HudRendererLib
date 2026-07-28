@@ -12,7 +12,7 @@ import io.github.brainage04.hudrendererlib.util.LayerInfo;
 import io.github.brainage04.hudrendererlib.util.TextList;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestDedicatedServerContext;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -38,35 +38,32 @@ public final class HudRendererLibClientGameTest implements FabricClientGameTest 
     public void runTest(ClientGameTestContext context) {
         Properties serverProperties = ClientGameTestServers.flatServerProperties();
 
-        try (TestDedicatedServerContext server = context.worldBuilder().createServer(serverProperties)) {
-            ClientGameTestServers.connectToDedicatedServer(context, server, "HudRendererLib HUD API GameTest");
-            try {
-                ClientGameTestServers.assertClientWorldAndPlayerAvailable(context);
-                context.runOnClient(client -> registerFixture());
-                context.waitTicks(20);
-
-                assertRegistrations();
-                ClientGameTestRecorder.startRecording(context);
-                ClientGameTestRecorder.showStep(
-                        context,
-                        "hud.before-chat",
-                        "HUD anchored before vanilla chat",
-                        "Aqua demo lines use the top-left anchor and render in the layer immediately before vanilla chat."
-                );
-                context.waitTicks(60);
-
-                context.runOnClient(client -> configureBottomRightFixture());
-                ClientGameTestRecorder.showStep(
-                        context,
-                        "hud.after-chat",
-                        "Configurable HUD after vanilla chat",
-                        "Gold demo lines use a bottom-right anchor, custom padding, colour, and translucent backdrop after vanilla chat."
-                );
-                context.waitTicks(60);
-            } finally {
-                ClientGameTestServers.disconnectFromDedicatedServer(context);
-            }
-        }
+        ClientGameTestServers.withDedicatedServer(context, serverProperties, "HudRendererLib HUD API GameTest", server -> { try {
+            ClientGameTestServers.assertClientWorldAndPlayerAvailable(context);
+            context.runOnClient(client -> registerFixture());
+            context.waitTicks(20);
+        
+            assertRegistrations();
+            ClientGameTestRecorder.startRecording(context);
+            ClientGameTestRecorder.showStep(
+                    context,
+                    "hud.before-chat",
+                    "HUD anchored before vanilla chat",
+                    "Aqua demo lines use the top-left anchor and render in the layer immediately before vanilla chat."
+            );
+            context.waitTicks(60);
+        
+            context.runOnClient(client -> configureBottomRightFixture());
+            ClientGameTestRecorder.showStep(
+                    context,
+                    "hud.after-chat",
+                    "Configurable HUD after vanilla chat",
+                    "Gold demo lines use a bottom-right anchor, custom padding, colour, and translucent backdrop after vanilla chat."
+            );
+            context.waitTicks(60);
+        } finally {
+            ;
+        } });
     }
 
     private static void registerFixture() {
