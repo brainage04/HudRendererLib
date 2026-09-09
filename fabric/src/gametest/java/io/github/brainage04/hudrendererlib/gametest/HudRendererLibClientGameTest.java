@@ -38,13 +38,12 @@ public final class HudRendererLibClientGameTest implements FabricClientGameTest 
     public void runTest(ClientGameTestContext context) {
         Properties serverProperties = ClientGameTestServers.flatServerProperties();
 
-        ClientGameTestServers.withDedicatedServer(context, serverProperties, "HudRendererLib HUD API GameTest", server -> { try {
+        ClientGameTestServers.withDedicatedServer(context, serverProperties, "HudRendererLib HUD API GameTest", server -> {
             ClientGameTestServers.assertClientWorldAndPlayerAvailable(context);
             context.runOnClient(client -> registerFixture());
             context.waitTicks(20);
         
             assertRegistrations();
-            ClientGameTestRecorder.startRecording(context);
             ClientGameTestRecorder.showStep(
                     context,
                     "hud.before-chat",
@@ -61,9 +60,7 @@ public final class HudRendererLibClientGameTest implements FabricClientGameTest 
                     "Gold demo lines use a bottom-right anchor, custom padding, colour, and translucent backdrop after vanilla chat."
             );
             context.waitTicks(60);
-        } finally {
-            ;
-        } });
+        });
     }
 
     private static void registerFixture() {

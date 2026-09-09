@@ -129,7 +129,10 @@ public class HudRenderer {
 
         if (coreSettings.elementAnchor == ElementAnchor.TOP_RIGHT) {
             LocalPlayer player = Minecraft.getInstance().player;
-            if (player != null && !player.getActiveEffects().isEmpty() && getConfig().adjustTopRightElementsWithStatusEffects) {
+            boolean hasVisibleEffectIcon =
+                    player != null
+                            && player.getActiveEffects().stream().anyMatch(effect -> effect.showIcon());
+            if (hasVisibleEffectIcon && getConfig().adjustTopRightElementsWithStatusEffects) {
                 posY += getConfig().adjustTopRightElementsWithStatusEffectsAmount;
             }
         }
