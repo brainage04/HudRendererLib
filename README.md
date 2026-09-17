@@ -9,11 +9,11 @@ said code each time I found a way to improve said code.
 
 # Setup
 
-HudRendererLib 1.0.6 targets Minecraft 26.2 on both loaders.
+HudRendererLib 1.0.7 targets Minecraft 26.2 on both loaders.
 
 ## Fabric Loom
 
-HudRendererLib 1.0.6 is published on Maven Central:
+HudRendererLib 1.0.7 is published on Maven Central:
 
 ```groovy
 repositories {
@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    modImplementation "io.github.brainage04:hudrendererlib:1.0.6"
+    modImplementation "io.github.brainage04:hudrendererlib:1.0.7"
 }
 ```
 
@@ -35,7 +35,7 @@ repositories {
 }
 
 dependencies {
-    implementation "io.github.brainage04:hudrendererlib-neoforge:1.0.6"
+    implementation "io.github.brainage04:hudrendererlib-neoforge:1.0.7"
 }
 ```
 
@@ -76,7 +76,7 @@ public class ExampleHudConfig implements ICoreSettingsContainer {
     public CoreSettings coreSettings;
 
     public ExampleHudConfig() {
-        this.coreSettings = new CoreSettings(0, "Example HUD", true, 5, 5, ElementAnchor.TOP_LEFT);
+        this.coreSettings = new CoreSettings("Example HUD", true, 5, 5, ElementAnchor.TOP_LEFT);
     }
 
     @Override
@@ -86,15 +86,10 @@ public class ExampleHudConfig implements ICoreSettingsContainer {
 }
 ```
 
-Each time that you create a new HUD element, you should increment the `elementId`
-you use when initialising your `CoreSettings` field (first argument in `CoreSettings` constructor).
-
-This annoying requirement is something I am planning on fixing in the future,
-when I figure out a better way to do it.
 
 Once you have registered a config object, you can register a basic (text-only) HUD element like so:
 ```java
-public class ExampleHud implements BasicHudElement<ExampleHudConfig> {
+public class ExampleHud implements BasicCoreHudElement<ExampleHudConfig> {
     @Override
     public TextList getLines() {
         TextList lines = new TextList();
@@ -113,9 +108,9 @@ public class ExampleHud implements BasicHudElement<ExampleHudConfig> {
 
 or a custom HUD element like so:
 ```java
-public class ExampleHud implements CustomHudElement<ExampleHudConfig> {
+public class ExampleHud implements CoreHudElement<ExampleHudConfig> {
     @Override
-    public void render(TextRenderer textRenderer, DrawContext drawContext) {
+    public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         // render element here
     }
 
@@ -130,14 +125,12 @@ If you wish to change the layer that a given element (basic or custom) is render
 ```java
     @Override
     public LayerInfo getLayerInfo() {
-        return new LayerInfo(IdentifiedLayer.CHAT, true);
+        return new LayerInfo(Identifier.fromNamespaceAndPath("minecraft", "chat"), true);
     }
 ```
 
-The first argument should be an officially supported HUD layer
-(`Identifiers` from `IdentifiedLayer`), and the second argument
-should be whether to render the element before or after the
-specified layer.
+The first argument is the identifier of an officially supported HUD layer, and the second
+argument controls whether the element renders before or after that layer.
 
 Once you have created a config and HUD class for your element, register the element in your `onInitializeClient` method like so:
 
@@ -169,16 +162,16 @@ public void onInitializeClient() {
     // THEN register your commands/keys
     // HUD elements can be registered before/after commands/keys as long as they are registered after the main config class
     HudRendererLib.registerConfigCommand(ModConfig.class, MOD_ID);
-    HudRendererLib.registerConfigKey(ModConfig.class, MOD_NAME);
+    HudRendererLib.registerConfigKey(ModConfig.class, GLFW.GLFW_KEY_KP_SUBTRACT, MOD_ID, MOD_NAME);
 
     // ...
 }
 ```
 
-Where `MOD_ID` is the ID of your mod and `MOD_NAME` is the name of your mod.
+Where `MOD_ID` is the ID of your mod, `MOD_NAME` is its display name, and the GLFW constant selects the default key.
 
-The HUD Element Editor can be accessed with `/hudrendererlibconfig`, or the Numpad Plus key.
-The HudRendererLib Config Editor can be accessed with `/hudelementeditor`, or the Numpad Enter key.
+The HUD Element Editor can be accessed with `/hudelementeditor`, or the Numpad Plus key.
+The HudRendererLib Config Editor can be accessed with `/hudrendererlibconfig`, or the Numpad Enter key.
 
 For more examples, please see my mods that use this library:
 - [BrainageHUD](https://github.com/brainage04/BrainageHUD/tree/master/src/main/java/com/github/brainage04/brainagehud)
