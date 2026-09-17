@@ -13,13 +13,8 @@ public class CoreSettingsIdAssigner {
         return current == INVALID_ID ? nextId++ : current;
     }
 
-    public static void reset() {
-        nextId = FIRST_ID;
-    }
 
     public static <T extends ConfigData> void assignElementIds(T config) {
-        reset();
-
         for (Field field : config.getClass().getDeclaredFields()) {
             field.setAccessible(true);
 
