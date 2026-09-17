@@ -24,12 +24,12 @@ public class ModKeys {
         HudRendererLib.platform().registerKeyMapping(openElementEditor);
         HudRendererLib.platform().registerEndClientTick(client -> {
             for (KeyMapping key : openConfigKeyMap.keySet()) {
-                if (key.isDown()) {
+                if (key.consumeClick()) {
                     ScreenUtils.openConfig(client, openConfigKeyMap.get(key));
                 }
             }
 
-            if (openElementEditor.isDown()) {
+            if (openElementEditor.consumeClick()) {
                 ScreenUtils.openElementEditor(client);
             }
         });
