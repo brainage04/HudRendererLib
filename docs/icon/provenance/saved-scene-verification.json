@@ -1,0 +1,145 @@
+[
+  {
+    "subject_screen_bounds": [
+      0.1993655413389206,
+      0.09500015527009964,
+      0.8006346225738525,
+      0.9050000309944153
+    ],
+    "heads": [
+      {
+        "name": "Owner head 01",
+        "location": [
+          0.0,
+          0.5625,
+          1.6875
+        ],
+        "uniform_scale": 1.0,
+        "nmsr_yaw": 44.99999408488256,
+        "pitch": 35.26439247116752,
+        "visible_front_probes": 9,
+        "front_probe_count": 9,
+        "screen_bounds": [
+          0.39978858828544617,
+          0.44214296340942383,
+          0.8006346225738525,
+          0.9050000309944153
+        ],
+        "layers": [
+          {
+            "name": "Owner head 01 / Base head",
+            "layer": "base",
+            "dimensions_unscaled": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "mesh_and_uv_sha256": "3f5c36766f062813348ef37f15a69184eccefa7274891e95cb8b85d29d407135",
+            "identical_to_reference": true
+          },
+          {
+            "name": "Owner head 01 / Outer hat layer",
+            "layer": "outer",
+            "dimensions_unscaled": [
+              1.125,
+              1.125,
+              1.125
+            ],
+            "mesh_and_uv_sha256": "7734489fe76bfbec14f5eb0316a29d60bc87e92159d1393d91b0ecdb738d856d",
+            "identical_to_reference": true
+          }
+        ],
+        "front_polygon_pixels": [
+          [
+            626.2921142578125,
+            551.655029296875
+          ],
+          [
+            808.7216186523438,
+            446.329345703125
+          ],
+          [
+            808.7216186523438,
+            235.677978515625
+          ],
+          [
+            626.2921752929688,
+            341.003662109375
+          ]
+        ]
+      }
+    ],
+    "bookshelves": [
+      {
+        "name": "Bookshelf 01",
+        "location": [
+          0.0,
+          -0.5625,
+          0.5625
+        ],
+        "cube_side": 1.125,
+        "full_cube": true,
+        "bookshelf_sides": 4,
+        "oak_plank_ends": 2,
+        "full_face_uvs": true,
+        "screen_bounds": [
+          0.1993655413389206,
+          0.09500015527009964,
+          0.6002115607261658,
+          0.5578572750091553
+        ]
+      },
+      {
+        "name": "Bookshelf 02",
+        "location": [
+          0.0,
+          0.5625,
+          0.5625
+        ],
+        "cube_side": 1.125,
+        "full_cube": true,
+        "bookshelf_sides": 4,
+        "oak_plank_ends": 2,
+        "full_face_uvs": true,
+        "screen_bounds": [
+          0.39978858828544617,
+          0.2107143998146057,
+          0.8006345629692078,
+          0.6735715270042419
+        ]
+      },
+      {
+        "name": "Bookshelf 03",
+        "location": [
+          0.0,
+          -0.5625,
+          1.6875
+        ],
+        "cube_side": 1.125,
+        "full_cube": true,
+        "bookshelf_sides": 4,
+        "oak_plank_ends": 2,
+        "full_face_uvs": true,
+        "screen_bounds": [
+          0.19936557114124298,
+          0.32642871141433716,
+          0.6002115607261658,
+          0.7892857789993286
+        ]
+      }
+    ],
+    "positive_volume_intersections": 0,
+    "background": "neutral gray seamless matte floor with Cycles area-light contact shadows",
+    "nmsr_visible_faces": [
+      "front on screen-right",
+      "player-right side on screen-left",
+      "top"
+    ],
+    "name": "hudrendererlib-06-library-mosaic",
+    "reopened_from_disk": true,
+    "packed_assets_exactly_match_originals": true,
+    "embedded_script_matches_saved_script": true,
+    "no_text_or_plus_symbol": true,
+    "blender_version": "5.1.1"
+  }
+]

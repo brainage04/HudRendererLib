@@ -1,0 +1,17 @@
+{
+  "review_method": "Opened every delivered 1024x1024 PNG in the image reader, then opened the six-image grid with each candidate at exactly 128x128 pixels.",
+  "results": {
+    "hudrendererlib-06-library-mosaic": "PASS: three shelf cubes and one head occupy a two-by-two arrangement; upper-right face clearly replaces a shelf block rather than being painted onto it."
+  },
+  "shared_checks": [
+    "NMSR orientation: front on screen-right, player-right side on screen-left, top visible.",
+    "Original supplied-skin texture; no green NPCAddons plus, other logos, or text.",
+    "Complete unmodified vanilla bookshelf cubes; no beveled or reconstructed shelving geometry.",
+    "Neutral seamless background with soft contact shadows; no clipping at image edges."
+  ],
+  "programmatic_proof": [
+    "saved-scene-verification.json",
+    "png-verification.json"
+  ],
+  "rendering": "All six: Blender 5.1.1, Cycles CPU, 64 samples, 1024x1024 PNG; individual exact durations in render-report.json."
+}

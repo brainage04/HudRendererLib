@@ -1,0 +1,33 @@
+{
+  "script": "verify-scenes.py",
+  "command": [
+    "taskset",
+    "-c",
+    "0,1",
+    "nix",
+    "shell",
+    "nixpkgs#blender",
+    "--command",
+    "blender",
+    "--background",
+    "-noaudio",
+    "--threads",
+    "2",
+    "--python-exit-code",
+    "1",
+    "--python",
+    "/home/thomas/01_TM/Coding/Websites/brainage04.github.io/.local-icon-variants/round3/blender-z/verify-scenes.py"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 1.177629618003266,
+  "affinity_cpus": [
+    0,
+    1
+  ],
+  "render_threads": 2,
+  "cpu_weight": 20,
+  "cpu_max": "300000 100000",
+  "display": null,
+  "audio": null,
+  "gpu": null
+}

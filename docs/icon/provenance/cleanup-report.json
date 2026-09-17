@@ -1,0 +1,33 @@
+{
+  "status": "complete",
+  "deliverables": "Six PNGs; six matching entrypoint scripts; six packed .blend scenes; per-image metadata; shared scene author; original assets; manifests; verification and reproduction evidence.",
+  "processes": {
+    "blender": "All owned finite Blender invocations exited successfully; final pgrep for blender-z/(hudrendererlib|verify-scenes|inspect-source) returned no processes.",
+    "render_slot": "Released to ConventionsIcon after all six renders and six saved-scene reopen checks; no further Blender calls made.",
+    "services_started": [],
+    "display_servers_started": [],
+    "audio_sinks_started": [],
+    "gpu_devices_allocated": [],
+    "shared_cgroups": "Pre-existing render-blender.service (CPUWeight 20, quota 3 cores) and osu-boost.service (CPUWeight 1000) retained unchanged. Every owned Blender launch pinned to CPUs 0-1 and 2 render threads."
+  },
+  "files": {
+    "final_artifact_directory": "round3/blender-z/",
+    "tracked_portfolio_files_edited": [],
+    "commits_created": 0,
+    "git_directories_created": 0,
+    "pushes": 0,
+    "blender_backups_or_python_cache": "Scoped glob found no .blend1, __pycache__, or .git artifacts under blender-z.",
+    "resolved_shared_kernel_collision": "A sibling overwrote the shared Eval global root. Six owned HudRendererLib entrypoint duplicates were temporarily written in blender-aa, then removed after byte-equality checks with final blender-z files. One owned live-resource snapshot was relocated from blender-aa/evidence to blender-z/evidence. Peer was informed before touching those exact owned paths; no peer-authored files altered. Subsequent Eval variables use hud_ prefix."
+  },
+  "verification": {
+    "rendered_images_opened": 6,
+    "decoded_pngs_passed": 6,
+    "packed_scenes_reopened_passed": 6,
+    "icon_size": "All six reviewed at 128px; evidence grid preserved.",
+    "geometry": "Exact reference mesh and UV hashes for both head layers, NMSR orientation, complete cube shelf geometry, non-intersection, front-face visibility and unclipped bounds asserted.",
+    "assets": "All three packed texture byte hashes verified against the original supplied skin and client-jar textures in every saved scene.",
+    "png_content": "Owner face yellow/glasses/eye-mouth regions and red/blue/green book textures measured; visible ground shadows measured below subject bounds.",
+    "project_wide_validation": "Not run; assignment-local scene and PNG proofs only."
+  },
+  "blockers": []
+}

@@ -1,0 +1,399 @@
+{
+  "objects": [
+    {
+      "name": "Isometric composition",
+      "type": "CAMERA",
+      "location": [
+        8.485280990600586,
+        -8.485280990600586,
+        8.485280990600586
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.9553165435791016,
+        -6.959331955158632e-08,
+        0.7853983044624329
+      ],
+      "parent": null,
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Large soft key",
+      "type": "LIGHT",
+      "location": [
+        -4.0,
+        -6.0,
+        9.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.6754926443099976,
+        5.2380801918161524e-08,
+        -0.5880025625228882
+      ],
+      "parent": null,
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Neutral fill",
+      "type": "LIGHT",
+      "location": [
+        6.0,
+        -3.0,
+        5.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.9302740097045898,
+        -2.2189735204847238e-07,
+        1.1071487665176392
+      ],
+      "parent": null,
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Soft rear edge",
+      "type": "LIGHT",
+      "location": [
+        -2.0,
+        5.0,
+        7.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.6557449102401733,
+        -2.557140987846651e-08,
+        -2.7610862255096436
+      ],
+      "parent": null,
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "properties": {}
+    },
+    {
+      "name": "Supplied skin head",
+      "type": "EMPTY",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        1.5707963705062866
+      ],
+      "parent": null,
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "properties": {
+        "role": "head"
+      }
+    },
+    {
+      "name": "Base head",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "parent": "Supplied skin head",
+      "dimensions": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "properties": {
+        "skin_layer": "base"
+      },
+      "vertices": 24,
+      "polygons": 6,
+      "materials": [
+        "Supplied skin with alpha"
+      ],
+      "local_bounds": [
+        [
+          -0.5,
+          0.5
+        ],
+        [
+          -0.5,
+          0.5
+        ],
+        [
+          -0.5,
+          0.5
+        ]
+      ]
+    },
+    {
+      "name": "Outer hat layer",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "parent": "Supplied skin head",
+      "dimensions": [
+        1.125,
+        1.125,
+        1.125
+      ],
+      "properties": {
+        "skin_layer": "outer"
+      },
+      "vertices": 24,
+      "polygons": 6,
+      "materials": [
+        "Supplied skin with alpha"
+      ],
+      "local_bounds": [
+        [
+          -0.5625,
+          0.5625
+        ],
+        [
+          -0.5625,
+          0.5625
+        ],
+        [
+          -0.5625,
+          0.5625
+        ]
+      ]
+    },
+    {
+      "name": "GREEN PLUS on front top-right",
+      "type": "EMPTY",
+      "location": [
+        0.28125,
+        -0.5985000133514404,
+        0.28125
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "parent": "Supplied skin head",
+      "dimensions": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "properties": {
+        "role": "plus",
+        "front_face": "north (-Y)",
+        "front_face_normal": "<bpy id property array [3]>",
+        "front_uv_center": "<bpy id property array [2]>",
+        "center_in_front_top_right_quadrant": "True",
+        "front_uv_width": "0.5",
+        "front_uv_height": "0.5"
+      }
+    },
+    {
+      "name": "Plus horizontal bar",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "parent": "GREEN PLUS on front top-right",
+      "dimensions": [
+        0.5625,
+        0.05999999865889549,
+        0.140625
+      ],
+      "properties": {},
+      "vertices": 24,
+      "polygons": 6,
+      "materials": [
+        "modern:Bright green symbol:0.28"
+      ],
+      "local_bounds": [
+        [
+          -0.28125,
+          0.28125
+        ],
+        [
+          -0.029999999329447746,
+          0.029999999329447746
+        ],
+        [
+          -0.0703125,
+          0.0703125
+        ]
+      ]
+    },
+    {
+      "name": "Plus vertical bar",
+      "type": "MESH",
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "parent": "GREEN PLUS on front top-right",
+      "dimensions": [
+        0.140625,
+        0.05999999865889549,
+        0.5625
+      ],
+      "properties": {},
+      "vertices": 24,
+      "polygons": 6,
+      "materials": [
+        "modern:Bright green symbol:0.28"
+      ],
+      "local_bounds": [
+        [
+          -0.0703125,
+          0.0703125
+        ],
+        [
+          -0.029999999329447746,
+          0.029999999329447746
+        ],
+        [
+          -0.28125,
+          0.28125
+        ]
+      ]
+    }
+  ],
+  "camera": "Isometric composition",
+  "camera_rotation": [
+    0.9553165435791016,
+    -6.959331955158632e-08,
+    0.7853983044624329
+  ],
+  "camera_matrix": [
+    [
+      0.7071067094802856,
+      -0.4082484245300293,
+      0.5773503184318542,
+      8.485280990600586
+    ],
+    [
+      0.70710688829422,
+      0.40824824571609497,
+      -0.5773501992225647,
+      -8.485280990600586
+    ],
+    [
+      6.959331955158632e-08,
+      0.8164965510368347,
+      0.5773503184318542,
+      8.485280990600586
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "view_transform": "Standard",
+  "look": "None",
+  "world": "Quiet isolated world",
+  "images": [
+    {
+      "name": "supplied-skin.png",
+      "size": [
+        64,
+        64
+      ],
+      "packed": true
+    }
+  ]
+}

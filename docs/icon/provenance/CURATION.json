@@ -1,0 +1,100 @@
+{
+  "mod": "HudRendererLib",
+  "source_folder": "round3/blender-z",
+  "source_folder_absolute": "/home/thomas/01_TM/Coding/Websites/brainage04.github.io/.local-icon-variants/round3/blender-z",
+  "icon_source": "blender-z/hudrendererlib-06-library-mosaic.png",
+  "icon_sha256_source": "f2c61f3a4a5e7d6207644dee3e8da58fe5b989553ae435a7ee65336c071ed328",
+  "icon_sha256_copy": "f2c61f3a4a5e7d6207644dee3e8da58fe5b989553ae435a7ee65336c071ed328",
+  "icon_dimensions": [
+    1024,
+    1024
+  ],
+  "files_copied": [
+    "asset-provenance.json",
+    "assets/bookshelf-model.json",
+    "assets/bookshelf.png",
+    "assets/cube.json",
+    "assets/cube_column.json",
+    "assets/oak_planks.png",
+    "assets/orientation-reference.json",
+    "assets/reference-head.blend",
+    "assets/supplied-skin.png",
+    "cleanup-report.json",
+    "evidence/hudrendererlib-06-library-mosaic-run.json",
+    "evidence/inspect-source-run.json",
+    "evidence/live-resource-snapshot.json",
+    "evidence/reference-inspection.json",
+    "evidence/verify-scenes-run.json",
+    "hudrendererlib-06-library-mosaic-metadata.json",
+    "hudrendererlib-06-library-mosaic.blend",
+    "hudrendererlib-06-library-mosaic.py",
+    "inspect-source.py",
+    "manifest.json",
+    "png-verification.json",
+    "render-report.json",
+    "reproduction.json",
+    "run-blender.py",
+    "saved-scene-verification.json",
+    "scene.py",
+    "script-hashes.json",
+    "verify-pngs.py",
+    "verify-scenes.py",
+    "visual-review.json"
+  ],
+  "file_count_copied": 30,
+  "json_curation": [
+    {
+      "file": "manifest.json",
+      "curation": "kept only the selected 06-library-mosaic arrangement"
+    },
+    {
+      "file": "png-verification.json",
+      "curation": "kept the 06-library-mosaic row"
+    },
+    {
+      "file": "saved-scene-verification.json",
+      "curation": "kept the 06-library-mosaic row"
+    },
+    {
+      "file": "render-report.json",
+      "curation": "kept the 06-library-mosaic row"
+    },
+    {
+      "file": "script-hashes.json",
+      "curation": "kept hashes of the scripts shipped here"
+    },
+    {
+      "file": "visual-review.json",
+      "curation": "kept the 06-library-mosaic review row; the icon_size_proof pointer to the excluded 128px evidence PNG was dropped"
+    }
+  ],
+  "excluded": [
+    {
+      "path": "blender-z/hudrendererlib-0{1..5}-*.{py,blend,png,metadata.json}",
+      "reason": "five retired arrangements; see round3/removals.json"
+    },
+    {
+      "path": "blender-z/evidence/*.log",
+      "reason": "run logs"
+    },
+    {
+      "path": "blender-z/evidence/hudrendererlib-06-library-mosaic-128.png",
+      "reason": "evidence screenshot other than the icon itself"
+    },
+    {
+      "path": "blender-z/blockers.json",
+      "reason": "empty blocker list"
+    }
+  ],
+  "bytes_added_total": 1500171,
+  "deliverable": {
+    "icon": "icon.png",
+    "icon_sha256_round3_source": "f2c61f3a4a5e7d6207644dee3e8da58fe5b989553ae435a7ee65336c071ed328",
+    "icon_sha256_shipped_copy": "f2c61f3a4a5e7d6207644dee3e8da58fe5b989553ae435a7ee65336c071ed328",
+    "provenance_file_count": 30,
+    "total_file_count": 33,
+    "total_bytes": 1507880,
+    "largest_file": "icon.png",
+    "largest_file_bytes": 1220962
+  }
+}

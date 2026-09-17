@@ -1,0 +1,11 @@
+{
+  "working_directory": "round3/blender-z",
+  "render_command": ["python3", "run-blender.py", "hudrendererlib-01-pedestal.py", "hudrendererlib-02-bookend.py", "hudrendererlib-03-floating-portrait.py", "hudrendererlib-04-collected-heads.py", "hudrendererlib-05-bookshelf-hat.py", "hudrendererlib-06-library-mosaic.py", "verify-scenes.py"],
+  "blender_invocation_per_script": "taskset -c 0,1 nix shell nixpkgs#blender --command blender --background -noaudio --threads 2 --python-exit-code 1 --python <candidate>.py",
+  "resource_prerequisite": "Existing user render-blender.service cgroup, CPUWeight=20 and CPUQuota<=300%, checked before each invocation. Runner enters that cgroup before launching Blender and pins its entire process tree to two CPUs. Render only one Blender process at a time; coordinate shared renderer slot.",
+  "image_verification_command": "PYTHONPATH=/nix/store/4v9j9wbzyhrlx9980ygbr812313mazy0-python3.13-pillow-12.3.0/lib/python3.13/site-packages python3 verify-pngs.py",
+  "assets": "Original reference head .blend, supplied skin, official bookshelf/oak-planks textures and vanilla model JSON are preserved under assets/. Every output .blend packs all three textures and embeds its entrypoint plus scene.py.",
+  "script_commit_policy": "Scripts are saved and hashed, not committed. Explicit parent directive: no commits and no .git anywhere in the portfolio tree.",
+  "geometry_policy": "Exact reference base/outer head mesh and UVs, with uniform per-arrangement scaling only; NMSR camera-relative orientation unchanged. Bookshelves remain whole vanilla cubes. No shelf recesses, stretched head volumes, sculpted books, bevels or substitute textures.",
+  "display_audio_gpu": "No display server, audio sink, game runtime or GPU allocated. DISPLAY/WAYLAND_DISPLAY removed; CPU Cycles and -noaudio; CUDA/HIP/ROCR device visibility empty."
+}

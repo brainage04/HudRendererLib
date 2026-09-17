@@ -1,0 +1,12 @@
+{
+  "entries": [
+    {
+      "project": "HudRendererLib",
+      "label": "Owner head replacing the upper-right block of a two-by-two bookshelf mosaic.",
+      "path": "blender-z/hudrendererlib-06-library-mosaic.png",
+      "method": "Headless Blender CLI; Cycles CPU, 2 threads; exact reference-head geometry and vanilla client-jar bookshelf cube",
+      "source": "blender-h/npc-addons-head-2.blend; owner-supplied skin SHA256 e9ebbeece495d9c96040e235dc865fdb1a530cf6a2243a6c8fcec22e72f03e3f; Minecraft 26.2 client assets textures/block/bookshelf.png and oak_planks.png, models/block/bookshelf.json; see asset-provenance.json",
+      "notes": "Owner head replacing the upper-right block of a two-by-two bookshelf mosaic. Both vanilla head layers retain exactly the reference mesh and UVs; NMSR yaw +45\u00b0, elevation 35.264389682754654\u00b0. Bookshelves are complete vanilla cubes with unmodified side and oak-plank textures; no carving, stretching, beveling, text or logos. Neutral matte floor with soft shadows. Blender 5.1.1; Cycles CPU; 64 samples; 67.346s; 1024x1024. Per-image .py + packed .blend + metadata beside PNG. Scripts saved and embedded, hashed, not git-committed per local-only policy."
+    }
+  ]
+}

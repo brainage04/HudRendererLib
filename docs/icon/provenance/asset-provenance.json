@@ -1,0 +1,47 @@
+[
+  {
+    "source": "/home/thomas/01_TM/Coding/Websites/brainage04.github.io/.local-icon-variants/round3/blender-h/npc-addons-head-2.blend",
+    "path": "assets/reference-head.blend",
+    "sha256": "b948b5a03da4269ebed8e82246892e185ddf41b06f3421cf5d571b1f171099d1"
+  },
+  {
+    "source": "/home/thomas/01_TM/Coding/Websites/brainage04.github.io/.local-icon-variants/round3/pixel/sources/supplied-skin.png",
+    "path": "assets/supplied-skin.png",
+    "sha256": "e9ebbeece495d9c96040e235dc865fdb1a530cf6a2243a6c8fcec22e72f03e3f"
+  },
+  {
+    "source": "/home/thomas/01_TM/Coding/Websites/brainage04.github.io/.local-icon-variants/round3/blender-h/orientation-reference.json",
+    "path": "assets/orientation-reference.json",
+    "sha256": "50efcd0eada6646af7574eb6ba48ae5624b7d094fc3bb9d819db62099b34f312"
+  },
+  {
+    "source": "/home/thomas/.gradle/caches/fabric-loom/26.2/minecraft-merged.jar",
+    "member": "assets/minecraft/textures/block/bookshelf.png",
+    "path": "assets/bookshelf.png",
+    "sha256": "cf2b8c0da8e7164162ad4991916492b724c62c31de6c18b2abb7d60ec19ba418"
+  },
+  {
+    "source": "/home/thomas/.gradle/caches/fabric-loom/26.2/minecraft-merged.jar",
+    "member": "assets/minecraft/textures/block/oak_planks.png",
+    "path": "assets/oak_planks.png",
+    "sha256": "65665943ef9c8bcf63fc67d2083ed0c50243f724106d0e4bb1abea5d921b16d3"
+  },
+  {
+    "source": "/home/thomas/.gradle/caches/fabric-loom/26.2/minecraft-merged.jar",
+    "member": "assets/minecraft/models/block/bookshelf.json",
+    "path": "assets/bookshelf-model.json",
+    "sha256": "ca9f599c8d0e7e01f5020f6b506dbad3dd9c7ca43088ee4319a7814e9547d1cb"
+  },
+  {
+    "source": "/home/thomas/.gradle/caches/fabric-loom/26.2/minecraft-merged.jar",
+    "member": "assets/minecraft/models/block/cube_column.json",
+    "path": "assets/cube_column.json",
+    "sha256": "4cc89841e64bfb9be33aef096675291b585d05bae81cbbd14bf977f89aa81a6b"
+  },
+  {
+    "source": "/home/thomas/.gradle/caches/fabric-loom/26.2/minecraft-merged.jar",
+    "member": "assets/minecraft/models/block/cube.json",
+    "path": "assets/cube.json",
+    "sha256": "3e4aacd02e816aeba38f83076596e18ded4cf49c01e17c62d1fce79850ffb84e"
+  }
+]

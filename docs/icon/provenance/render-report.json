@@ -1,0 +1,16 @@
+[
+  {
+    "image": "hudrendererlib-06-library-mosaic.png",
+    "arrangement": "Owner head replacing the upper-right block of a two-by-two bookshelf mosaic.",
+    "blender_version": "5.1.1",
+    "engine": "CYCLES",
+    "device": "CPU",
+    "samples": 64,
+    "render_duration_seconds": 67.34560038699419,
+    "resolution": [
+      1024,
+      1024
+    ],
+    "threads": 2
+  }
+]

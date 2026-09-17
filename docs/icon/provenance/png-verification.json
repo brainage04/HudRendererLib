@@ -1,0 +1,35 @@
+[
+  {
+    "name": "hudrendererlib-06-library-mosaic",
+    "decoded": true,
+    "format": "PNG",
+    "resolution": [
+      1024,
+      1024
+    ],
+    "opaque_neutral_backdrop": true,
+    "visible_owner_faces": [
+      {
+        "head": "Owner head 01",
+        "projected_front_area_pixels": 38628,
+        "yellow_skin_pixels": 13892,
+        "dark_glasses_or_mouth_pixels": 20528,
+        "pale_eyes_or_mouth_pixels": 4254
+      }
+    ],
+    "visible_bookshelf_spine_color_pixels": {
+      "red": 44769,
+      "blue": 24984,
+      "green": 33879
+    },
+    "thumbnail": "evidence/hudrendererlib-06-library-mosaic-128.png",
+    "sha256": "f2c61f3a4a5e7d6207644dee3e8da58fe5b989553ae435a7ee65336c071ed328",
+    "geometry_checks": "saved-scene-verification.json",
+    "contact_shadow": {
+      "unoccluded_ground_region_below_subject": true,
+      "reference_luminance": 125.33333333333334,
+      "shadow_minimum_luminance": 101.33333333333333,
+      "contrast": 24.000000000000014
+    }
+  }
+]

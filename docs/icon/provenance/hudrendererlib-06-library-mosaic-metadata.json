@@ -1,0 +1,202 @@
+{
+  "project": "HudRendererLib",
+  "name": "hudrendererlib-06-library-mosaic",
+  "arrangement": "Owner head replacing the upper-right block of a two-by-two bookshelf mosaic.",
+  "geometry": {
+    "subject_screen_bounds": [
+      0.1993655413389206,
+      0.09500015527009964,
+      0.8006346225738525,
+      0.9050000309944153
+    ],
+    "heads": [
+      {
+        "name": "Owner head 01",
+        "location": [
+          0.0,
+          0.5625,
+          1.6875
+        ],
+        "uniform_scale": 1.0,
+        "nmsr_yaw": 44.99999408488256,
+        "pitch": 35.26439247116752,
+        "visible_front_probes": 9,
+        "front_probe_count": 9,
+        "screen_bounds": [
+          0.39978858828544617,
+          0.44214296340942383,
+          0.8006346225738525,
+          0.9050000309944153
+        ],
+        "layers": [
+          {
+            "name": "Owner head 01 / Base head",
+            "layer": "base",
+            "dimensions_unscaled": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "mesh_and_uv_sha256": "3f5c36766f062813348ef37f15a69184eccefa7274891e95cb8b85d29d407135",
+            "identical_to_reference": true
+          },
+          {
+            "name": "Owner head 01 / Outer hat layer",
+            "layer": "outer",
+            "dimensions_unscaled": [
+              1.125,
+              1.125,
+              1.125
+            ],
+            "mesh_and_uv_sha256": "7734489fe76bfbec14f5eb0316a29d60bc87e92159d1393d91b0ecdb738d856d",
+            "identical_to_reference": true
+          }
+        ],
+        "front_polygon_pixels": [
+          [
+            626.2921142578125,
+            551.655029296875
+          ],
+          [
+            808.7216186523438,
+            446.329345703125
+          ],
+          [
+            808.7216186523438,
+            235.677978515625
+          ],
+          [
+            626.2921752929688,
+            341.003662109375
+          ]
+        ]
+      }
+    ],
+    "bookshelves": [
+      {
+        "name": "Bookshelf 01",
+        "location": [
+          0.0,
+          -0.5625,
+          0.5625
+        ],
+        "cube_side": 1.125,
+        "full_cube": true,
+        "bookshelf_sides": 4,
+        "oak_plank_ends": 2,
+        "full_face_uvs": true,
+        "screen_bounds": [
+          0.1993655413389206,
+          0.09500015527009964,
+          0.6002115607261658,
+          0.5578572750091553
+        ]
+      },
+      {
+        "name": "Bookshelf 02",
+        "location": [
+          0.0,
+          0.5625,
+          0.5625
+        ],
+        "cube_side": 1.125,
+        "full_cube": true,
+        "bookshelf_sides": 4,
+        "oak_plank_ends": 2,
+        "full_face_uvs": true,
+        "screen_bounds": [
+          0.39978858828544617,
+          0.2107143998146057,
+          0.8006345629692078,
+          0.6735715270042419
+        ]
+      },
+      {
+        "name": "Bookshelf 03",
+        "location": [
+          0.0,
+          -0.5625,
+          1.6875
+        ],
+        "cube_side": 1.125,
+        "full_cube": true,
+        "bookshelf_sides": 4,
+        "oak_plank_ends": 2,
+        "full_face_uvs": true,
+        "screen_bounds": [
+          0.19936557114124298,
+          0.32642871141433716,
+          0.6002115607261658,
+          0.7892857789993286
+        ]
+      }
+    ],
+    "positive_volume_intersections": 0,
+    "background": "neutral gray seamless matte floor with Cycles area-light contact shadows",
+    "nmsr_visible_faces": [
+      "front on screen-right",
+      "player-right side on screen-left",
+      "top"
+    ]
+  },
+  "reference": "blender-h/npc-addons-head-2.png; exact base and outer head mesh/UV data, without NPCAddons plus",
+  "source_blend_sha256": "b948b5a03da4269ebed8e82246892e185ddf41b06f3421cf5d571b1f171099d1",
+  "skin_sha256": "e9ebbeece495d9c96040e235dc865fdb1a530cf6a2243a6c8fcec22e72f03e3f",
+  "script": "hudrendererlib-06-library-mosaic.py",
+  "author_script_sha256": "d3540b25085cb18745b2b8a2ca28c4bfe9d940b0c76d1ceb487c6121e773ad5a",
+  "blender_version": "5.1.1",
+  "engine": "CYCLES",
+  "device": "CPU",
+  "samples": 64,
+  "resolution": [
+    1024,
+    1024
+  ],
+  "packed_textures": [
+    {
+      "name": "bookshelf.png",
+      "bytes": 304,
+      "sha256": "cf2b8c0da8e7164162ad4991916492b724c62c31de6c18b2abb7d60ec19ba418"
+    },
+    {
+      "name": "oak_planks.png",
+      "bytes": 195,
+      "sha256": "65665943ef9c8bcf63fc67d2083ed0c50243f724106d0e4bb1abea5d921b16d3"
+    },
+    {
+      "name": "supplied-skin.png",
+      "bytes": 241,
+      "sha256": "e9ebbeece495d9c96040e235dc865fdb1a530cf6a2243a6c8fcec22e72f03e3f"
+    }
+  ],
+  "camera": {
+    "location": [
+      6.928203582763672,
+      -6.9282026290893555,
+      8.053203582763672
+    ],
+    "rotation": [
+      0.9553165435791016,
+      -6.959331955158632e-08,
+      0.7853983044624329
+    ],
+    "ortho_scale": 3.969080686569214
+  },
+  "resources": {
+    "background": true,
+    "noaudio": true,
+    "threads": 2,
+    "display": null,
+    "audio": null,
+    "gpu": null,
+    "cpu_weight": 20,
+    "quota_cores": 3,
+    "cpu_affinity": [
+      0,
+      1
+    ],
+    "cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/render-blender.service"
+  },
+  "render_duration_seconds": 67.34560038699419,
+  "png_sha256": "f2c61f3a4a5e7d6207644dee3e8da58fe5b989553ae435a7ee65336c071ed328"
+}

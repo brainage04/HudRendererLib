@@ -1,0 +1,13 @@
+{
+  "pid": 2888091,
+  "command": "/nix/store/j57qch19aq4rs4fg728vlilgb0dcxs7z-blender-5.1.1/bin/blender --python-use-system-env --background -noaudio --threads 2 --python-exit-code 1 --python /home/thomas/01_TM/Coding/Websites/brainage04.github.io/.local-icon-variants/round3/blender-z/hudrendererlib-02-bookend.py ",
+  "status": "Name:\t.blender-wrappe\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t2888091\nNgid:\t0\nPid:\t2888091\nPPid:\t2888090\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t100\t100\t100\t100\nFDSize:\t256\nGroups:\t1 17 26 27 57 67 100 174 302 \nNStgid:\t2888091\nNSpid:\t2888091\nNSpgid:\t2888090\nNSsid:\t2888090\nKthread:\t0\nVmPeak:\t 2151916 kB\nVmSize:\t 2151916 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t  435284 kB\nVmRSS:\t  435284 kB\nRssAnon:\t  220544 kB\nRssFile:\t  214740 kB\nRssShmem:\t       0 kB\nVmData:\t  863844 kB\nVmStk:\t     160 kB\nVmExe:\t   73652 kB\nVmLib:\t  492736 kB\nVmPTE:\t    1684 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t6\nSigQ:\t0/126985\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000100000462\nCapInh:\t0000000800000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\t000003\nCpus_allowed_list:\t0-1\nMems_allowed:\t00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t92\nnonvoluntary_ctxt_switches:\t13\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+  "cgroup": "0::/user.slice/user-1000.slice/user@1000.service/app.slice/render-blender.service\n",
+  "file_descriptors": {
+    "0": "/dev/null",
+    "1": "/home/thomas/01_TM/Coding/Websites/brainage04.github.io/.local-icon-variants/round3/blender-z/evidence/hudrendererlib-02-bookend.log",
+    "2": "/home/thomas/01_TM/Coding/Websites/brainage04.github.io/.local-icon-variants/round3/blender-z/evidence/hudrendererlib-02-bookend.log"
+  },
+  "render_threads": 2,
+  "note": "Blender also has sleeping internal service threads; CPU affinity limits all threads to two CPUs. No display/audio/GPU resources launched."
+}

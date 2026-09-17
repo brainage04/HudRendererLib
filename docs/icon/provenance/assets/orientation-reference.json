@@ -1,0 +1,65 @@
+{
+  "reference": "sources/brainage-lib-default.png",
+  "sha256": "2c8f4b74f8cc6d9630aeec5530fb7339f183ce4257379c85aee86d4524e9d46f",
+  "measurement": "Connected-component centroids of the exact-white 1x1 eyes and 2x2 mouth, matched to supplied skin outer-front texel regions. Fit orthographic affine texel basis, then solve slope=sin(pitch)*tan(abs(yaw)), vertical_ratio=cos(pitch)/cos(yaw). Raster quantization means fitted angles are estimates; exact constants corroborated in unchanged NMSR source.",
+  "landmarks": [
+    {
+      "skin_center": [
+        41.5,
+        10.5
+      ],
+      "image_centroid": [
+        296.0,
+        310.5
+      ],
+      "pixel_count": 846
+    },
+    {
+      "skin_center": [
+        45.5,
+        10.5
+      ],
+      "image_centroid": [
+        404.9952718676123,
+        247.57683215130024
+      ],
+      "pixel_count": 846
+    },
+    {
+      "skin_center": [
+        44,
+        15
+      ],
+      "image_centroid": [
+        364.0017548990933,
+        412.05352442234573
+      ],
+      "pixel_count": 3419
+    }
+  ],
+  "horizontal_texel_vector_pixels": [
+    27.248817966903076,
+    -15.73079196217494
+  ],
+  "vertical_texel_vector_pixels": [
+    -0.02673111514763428,
+    31.30677873950735
+  ],
+  "fitted_abs_yaw_degrees": 44.85543551077238,
+  "fitted_pitch_degrees": 35.46618638442917,
+  "fitted_yaw_error_degrees": -0.14456448922761922,
+  "fitted_pitch_error_degrees": 0.20179670167451746,
+  "raster_tolerance_degrees": 0.3,
+  "pitch_measured_from_eye_slope_at_source_yaw_45_degrees": 35.26098931736308,
+  "eye_slope_pitch_error_degrees": -0.003400365391577509,
+  "exact_nmsr_yaw_degrees": 45,
+  "exact_nmsr_pitch_degrees": 35.264389682754654,
+  "exact_nmsr_roll_degrees": 0,
+  "exact_source": "../nmsr-service/nmsr-aas/src/model/request/mode.rs:229-233; NMSR bf87e8275005601c12768a9d74c016d0337d58b0; yaw:45.0, pitch:FRAC_1_SQRT_2.atan().to_degrees(), roll:0.0",
+  "visible_faces": {
+    "screen_right": "front: base UV [8,8,8,8], outer UV [40,8,8,8]; glasses/eyes/mouth",
+    "screen_left": "player-right side: base UV [0,8,8,8], outer UV [32,8,8,8]",
+    "screen_top": "top: base UV [8,0,8,8], outer UV [40,0,8,8]"
+  },
+  "blender_conversion": "Original camera azimuth +45 around +Z measured atan2(x,-y); rotate head +90 about +Z, giving relative camera azimuth -45. Equivalent to NMSR +45 under its opposite yaw convention. Camera elevation remains atan(1/sqrt(2)); roll zero."
+}
