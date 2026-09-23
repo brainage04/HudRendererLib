@@ -61,6 +61,7 @@ public class EnglishLangProvider extends FabricLanguageProvider {
                 "key",
                 translationBuilder
         );
+        translationBuilder.add("key.category.%s.keys".formatted(HudRendererLib.MOD_ID), HudRendererLib.MOD_NAME);
 
         // config
         generateReflectedTranslations(HudRendererLibConfig.class, autoConfigPrefix, translationBuilder);

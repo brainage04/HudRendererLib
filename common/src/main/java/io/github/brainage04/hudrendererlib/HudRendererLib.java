@@ -22,6 +22,8 @@ import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class HudRendererLib {
@@ -29,6 +31,7 @@ public class HudRendererLib {
     public static final String MOD_NAME = "HudRendererLib";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final KeyMapping.Category KEY_CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(MOD_ID, "keys"));
+    private static final Map<String, KeyMapping.Category> KEY_CATEGORIES = new HashMap<>();
     private static HudRendererPlatform platform;
 
     public static synchronized void initialize(HudRendererPlatform loaderPlatform) {
@@ -84,16 +87,36 @@ public class HudRendererLib {
         );
     }
 
+    /**
+     * Registers a key that opens {@code configClass}'s config screen, grouped under the mod's own
+     * key category (see {@link #getKeyCategory(String)}). The mod provides the translations
+     * {@code key.<modId>.openConfig} and {@code key.category.<modId>.keys}.
+     */
     @SuppressWarnings("unused")
     public static void registerConfigKey(Class<? extends ConfigData> configClass, int keycode, String modId, String modName) {
         KeyMapping keyMapping = new KeyMapping(
                 "key.%s.openConfig".formatted(modId),
                 InputConstants.Type.KEYSYM,
                 keycode,
-                KEY_CATEGORY
+                getKeyCategory(modId)
         );
         platform().registerKeyMapping(keyMapping);
         ModKeys.openConfigKeyMap.put(keyMapping, configClass);
+    }
+
+    /**
+     * The key category {@code <modId>:keys}, created and registered on first use, so that a mod's
+     * config key and any keys the mod registers itself appear together in the controls screen.
+     * Its title is the translation {@code key.category.<modId>.keys}.
+     */
+    public static synchronized KeyMapping.Category getKeyCategory(String modId) {
+        if (modId.equals(MOD_ID)) return KEY_CATEGORY;
+
+        return KEY_CATEGORIES.computeIfAbsent(modId, id -> {
+            KeyMapping.Category category = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(id, "keys"));
+            platform().registerKeyCategory(category);
+            return category;
+        });
     }
 
     @SuppressWarnings("unused")

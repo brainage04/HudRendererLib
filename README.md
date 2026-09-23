@@ -169,6 +169,8 @@ public void onInitializeClient() {
 ```
 
 Where `MOD_ID` is the ID of your mod, `MOD_NAME` is its display name, and the GLFW constant selects the default key.
+The key is listed in the controls screen under your mod's own category, `HudRendererLib.getKeyCategory(MOD_ID)`; use the same category for any other keys your mod registers so they appear together.
+Provide the translations `key.<MOD_ID>.openConfig` for the key and `key.category.<MOD_ID>.keys` for the category title.
 
 The HUD Element Editor can be accessed with `/hudelementeditor`, or the Numpad Plus key.
 The HudRendererLib Config Editor can be accessed with `/hudrendererlibconfig`, or the Numpad Enter key.
