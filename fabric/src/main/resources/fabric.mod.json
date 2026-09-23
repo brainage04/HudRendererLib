@@ -12,6 +12,7 @@
 		"sources": "https://github.com/brainage04/HudRendererLib"
 	},
 	"license": "MIT",
+	"icon": "assets/hudrendererlib/icon.png",
 	"environment": "client",
 	"entrypoints": {
 		"main": [

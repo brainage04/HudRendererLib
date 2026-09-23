@@ -6,6 +6,7 @@ license="MIT"
 modId="hudrendererlib"
 version="${version}"
 displayName="HudRendererLib"
+logoFile="assets/hudrendererlib/icon.png"
 authors="brainage04"
 description='''A library for rendering HUD elements.'''
 
