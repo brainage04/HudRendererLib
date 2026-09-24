@@ -18,11 +18,22 @@ public class ConfigUtils {
     }
 
     @SuppressWarnings({"SameReturnValue", "unused"})
-    public static <T extends ConfigData> InteractionResult saveLoad(ConfigHolder<T> configHolder, T config) {
-        // refresh element IDs
+    public static <T extends ConfigData> InteractionResult onSave(ConfigHolder<T> configHolder, T config) {
         CoreSettingsIdAssigner.assignElementIds(config);
-
         HudElementEditor.populateCoreSettingsElements();
+
+        return InteractionResult.SUCCESS;
+    }
+
+    /**
+     * Gives the freshly loaded config's elements their IDs. The editor's element map is not
+     * rebuilt here: AutoConfig calls load listeners before it replaces the holder's config, so
+     * the registered elements would still report the old config's settings. Callers of
+     * {@code load()} rebuild the map afterwards (see {@link #loadConfigClasses()}).
+     */
+    @SuppressWarnings({"SameReturnValue", "unused"})
+    public static <T extends ConfigData> InteractionResult onLoad(ConfigHolder<T> configHolder, T config) {
+        CoreSettingsIdAssigner.assignElementIds(config);
 
         return InteractionResult.SUCCESS;
     }
@@ -41,5 +52,6 @@ public class ConfigUtils {
         for (Class<? extends ConfigData> configClass : configClasses) {
             AutoConfig.getConfigHolder(configClass).load();
         }
+        HudElementEditor.populateCoreSettingsElements();
     }
 }

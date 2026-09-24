@@ -75,8 +75,8 @@ public class HudRendererLib {
 
         CoreSettingsIdAssigner.assignElementIds(AutoConfig.getConfigHolder(configClass).getConfig());
 
-        AutoConfig.getConfigHolder(configClass).registerSaveListener(ConfigUtils::saveLoad);
-        AutoConfig.getConfigHolder(configClass).registerLoadListener(ConfigUtils::saveLoad);
+        AutoConfig.getConfigHolder(configClass).registerSaveListener(ConfigUtils::onSave);
+        AutoConfig.getConfigHolder(configClass).registerLoadListener(ConfigUtils::onLoad);
     }
 
     @SuppressWarnings("unused")
