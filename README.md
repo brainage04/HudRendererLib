@@ -178,3 +178,16 @@ The HudRendererLib Config Editor can be accessed with `/hudrendererlibconfig`, o
 For more examples, please see my mods that use this library:
 - [BrainageHUD](https://github.com/brainage04/BrainageHUD/tree/master/src/main/java/com/github/brainage04/brainagehud)
 - [TwitchPlaysMinecraft](https://github.com/brainage04/TwitchPlaysMinecraft/tree/master/src/main/java/io/github/brainage04/twitchplaysminecraft)
+
+# Vanilla status effect icons
+
+Top-right elements move down while the game's status effect icons are showing, so the two don't overlap.
+Show Vanilla Status Effects in HudRendererLib's config editor hides the icons for every mod, and top-right elements then stay where they are.
+
+A mod that draws its own status effect display can hide the vanilla icons only while that display is on:
+
+```java
+HudRendererLib.registerVanillaStatusEffectsHider(() -> getConfig().statusEffectHudConfig.coreSettings.enabled);
+```
+
+The icons are hidden while any registered supplier returns true, and top-right elements are not moved down for them.

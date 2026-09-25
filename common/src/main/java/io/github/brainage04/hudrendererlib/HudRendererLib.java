@@ -23,8 +23,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BooleanSupplier;
 
 public class HudRendererLib {
     public static final String MOD_ID = "hudrendererlib";
@@ -32,6 +35,7 @@ public class HudRendererLib {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final KeyMapping.Category KEY_CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(MOD_ID, "keys"));
     private static final Map<String, KeyMapping.Category> KEY_CATEGORIES = new HashMap<>();
+    private static final List<BooleanSupplier> VANILLA_STATUS_EFFECTS_HIDERS = new CopyOnWriteArrayList<>();
     private static HudRendererPlatform platform;
 
     public static synchronized void initialize(HudRendererPlatform loaderPlatform) {
@@ -130,6 +134,28 @@ public class HudRendererLib {
                 layerId,
                 coreHudElement
         );
+    }
+
+    /**
+     * Asks for the game's status effect icons in the top right of the HUD to be hidden whenever
+     * {@code hider} returns {@code true}, e.g. while a mod draws its own status effect list.
+     * Top-right HUD elements are not moved down for the icons while they are hidden.
+     */
+    @SuppressWarnings("unused")
+    public static void registerVanillaStatusEffectsHider(BooleanSupplier hider) {
+        VANILLA_STATUS_EFFECTS_HIDERS.add(Objects.requireNonNull(hider, "hider"));
+    }
+
+    /**
+     * Whether the game's status effect icons are hidden: Show Vanilla Status Effects is off, or a
+     * registered hider asks for it.
+     */
+    public static boolean shouldHideVanillaStatusEffects() {
+        if (!ConfigUtils.getConfig().showVanillaStatusEffects) return true;
+        for (BooleanSupplier hider : VANILLA_STATUS_EFFECTS_HIDERS) {
+            if (hider.getAsBoolean()) return true;
+        }
+        return false;
     }
 
     // override util methods
