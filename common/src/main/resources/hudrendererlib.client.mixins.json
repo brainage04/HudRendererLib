@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "io.github.brainage04.hudrendererlib.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "MixinHud"
+  ]
+}

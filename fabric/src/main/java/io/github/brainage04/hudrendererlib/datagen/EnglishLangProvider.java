@@ -68,10 +68,12 @@ public class EnglishLangProvider extends FabricLanguageProvider {
 
         addAutoConfigTranslations(
                 new String[]{
+                        "showVanillaStatusEffects.@Tooltip",
                         "adjustTopRightElementsWithStatusEffects.@Tooltip"
                 },
                 new String[]{
-                        "Shifts elements with the \"%s\" alignment down by the specified amount of pixels below if potion effects are being overlayed in the top right.".formatted(ElementAnchor.TOP_RIGHT)
+                        "Show the game's status effect icons in the top right of the screen.",
+                        "Shifts elements with the \"%s\" alignment down by the specified amount of pixels below if potion effects are being overlayed in the top right. Only applies while Show Vanilla Status Effects is on.".formatted(ElementAnchor.TOP_RIGHT)
                 },
                 translationBuilder
         );

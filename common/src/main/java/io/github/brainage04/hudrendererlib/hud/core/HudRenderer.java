@@ -132,7 +132,9 @@ public class HudRenderer {
             boolean hasVisibleEffectIcon =
                     player != null
                             && player.getActiveEffects().stream().anyMatch(effect -> effect.showIcon());
-            if (hasVisibleEffectIcon && getConfig().adjustTopRightElementsWithStatusEffects) {
+            if (hasVisibleEffectIcon
+                    && getConfig().showVanillaStatusEffects
+                    && getConfig().adjustTopRightElementsWithStatusEffects) {
                 posY += getConfig().adjustTopRightElementsWithStatusEffectsAmount;
             }
         }

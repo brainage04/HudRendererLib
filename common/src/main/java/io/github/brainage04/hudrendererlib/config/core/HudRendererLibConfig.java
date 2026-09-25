@@ -21,6 +21,8 @@ public class HudRendererLibConfig implements ConfigData {
 
     // quality of life settings
     @ConfigEntry.Gui.Tooltip()
+    public boolean showVanillaStatusEffects = true;
+    @ConfigEntry.Gui.Tooltip()
     public boolean adjustTopRightElementsWithStatusEffects = true;
     public int adjustTopRightElementsWithStatusEffectsAmount = 21;
 }
