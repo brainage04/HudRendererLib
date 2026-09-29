@@ -11,6 +11,7 @@ import io.github.brainage04.hudrendererlib.hud.core.HudRenderer;
 import io.github.brainage04.hudrendererlib.platform.HudRendererPlatform;
 import io.github.brainage04.hudrendererlib.keys.ModKeys;
 import io.github.brainage04.hudrendererlib.util.ConfigUtils;
+import io.github.brainage04.hudrendererlib.util.LayerInfo;
 import io.github.brainage04.hudrendererlib.util.ScreenUtils;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigData;
@@ -123,14 +124,29 @@ public class HudRendererLib {
         });
     }
 
+    /**
+     * Registers {@code coreHudElement}, drawn next to the vanilla layer named by its
+     * {@link CoreHudElement#getLayerInfo()}.
+     *
+     * @throws IllegalArgumentException if the element's layer info names no vanilla HUD layer
+     */
     @SuppressWarnings("unused")
     public static void registerHudElement(CoreHudElement<? extends ICoreSettingsContainer> coreHudElement) {
+        LayerInfo layerInfo;
+        try {
+            layerInfo = coreHudElement.getLayerInfo();
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "HUD element %s has an invalid anchor: %s".formatted(coreHudElement.getClass().getName(), e.getMessage()),
+                    e
+            );
+        }
         Identifier layerId = Identifier.fromNamespaceAndPath(MOD_ID, "hud-layer-%d".formatted(HudRenderer.REGISTERED_ELEMENTS.size()));
 
         HudRenderer.REGISTERED_ELEMENTS.add(coreHudElement);
         platform().registerHudElement(
-                coreHudElement.getLayerInfo().layer(),
-                coreHudElement.getLayerInfo().before(),
+                layerInfo.layer(),
+                layerInfo.before(),
                 layerId,
                 coreHudElement
         );

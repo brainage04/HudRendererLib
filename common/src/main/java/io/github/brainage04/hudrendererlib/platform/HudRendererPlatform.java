@@ -1,6 +1,7 @@
 package io.github.brainage04.hudrendererlib.platform;
 
 import io.github.brainage04.hudrendererlib.hud.core.CoreHudElement;
+import io.github.brainage04.hudrendererlib.util.VanillaHudLayer;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
@@ -17,8 +18,12 @@ public interface HudRendererPlatform {
 
 	void registerEndClientTick(Consumer<Minecraft> listener);
 
+	/**
+	 * Draws {@code element} just before or after {@code anchor}, under the same conditions the game
+	 * draws {@code anchor} itself (F1, game mode, ...).
+	 */
 	void registerHudElement(
-			Identifier anchor,
+			VanillaHudLayer anchor,
 			boolean before,
 			Identifier id,
 			CoreHudElement<?> element

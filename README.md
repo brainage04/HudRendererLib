@@ -9,11 +9,11 @@ said code each time I found a way to improve said code.
 
 # Setup
 
-HudRendererLib 1.0.7 targets Minecraft 26.2 on both loaders.
+HudRendererLib 1.0.12 targets Minecraft 26.2 on both loaders.
 
 ## Fabric Loom
 
-HudRendererLib 1.0.7 is published on Maven Central:
+HudRendererLib 1.0.12 is published on Maven Central:
 
 ```groovy
 repositories {
@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    modImplementation "io.github.brainage04:hudrendererlib:1.0.7"
+    modImplementation "io.github.brainage04:hudrendererlib:1.0.12"
 }
 ```
 
@@ -35,7 +35,7 @@ repositories {
 }
 
 dependencies {
-    implementation "io.github.brainage04:hudrendererlib-neoforge:1.0.7"
+    implementation "io.github.brainage04:hudrendererlib-neoforge:1.0.12"
 }
 ```
 
@@ -125,12 +125,21 @@ If you wish to change the layer that a given element (basic or custom) is render
 ```java
     @Override
     public LayerInfo getLayerInfo() {
-        return new LayerInfo(Identifier.fromNamespaceAndPath("minecraft", "chat"), true);
+        return new LayerInfo(VanillaHudLayer.CHAT, true);
     }
 ```
 
-The first argument is the identifier of an officially supported HUD layer, and the second
-argument controls whether the element renders before or after that layer.
+The first argument is the vanilla HUD layer to draw next to, and the second argument controls
+whether the element renders before or after that layer. `VanillaHudLayer` names every vanilla layer
+the same way on both loaders; HudRendererLib maps it to Fabric's `VanillaHudElements` or NeoForge's
+`VanillaGuiLayers`. `new LayerInfo(Identifier, boolean)` also accepts either loader's identifier
+(e.g. `minecraft:scoreboard` or `minecraft:scoreboard_sidebar`); an identifier that names no vanilla
+layer fails at registration with an error naming the element and the identifier.
+
+An element is drawn under the same conditions as its layer on both loaders: F1 hides it with the rest
+of the HUD (except next to `SLEEP` and `SUBTITLES`, which the game keeps drawing), and it only
+appears when the game draws the layer, e.g. `HEALTH_BAR` only in survival/adventure mode and
+`HOTBAR` only outside spectator mode (`SPECTATOR_MENU` is the spectator hotbar).
 
 Once you have created a config and HUD class for your element, register the element in your `onInitializeClient` method like so:
 
