@@ -16,7 +16,7 @@ config="hudrendererlib.client.mixins.json"
 [[dependencies.hudrendererlib]]
 modId="neoforge"
 type="required"
-versionRange="[26.2.0.23-beta,26.3)"
+versionRange="[26.2.0.88,26.3)"
 ordering="NONE"
 side="CLIENT"
 
