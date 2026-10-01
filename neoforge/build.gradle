@@ -2,6 +2,13 @@ plugins {
 	id 'io.github.brainage04.maven-central-publishing' version "${fabricmoddingconventions_version}"
 }
 
+repositories {
+	exclusiveContent {
+		forRepository { maven { url = "https://maven.shedaniel.me/" } }
+		filter { includeGroup "me.shedaniel.cloth" }
+	}
+}
+
 mavenCentralPublishing {
 	repository.set('brainage04/HudRendererLib')
 	publicationName.set(rootProject.mod_name)

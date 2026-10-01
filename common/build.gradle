@@ -1,1 +1,8 @@
+repositories {
+	exclusiveContent {
+		forRepository { maven { url = "https://maven.shedaniel.me/" } }
+		filter { includeGroup "me.shedaniel.cloth" }
+	}
+}
+
 dependencies { implementation "me.shedaniel.cloth:cloth-config:${rootProject.cloth_config_version}" }
