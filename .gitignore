@@ -30,7 +30,11 @@ bin/
 
 # fabric
 
-run/
+.fabric/
+mods/
+**/run/*
+!**/run/options.txt
+logs/
 
 # java
 
@@ -39,10 +43,10 @@ replay_*.log
 *.hprof
 *.jfr
 
-# other
-
-src/main/generated/.cache
-
 .env
 
 .codex
+
+# other
+
+src/main/generated/.cache

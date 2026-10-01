@@ -3,6 +3,7 @@
 	"id": "${mod_id}-gametest",
 	"version": "${mod_version}",
 	"name": "${mod_name} Game Tests",
+	"icon": "assets/hudrendererlib/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"fabric-client-gametest": [

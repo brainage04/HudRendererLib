@@ -27,14 +27,13 @@ tasks.named('publishToMavenCentral') {
 fabricApi { configureDataGeneration { client = true } }
 
 dependencies {
-	implementation("me.shedaniel.cloth:cloth-config-fabric:${rootProject.cloth_config_version}") {
-		exclude group: 'net.fabricmc.fabric-api'
-	}
-	compileOnly "com.terraformersmc:modmenu:${rootProject.modmenu_version}"
-}
+	// ModMenu: compile-only so the published POM does not force an optional integration (and a non-Central repository) on consumers.
+	compileOnly("com.terraformersmc:modmenu:${rootProject.modmenu_version}") { exclude group: "net.fabricmc.fabric-api" }
+	productionRuntimeMods("com.terraformersmc:modmenu:${rootProject.modmenu_version}") { exclude group: "net.fabricmc.fabric-api" }
 
-productionGameTests {
-	runtimeModDependencies.add("me.shedaniel.cloth:cloth-config-fabric:${rootProject.cloth_config_version}")
+	// Cloth Config
+	implementation("me.shedaniel.cloth:cloth-config-fabric:${rootProject.cloth_config_version}") { exclude group: "net.fabricmc.fabric-api" }
+	productionRuntimeMods("me.shedaniel.cloth:cloth-config-fabric:${rootProject.cloth_config_version}") { exclude group: "net.fabricmc.fabric-api" }
 }
 
 tasks.register('javadocJar', Jar) {

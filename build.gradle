@@ -7,3 +7,8 @@ tasks.register('publishAllToMavenCentral') {
 	description = 'Uploads both loader publications before finalizing one Maven Central deployment.'
 	dependsOn ':fabric:publishToMavenCentral'
 }
+
+multiLoaderModConventions {
+	// Client-only mod: NeoForge GameTests run on a dedicated server, where this mod does nothing.
+	neoForgeGameTests = false
+}

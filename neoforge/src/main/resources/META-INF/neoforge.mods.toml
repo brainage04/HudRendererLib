@@ -1,6 +1,7 @@
 modLoader="javafml"
 loaderVersion="[11,)"
 license="MIT"
+issueTrackerURL="https://github.com/brainage04/HudRendererLib/issues"
 
 [[mods]]
 modId="hudrendererlib"
@@ -9,6 +10,7 @@ displayName="HudRendererLib"
 iconFile="assets/hudrendererlib/icon.png"
 authors="brainage04"
 description='''A library for rendering HUD elements.'''
+displayURL="https://github.com/brainage04/HudRendererLib"
 
 [[mixins]]
 config="hudrendererlib.client.mixins.json"
@@ -30,6 +32,6 @@ side="CLIENT"
 [[dependencies.hudrendererlib]]
 modId="cloth_config"
 type="required"
-versionRange="[26.2.155,)"
+versionRange="[${cloth_config_version},)"
 ordering="NONE"
 side="CLIENT"
