@@ -18,14 +18,14 @@ config="hudrendererlib.client.mixins.json"
 [[dependencies.hudrendererlib]]
 modId="neoforge"
 type="required"
-versionRange="[26.2.0.88,26.3)"
+versionRange="[${neoforge_version},)"
 ordering="NONE"
 side="CLIENT"
 
 [[dependencies.hudrendererlib]]
 modId="minecraft"
 type="required"
-versionRange="[26.2,26.3)"
+versionRange="${minecraft_version_range}"
 ordering="NONE"
 side="CLIENT"
 
