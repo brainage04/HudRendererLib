@@ -32,3 +32,41 @@ publishing {
 		}
 	}
 }
+
+def clientGameTestDirectory = rootProject.file('run/clientGameTest/neoforge')
+
+loom {
+	runs {
+		clientGameTest {
+			client()
+			name 'HudRendererLib NeoForge Client GameTest'
+			source sourceSets.gametest
+			runDir clientGameTestDirectory.absolutePath
+			property 'hudrendererlib.clientGameTest', 'true'
+		}
+	}
+}
+
+tasks.register('clearClientGameTestWorld', Delete) {
+	delete new File(clientGameTestDirectory, 'saves/hudrendererlib-client-gametest')
+}
+
+tasks.named('runClientGameTest') {
+	dependsOn clearClientGameTestWorld
+	doLast {
+		def log = new File(clientGameTestDirectory, 'logs/latest.log')
+		if (!log.exists() || !log.text.contains('HUD_NEOFORGE_CLIENT_GAMETEST_PASS')) {
+			throw new GradleException('NeoForge client GameTest did not complete its assertions.')
+		}
+	}
+}
+
+rootProject.tasks.named('runAllGameTests') {
+	dependsOn ':neoforge:runClientGameTest'
+}
+
+gradle.projectsEvaluated {
+	tasks.named('runClientGameTest') {
+		mustRunAfter project(':fabric').tasks.named('runProductionClientGameTest')
+	}
+}

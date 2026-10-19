@@ -111,7 +111,14 @@ or a custom HUD element like so:
 public class ExampleHud implements CoreHudElement<ExampleHudConfig> {
     @Override
     public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
-        // render element here
+        CoreSettings settings = getElementConfig().getCoreSettings();
+        int width = 100;
+        int height = 24;
+        int x = HudRenderer.getPosX(settings, width);
+        int y = HudRenderer.getPosY(settings, height);
+        HudRenderer.setElementBounds(settings, x, y, x + width, y + height);
+        graphics.fill(x, y, x + width, y + height, 0x80000000);
+        graphics.text(Minecraft.getInstance().font, "Example HUD", x + 4, y + 4, 0xFFFFFFFF);
     }
 
     @Override
@@ -120,6 +127,9 @@ public class ExampleHud implements CoreHudElement<ExampleHudConfig> {
     }
 }
 ```
+
+Call `HudRenderer.setElementBounds(...)` on every rendered frame with the element's current screen-space bounds, including any padding.
+The HUD Element Editor uses those bounds to select and drag custom elements; text-only elements set them automatically.
 
 If you wish to change the layer that a given element (basic or custom) is rendered with:
 ```java

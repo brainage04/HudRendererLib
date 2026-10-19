@@ -41,6 +41,17 @@ public final class HudRendererLibClientGameTest implements FabricClientGameTest 
         ClientGameTestServers.withDedicatedServer(context, serverProperties, "HudRendererLib HUD API GameTest", server -> {
             ClientGameTestServers.assertClientWorldAndPlayerAvailable(context);
             context.runOnClient(client -> registerFixture());
+            HudClientScenarios.run(new HudClientScenarios.Driver() {
+                @Override
+                public void onClient(java.util.function.Consumer<net.minecraft.client.Minecraft> action) {
+                    context.runOnClient(action);
+                }
+
+                @Override
+                public void waitTicks(int ticks) {
+                    context.waitTicks(ticks);
+                }
+            });
             context.waitTicks(20);
         
             assertRegistrations();

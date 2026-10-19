@@ -1,5 +1,6 @@
 package io.github.brainage04.hudrendererlib.neoforge;
 
+import io.github.brainage04.hudrendererlib.HudRendererLib;
 import io.github.brainage04.hudrendererlib.hud.core.CoreHudElement;
 import io.github.brainage04.hudrendererlib.platform.HudRendererPlatform;
 import io.github.brainage04.hudrendererlib.util.VanillaHudLayer;
@@ -22,6 +23,7 @@ import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -30,9 +32,12 @@ public final class NeoForgeHudRendererPlatform implements HudRendererPlatform {
 	private final List<KeyMapping.Category> keyCategories = new ArrayList<>();
 	private final List<KeyMapping> keyMappings = new ArrayList<>();
 	private final List<Consumer<Minecraft>> endClientTickListeners = new ArrayList<>();
-	private final List<HudElementRegistration> hudElements = new ArrayList<>();
+	private final EnumMap<VanillaHudLayer, ElementLayers> hudElements = new EnumMap<>(VanillaHudLayer.class);
 
 	public NeoForgeHudRendererPlatform(IEventBus modBus) {
+		for (VanillaHudLayer anchor : VanillaHudLayer.values()) {
+			hudElements.put(anchor, new ElementLayers());
+		}
 		modBus.addListener(this::onRegisterKeyMappings);
 		modBus.addListener(this::onRegisterGuiLayers);
 		NeoForge.EVENT_BUS.addListener(this::onRegisterClientCommands);
@@ -66,7 +71,9 @@ public final class NeoForgeHudRendererPlatform implements HudRendererPlatform {
 			Identifier id,
 			CoreHudElement<?> element
 	) {
-		hudElements.add(new HudElementRegistration(anchor, before, id, element));
+		ElementLayers layers = hudElements.get(anchor);
+		if (before) layers.before.add(element);
+		else layers.after.addFirst(element);
 	}
 
 	private void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
@@ -75,20 +82,27 @@ public final class NeoForgeHudRendererPlatform implements HudRendererPlatform {
 	}
 
 	private void onRegisterGuiLayers(RegisterGuiLayersEvent event) {
-		for (HudElementRegistration registration : hudElements) {
-			VanillaHudLayer anchor = registration.anchor();
-			CoreHudElement<?> element = registration.element();
-			// Unlike Fabric's attached elements, NeoForge layers do not inherit their neighbour's
-			// condition, so apply the anchor's own condition here.
-			GuiLayer layer = (graphics, deltaTracker) -> {
-				if (isDrawn(anchor, Minecraft.getInstance())) element.extractRenderState(graphics, deltaTracker);
-			};
-			if (registration.before()) {
-				event.registerBelow(layerId(anchor), registration.id(), layer);
-			} else {
-				event.registerAbove(layerId(anchor), registration.id(), layer);
-			}
+		// Install both attachment points even when empty. Mods can register elements after this
+		// one-shot event, just as they can with Fabric's HUD registry.
+		for (VanillaHudLayer anchor : VanillaHudLayer.values()) {
+			ElementLayers layers = hudElements.get(anchor);
+			String name = anchor.name().toLowerCase(java.util.Locale.ROOT);
+			event.registerBelow(layerId(anchor),
+					Identifier.fromNamespaceAndPath(HudRendererLib.MOD_ID, name + "-before"),
+					elementLayer(anchor, layers.before));
+			event.registerAbove(layerId(anchor),
+					Identifier.fromNamespaceAndPath(HudRendererLib.MOD_ID, name + "-after"),
+					elementLayer(anchor, layers.after));
 		}
+	}
+
+	private static GuiLayer elementLayer(VanillaHudLayer anchor, List<CoreHudElement<?>> elements) {
+		return (graphics, deltaTracker) -> {
+			if (!isDrawn(anchor, Minecraft.getInstance())) return;
+			for (int i = 0; i < elements.size(); i++) {
+				elements.get(i).extractRenderState(graphics, deltaTracker);
+			}
+		};
 	}
 
 	private static Identifier layerId(VanillaHudLayer layer) {
@@ -178,11 +192,8 @@ public final class NeoForgeHudRendererPlatform implements HudRendererPlatform {
 	private record ClientCommandRegistration(String literal, Consumer<Minecraft> action) {
 	}
 
-	private record HudElementRegistration(
-			VanillaHudLayer anchor,
-			boolean before,
-			Identifier id,
-			CoreHudElement<?> element
-	) {
+	private static final class ElementLayers {
+		private final List<CoreHudElement<?>> before = new ArrayList<>();
+		private final List<CoreHudElement<?>> after = new ArrayList<>();
 	}
 }
