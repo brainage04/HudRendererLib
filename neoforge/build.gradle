@@ -80,7 +80,15 @@ rootProject.tasks.named('runAllGameTests') {
 }
 
 gradle.projectsEvaluated {
+	def assetDownloads = [
+			project(':fabric').tasks.named('downloadAssets'),
+			tasks.named('downloadAssets')
+	]
+	project(':fabric').tasks.named('runProductionClientGameTest') {
+		mustRunAfter assetDownloads
+	}
 	tasks.named('runClientGameTest') {
+		mustRunAfter assetDownloads
 		mustRunAfter project(':fabric').tasks.named('runProductionClientGameTest')
 	}
 }
