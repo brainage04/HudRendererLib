@@ -1,5 +1,5 @@
 plugins {
-	id 'io.github.brainage04.maven-central-publishing' version "${fabricmoddingconventions_version}"
+	id 'io.github.brainage04.maven-central-publishing' version "${minecraftmodconventions_version}"
 }
 
 repositories {
@@ -51,15 +51,9 @@ tasks.register('clearClientGameTestWorld', Delete) {
 	delete new File(clientGameTestDirectory, 'saves/hudrendererlib-client-gametest')
 }
 
-def fabricOptions = project(':fabric').tasks.named('prepareClientGameTestRun')
-tasks.register('prepareClientGameTestRun', io.github.brainage04.fabricmoddingconventions.gradle.recorder.PrepareClientGameTestRunTask) {
+tasks.register('prepareClientGameTestRun', io.github.brainage04.minecraftmodconventions.gradle.recorder.PrepareClientGameTestRunTask) {
+	profile.set('test')
 	recordingAudioDevice.set('')
-	minecraftOptionsVersion.set(fabricOptions.flatMap { it.minecraftOptionsVersion })
-	maxFps.set('60')
-	renderDistance.set('2')
-	simulationDistance.set('2')
-	guiScale.set('2')
-	fullscreen.set('false')
 	disableSocialInteractionsToast.set(true)
 	optionsFile.set(new File(clientGameTestDirectory, 'options.txt'))
 }

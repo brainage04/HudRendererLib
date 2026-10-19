@@ -1,6 +1,6 @@
 package io.github.brainage04.hudrendererlib.gametest;
 
-import io.github.brainage04.fabricmoddingconventions.ClientGameTestServers;
+import io.github.brainage04.minecraftmodconventions.ClientGameTestServers;
 import java.util.function.Consumer;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
