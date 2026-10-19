@@ -51,8 +51,22 @@ tasks.register('clearClientGameTestWorld', Delete) {
 	delete new File(clientGameTestDirectory, 'saves/hudrendererlib-client-gametest')
 }
 
+def fabricOptions = project(':fabric').tasks.named('prepareClientGameTestRun')
+tasks.register('prepareClientGameTestRun', io.github.brainage04.fabricmoddingconventions.gradle.recorder.PrepareClientGameTestRunTask) {
+	recordingAudioDevice.set('')
+	minecraftOptionsVersion.set(fabricOptions.flatMap { it.minecraftOptionsVersion })
+	maxFps.set('60')
+	renderDistance.set('2')
+	simulationDistance.set('2')
+	guiScale.set('2')
+	fullscreen.set('false')
+	disableSocialInteractionsToast.set(true)
+	optionsFile.set(new File(clientGameTestDirectory, 'options.txt'))
+}
+
 tasks.named('runClientGameTest') {
 	dependsOn clearClientGameTestWorld
+	dependsOn prepareClientGameTestRun
 	doLast {
 		def log = new File(clientGameTestDirectory, 'logs/latest.log')
 		if (!log.exists() || !log.text.contains('HUD_NEOFORGE_CLIENT_GAMETEST_PASS')) {

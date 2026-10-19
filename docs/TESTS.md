@@ -31,6 +31,7 @@ heavy --label hudrendererlib-wave -- ./gradlew --no-daemon -Pfabricmoddingconven
 ```
 
 `runAllGameTests` includes the Fabric production client suite and the NeoForge integrated-world client suite. Dedicated-server GameTests are disabled because this library is client-only. Both clients use the same production HUD/editor assertions in `common/src/gametest`.
+The NeoForge client prepares a separate, muted options file through the conventions task rather than copying the owner's settings.
 
 ## Coverage gaps filled
 
