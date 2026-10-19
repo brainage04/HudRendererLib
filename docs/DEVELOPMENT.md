@@ -203,3 +203,14 @@ HudRendererLib.registerVanillaStatusEffectsHider(() -> getConfig().statusEffectH
 ```
 
 The icons are hidden while any registered supplier returns true, and top-right elements are not moved down for them.
+
+## Building and running tests
+
+```bash
+heavy status
+heavy --mem 6G --label hudrendererlib-tests -- ./gradlew --no-daemon -Pfabricmoddingconventions.devClientOptions=/nonexistent build runAllGameTests
+```
+
+`runAllGameTests` includes the Fabric production client suite and the NeoForge integrated-world client suite.
+Dedicated-server GameTests are disabled because this library is client-only.
+The NeoForge client prepares a separate, muted options file through the conventions task rather than copying the owner's settings.

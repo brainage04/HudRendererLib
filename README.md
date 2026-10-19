@@ -47,5 +47,4 @@ An element is drawn under the same conditions as its layer on both loaders: F1 h
 - [Development and API](docs/DEVELOPMENT.md) - dependency setup, config registration, text and custom elements, bounds for the editor, layer anchors and status effect integration.
 - [Publishing](docs/PUBLISHING.md) - publishing configuration.
 - [Release checklist](docs/RELEASE.md) - loader artifacts and release steps.
-- [Tests](docs/TESTS.md) - test review and suite commands.
 - [Modrinth](docs/MODRINTH.md) - Modrinth publishing setup.
