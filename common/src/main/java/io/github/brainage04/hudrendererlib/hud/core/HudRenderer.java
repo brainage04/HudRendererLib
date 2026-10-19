@@ -19,7 +19,16 @@ public class HudRenderer {
     public static final List<CoreHudElement<? extends ICoreSettingsContainer>> REGISTERED_ELEMENTS = new ArrayList<>();
 
     public static void renderElement(Font renderer, GuiGraphicsExtractor drawContext, TextList lines, CoreSettings coreSettings) {
-        if (lines.isEmpty()) return;
+        if (lines.isEmpty()) {
+            CoreSettingsElement element = HudElementEditor.CORE_SETTINGS_ELEMENTS.get(coreSettings.elementId);
+            if (element != null) {
+                element.corners.left = -1;
+                element.corners.top = -1;
+                element.corners.right = -1;
+                element.corners.bottom = -1;
+            }
+            return;
+        }
 
         int elementWidth = 0;
 

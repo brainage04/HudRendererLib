@@ -93,6 +93,8 @@ public final class HudClientScenarios {
             editorDrag(driver);
             configSaveAndUndo(driver);
             textWrapping(driver);
+            basicAnchorCycle(driver);
+            editorLifecycle(driver);
             statusEffects(driver);
             System.out.println("HUD_CLIENT_SCENARIOS_PASS: registration/order, F1, enabled, commands/keys, editor, save/undo, text wrapping, status effects");
         } finally {
@@ -126,6 +128,9 @@ public final class HudClientScenarios {
             check(editor.selectedElementIndex == settings.elementId, "Click must select the custom HUD element");
             editor.mouseDragged(mouse(x + 12, y + 9), 12, 9);
             check(settings.x == oldX + 12 && settings.y == oldY + 9, "Dragging must move the selected element");
+            BEFORE_FIRST.getElementConfig().getCoreSettings().enabled = false;
+            check(editor.mouseInElement(x, y) != settings.elementId, "Disabled elements must not remain selectable");
+            BEFORE_FIRST.getElementConfig().getCoreSettings().enabled = true;
             editor.closeWithoutSaving();
         });
     }
@@ -237,6 +242,68 @@ public final class HudClientScenarios {
         });
     }
 
+    private static void editorLifecycle(Driver driver) {
+        driver.onClient(client -> {
+            int previous = client.options.menuBackgroundBlurriness().get();
+            try {
+                client.options.menuBackgroundBlurriness().set(7);
+                client.setScreen(new HudElementEditor());
+                check(client.options.menuBackgroundBlurriness().get() == 0, "Editor must disable blur while open");
+                client.setScreen(new HudElementEditor());
+                check(client.options.menuBackgroundBlurriness().get() == 0, "Replacing an editor must keep blur disabled");
+                client.setScreen(null);
+                check(client.options.menuBackgroundBlurriness().get() == 7, "Replacing the editor must restore the previous blur");
+            } finally {
+                client.setScreen(null);
+                client.options.menuBackgroundBlurriness().set(previous);
+            }
+        });
+        int[] oldBounds = new int[2];
+        driver.onClient(client -> client.setScreen(new HudElementEditor()));
+        driver.waitTicks(4);
+        driver.onClient(client -> {
+            CoreSettings settings = TEXT.getElementConfig().getCoreSettings();
+            ElementCorners bounds = HudElementEditor.CORE_SETTINGS_ELEMENTS.get(settings.elementId).corners;
+            oldBounds[0] = bounds.left + 1;
+            oldBounds[1] = bounds.top + 1;
+            TEXT.empty = true;
+        });
+        driver.waitTicks(4);
+        driver.onClient(client -> {
+            HudElementEditor editor = (HudElementEditor) client.gui.screen();
+            CoreSettings settings = TEXT.getElementConfig().getCoreSettings();
+            check(editor.mouseInElement(oldBounds[0], oldBounds[1]) != settings.elementId,
+                    "Empty text must not leave a selectable stale rectangle");
+            editor.closeWithoutSaving();
+            TEXT.empty = false;
+        });
+    }
+
+    private static void basicAnchorCycle(Driver driver) {
+        driver.onClient(client -> client.setScreen(new HudElementEditor()));
+        driver.waitTicks(4);
+        for (int i = 0; i < ElementAnchor.values().length; i++) {
+            int[] previous = new int[2];
+            driver.onClient(client -> {
+                CoreSettings settings = TEXT.getElementConfig().getCoreSettings();
+                ElementCorners bounds = HudElementEditor.CORE_SETTINGS_ELEMENTS.get(settings.elementId).corners;
+                previous[0] = bounds.left;
+                previous[1] = bounds.top;
+                HudElementEditor editor = (HudElementEditor) client.gui.screen();
+                editor.selectedElementIndex = settings.elementId;
+                editor.keyPressed(new KeyEvent(GLFW.GLFW_KEY_SPACE, 0, 0));
+            });
+            driver.waitTicks(3);
+            driver.onClient(client -> {
+                CoreSettings settings = TEXT.getElementConfig().getCoreSettings();
+                ElementCorners bounds = HudElementEditor.CORE_SETTINGS_ELEMENTS.get(settings.elementId).corners;
+                check(bounds.left == previous[0] && bounds.top == previous[1],
+                        "Cycling a padded text element's anchor must preserve its screen position");
+            });
+        }
+        driver.onClient(client -> ((HudElementEditor) client.gui.screen()).closeWithoutSaving());
+    }
+
     private static void statusEffects(Driver driver) {
         driver.onClient(client -> {
             var config = ConfigUtils.getConfig();
@@ -305,6 +372,7 @@ public final class HudClientScenarios {
         public void setCoreSettings(CoreSettings settings) { coreSettings = settings; }
     }
     private static final class TextProbe implements BasicCoreHudElement<Settings> {
+        private boolean empty;
         @Override
         public Settings getElementConfig() {
             return AutoConfig.getConfigHolder(FixtureConfig.class).getConfig().text;
@@ -313,6 +381,7 @@ public final class HudClientScenarios {
         @Override
         public TextList getLines() {
             TextList lines = new TextList();
+            if (empty) return lines;
             lines.add("A long HUD line wraps into several short lines");
             lines.addEmpty();
             return lines;

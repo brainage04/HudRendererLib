@@ -3,6 +3,7 @@ package io.github.brainage04.hudrendererlib.config.core;
 import me.shedaniel.autoconfig.ConfigData;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 public class CoreSettingsIdAssigner {
     public static final int INVALID_ID = 0;
@@ -15,7 +16,14 @@ public class CoreSettingsIdAssigner {
 
 
     public static <T extends ConfigData> void assignElementIds(T config) {
-        for (Field field : config.getClass().getDeclaredFields()) {
+        for (Class<?> type = config.getClass(); type != Object.class; type = type.getSuperclass()) {
+            assignDeclaredElementIds(config, type);
+        }
+    }
+
+    private static void assignDeclaredElementIds(ConfigData config, Class<?> type) {
+        for (Field field : type.getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers())) continue;
             field.setAccessible(true);
 
             try {

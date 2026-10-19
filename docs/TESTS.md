@@ -37,3 +37,12 @@ heavy --label hudrendererlib-wave -- ./gradlew --no-daemon -Pfabricmoddingconven
 The original suites did not exercise command dispatch, key handling, config save/load, undo, keyboard editing, anchor cycling, text wrapping or status-effect offsets. The shared client suite now checks both commands and both default keys, a real custom-element drag, Ctrl+Shift movement, anchor-position preservation, save/reload/undo with fresh config objects, text wrapping with padding, and global/per-mod status-effect hiding and offsets on both loaders.
 
 Remaining gaps: pixel-level styling, all vanilla layer/game-mode combinations, optional Mod Menu and NeoForge Mods-list navigation, and rendering across resource reloads. The server has no commands, gamerules or lifecycle behaviour in this client-only library. The tests check extraction order and bounds, not screenshot pixels or sound.
+
+## Code-review regressions
+
+- Custom elements moved by their padding when Space cycled alignment. Anchor cycling now uses the renderer's offsets, accounting separately for text bounds; the client suite checks custom alignment and a complete nine-anchor cycle for padded text.
+- Replacing an editor screen without closing it left menu blur disabled. Blur now belongs to the displayed screen lifecycle and restores on removal, including editor-to-editor replacement.
+- Disabled elements and text elements that became empty left selectable stale bounds. Hit testing skips disabled settings and empty text clears its old rectangle; both cases have client assertions.
+- Inherited config fields were not assigned IDs after deserialization, and static config fields were treated as instance elements. Unit regressions cover inherited IDs, stable existing IDs and ignored static fields.
+
+No public API signatures changed. English-only editor labels and overlapping-element selection order remain judgement calls rather than changed behaviour.

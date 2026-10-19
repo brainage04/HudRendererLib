@@ -1,5 +1,6 @@
 package io.github.brainage04.hudrendererlib.hud.core;
 
+import io.github.brainage04.hudrendererlib.HudRendererLib;
 import io.github.brainage04.hudrendererlib.config.core.*;
 import io.github.brainage04.hudrendererlib.util.ConfigUtils;
 import io.github.brainage04.hudrendererlib.util.MathUtils;
@@ -46,8 +47,6 @@ public class HudElementEditor extends Screen {
 
         populateCoreSettingsElements();
 
-        // disable blur while editing elements
-        disableBlur();
     }
 
     public static void populateCoreSettingsElements() {
@@ -67,17 +66,24 @@ public class HudElementEditor extends Screen {
 
     public void disableBlur() {
         OptionInstance<Integer> menuBackgroundBlurriness = Minecraft.getInstance().options.menuBackgroundBlurriness();
-        previousMenuBackgroundBlurriness = menuBackgroundBlurriness.get();
+        if (previousMenuBackgroundBlurriness == null) {
+            previousMenuBackgroundBlurriness = menuBackgroundBlurriness.get();
+        }
         menuBackgroundBlurriness.set(0);
     }
 
     public void revertBlur() {
-        Minecraft.getInstance().options.menuBackgroundBlurriness().set(previousMenuBackgroundBlurriness);
+        if (previousMenuBackgroundBlurriness != null) {
+            Minecraft.getInstance().options.menuBackgroundBlurriness().set(previousMenuBackgroundBlurriness);
+            previousMenuBackgroundBlurriness = null;
+        }
     }
 
     public int mouseInElement(double mouseX, double mouseY) {
         for (int i : CORE_SETTINGS_ELEMENTS.keySet()) {
-            ElementCorners corners = CORE_SETTINGS_ELEMENTS.get(i).corners;
+            CoreSettingsElement element = CORE_SETTINGS_ELEMENTS.get(i);
+            if (!element.coreSettings.enabled) continue;
+            ElementCorners corners = element.corners;
 
             if (mouseInRect(
                     corners.left,
@@ -135,6 +141,7 @@ public class HudElementEditor extends Screen {
 
     @Override
     protected void init() {
+        disableBlur();
         addRenderableWidget(button1);
         addRenderableWidget(button2);
     }
@@ -144,6 +151,12 @@ public class HudElementEditor extends Screen {
         ConfigUtils.saveConfigClasses();
         revertBlur();
         super.onClose();
+    }
+
+    @Override
+    public void removed() {
+        revertBlur();
+        super.removed();
     }
 
     public void closeWithoutSaving() {
@@ -170,22 +183,23 @@ public class HudElementEditor extends Screen {
             if (keyCode == GLFW.GLFW_KEY_SPACE) {
                 ElementCorners corners = coreSettingsElement.corners;
 
-                ElementAnchor before = coreSettings.elementAnchor;
-                int newOrdinal = coreSettings.elementAnchor.ordinal() + 1;
-                if (newOrdinal >= ElementAnchor.values().length) newOrdinal = 0;
-                coreSettings.elementAnchor = ElementAnchor.values()[newOrdinal];
-                ElementAnchor after = coreSettings.elementAnchor;
+                int elementWidth = corners.right - corners.left;
+                int elementHeight = corners.bottom - corners.top;
+                for (CoreHudElement<?> element : HudRenderer.REGISTERED_ELEMENTS) {
+                    if (element.getElementConfig().getCoreSettings() == coreSettings
+                            && element instanceof BasicCoreHudElement<?>) {
+                        elementWidth -= HudRendererLib.getPadding(coreSettings) * 4;
+                        elementHeight -= HudRendererLib.getPadding(coreSettings) * 2;
+                        break;
+                    }
+                }
+                int beforeX = HudRenderer.getPosX(coreSettings, elementWidth);
+                int beforeY = HudRenderer.getPosY(coreSettings, elementHeight);
+                ElementAnchor[] anchors = ElementAnchor.values();
+                coreSettings.elementAnchor = anchors[(coreSettings.elementAnchor.ordinal() + 1) % anchors.length];
+                coreSettings.x += beforeX - HudRenderer.getPosX(coreSettings, elementWidth);
+                coreSettings.y += beforeY - HudRenderer.getPosY(coreSettings, elementHeight);
 
-                // modify x/y coords such that the element remains in the same position
-                int beforeX = HudRenderer.getXOffsetNoPadding(before, corners.right - corners.left);
-                int afterX = HudRenderer.getXOffsetNoPadding(after, corners.right - corners.left);
-                int beforeY = HudRenderer.getYOffsetNoPadding(before, corners.bottom - corners.top);
-                int afterY = HudRenderer.getYOffsetNoPadding(after, corners.bottom - corners.top);
-
-                coreSettings.x += (beforeX - afterX);
-                coreSettings.y += (beforeY - afterY);
-
-                // update selected element position
                 selectedElementX = coreSettings.x;
                 selectedElementY = coreSettings.y;
             } else {
