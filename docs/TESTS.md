@@ -9,17 +9,15 @@
 
 ## Classification before pruning
 
-| Test or assertion | Classification | Reason |
-|---|---|---|
-| `CoreSettingsIdAssignerTest.assignsIdsGloballyAcrossConfigClasses` | Keep | Separate mod configs must not share editor IDs. |
-| `VanillaHudLayerTest.resolvesFabricAndNeoForgeIdsToTheSameLayer` | Keep | Resolves public identifiers from both loaders. |
-| `VanillaHudLayerTest.rejectsUnknownAndNonVanillaIdsNamingTheId` | Keep | Rejects bad public input and names it in the error. |
-| Original Fabric `assertRegistrations` | Tautological | Counts fixture registrations and compares the fixtures' fixed `before` values, without observing rendering. |
-| Original Fabric before-chat/after-chat demo scenes | Redundant | `HudClientScenarios.run` now checks actual late rendering, both sides of chat and same-side ordering on both loaders; the demo scenes only wait. |
-| Shared late-registration and order assertions | Keep | Observe extraction callbacks from the real loader HUD. |
-| Shared enable/disable and F1 assertions | Keep | Observe stopped and resumed rendering, not the settings alone. |
-| Shared custom-bounds and editor-drag assertions | Keep | Use real bounds and mouse input to check selected ID and moved coordinates. |
-| NeoForge client runner | Keep | Required loader entry point for the shared scenarios, not an independent assertion. |
+- Keep `CoreSettingsIdAssignerTest.assignsIdsGloballyAcrossConfigClasses`: separate mod configs must not share editor IDs.
+- Keep `VanillaHudLayerTest.resolvesFabricAndNeoForgeIdsToTheSameLayer`: resolves public identifiers from both loaders.
+- Keep `VanillaHudLayerTest.rejectsUnknownAndNonVanillaIdsNamingTheId`: rejects bad public input and names it in the error.
+- Tautological: original Fabric `assertRegistrations` counts fixture registrations and compares the fixtures' fixed `before` values, without observing rendering.
+- Redundant: original Fabric before-chat/after-chat demo scenes only wait; `HudClientScenarios.run` now checks actual late rendering, both sides of chat and same-side ordering on both loaders.
+- Keep shared late-registration and order assertions: observe extraction callbacks from the real loader HUD.
+- Keep shared enable/disable and F1 assertions: observe stopped and resumed rendering, not the settings alone.
+- Keep shared custom-bounds and editor-drag assertions: use real bounds and mouse input to check selected ID and moved coordinates.
+- Keep the NeoForge client runner: required loader entry point for the shared scenarios, not an independent assertion.
 
 Removed the original Fabric `assertRegistrations` helper and its two demo scenes, demo-only settings and rendering fixture. No unit test was removed.
 
