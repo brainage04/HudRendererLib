@@ -67,6 +67,7 @@ tasks.register('prepareClientGameTestRun', io.github.brainage04.fabricmoddingcon
 tasks.named('runClientGameTest') {
 	dependsOn clearClientGameTestWorld
 	dependsOn prepareClientGameTestRun
+	getUseXvfb().set(true)
 	doLast {
 		def log = new File(clientGameTestDirectory, 'logs/latest.log')
 		if (!log.exists() || !log.text.contains('HUD_NEOFORGE_CLIENT_GAMETEST_PASS')) {
