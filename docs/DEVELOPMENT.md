@@ -123,6 +123,7 @@ public class ExampleHud implements CoreHudElement<ExampleHudConfig> {
 
 Call `HudRenderer.setElementBounds(...)` on every rendered frame with the element's current screen-space bounds, including any padding.
 The HUD Element Editor uses those bounds to select and drag custom elements; text-only elements set them automatically.
+For padded custom layouts, pass the `ElementCorners` returned by `HudRenderer.getCornersWithPadding(...)` directly to `setElementBounds(...)`; it retains the padding information the editor needs when cycling alignment.
 
 If you wish to change the layer that a given element (basic or custom) is rendered with:
 ```java

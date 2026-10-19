@@ -47,6 +47,7 @@ public final class HudClientScenarios {
     private static final Probe AFTER_SECOND = new Probe("after-second", false, 3);
     private static boolean collectOrder;
     private static final TextProbe TEXT = new TextProbe();
+    private static final PaddedProbe PADDED = new PaddedProbe();
     private static final boolean[] HIDE_EFFECTS = {false};
 
     private HudClientScenarios() {}
@@ -65,6 +66,7 @@ public final class HudClientScenarios {
             HudRendererLib.registerHudElement(AFTER_FIRST);
             HudRendererLib.registerHudElement(AFTER_SECOND);
             HudRendererLib.registerHudElement(TEXT);
+            HudRendererLib.registerHudElement(PADDED);
             HudRendererLib.registerVanillaStatusEffectsHider(() -> HIDE_EFFECTS[0]);
             HudElementEditor.populateCoreSettingsElements();
             ConfigUtils.saveConfigClasses();
@@ -93,10 +95,10 @@ public final class HudClientScenarios {
             editorDrag(driver);
             configSaveAndUndo(driver);
             textWrapping(driver);
-            basicAnchorCycle(driver);
+            anchorCycles(driver);
             editorLifecycle(driver);
             statusEffects(driver);
-            System.out.println("HUD_CLIENT_SCENARIOS_PASS: registration/order, F1, enabled, commands/keys, editor, save/undo, text wrapping, status effects");
+            System.out.println("HUD_CLIENT_SCENARIOS_PASS: registration/order, F1, enabled, commands/keys, editor, save/undo, text wrapping, padded/unpadded anchor cycles, status effects");
         } finally {
             driver.onClient(client -> {
                 collectOrder = false;
@@ -106,6 +108,7 @@ public final class HudClientScenarios {
                     probe.getElementConfig().getCoreSettings().enabled = false;
                 }
                 TEXT.getElementConfig().getCoreSettings().enabled = false;
+                PADDED.getElementConfig().getCoreSettings().enabled = false;
                 HIDE_EFFECTS[0] = false;
             });
         }
@@ -282,27 +285,40 @@ public final class HudClientScenarios {
         });
     }
 
-    private static void basicAnchorCycle(Driver driver) {
+    private static void anchorCycles(Driver driver) {
         driver.onClient(client -> client.setScreenAndShow(new HudElementEditor()));
-        driver.waitTicks(4);
-        for (int i = 0; i < ElementAnchor.values().length; i++) {
-            int[] previous = new int[2];
-            driver.onClient(client -> {
-                CoreSettings settings = TEXT.getElementConfig().getCoreSettings();
-                ElementCorners bounds = HudElementEditor.CORE_SETTINGS_ELEMENTS.get(settings.elementId).corners;
-                previous[0] = bounds.left;
-                previous[1] = bounds.top;
-                HudElementEditor editor = (HudElementEditor) client.gui.screen();
-                editor.selectedElementIndex = settings.elementId;
-                editor.keyPressed(new KeyEvent(GLFW.GLFW_KEY_SPACE, 0, 0));
-            });
-            driver.waitTicks(3);
-            driver.onClient(client -> {
-                CoreSettings settings = TEXT.getElementConfig().getCoreSettings();
-                ElementCorners bounds = HudElementEditor.CORE_SETTINGS_ELEMENTS.get(settings.elementId).corners;
-                check(bounds.left == previous[0] && bounds.top == previous[1],
-                        "Cycling a padded text element's anchor must preserve its screen position");
-            });
+        for (CoreHudElement<Settings> element : List.<CoreHudElement<Settings>>of(TEXT, BEFORE_FIRST, PADDED)) {
+            for (int padding : new int[] {0, 2, 6}) {
+                driver.onClient(client -> {
+                    CoreSettings settings = element.getElementConfig().getCoreSettings();
+                    settings.elementAnchor = ElementAnchor.TOP_LEFT;
+                    settings.x = 20;
+                    settings.y = 24;
+                    settings.elementOverrides.padding.enabled = true;
+                    settings.elementOverrides.padding.value = padding;
+                });
+                driver.waitTicks(4);
+                for (int i = 0; i < ElementAnchor.values().length; i++) {
+                    int[] previous = new int[2];
+                    driver.onClient(client -> {
+                        CoreSettings settings = element.getElementConfig().getCoreSettings();
+                        ElementCorners bounds = HudElementEditor.CORE_SETTINGS_ELEMENTS.get(settings.elementId).corners;
+                        previous[0] = bounds.left;
+                        previous[1] = bounds.top;
+                        HudElementEditor editor = (HudElementEditor) client.gui.screen();
+                        editor.selectedElementIndex = settings.elementId;
+                        editor.keyPressed(new KeyEvent(GLFW.GLFW_KEY_SPACE, 0, 0));
+                    });
+                    driver.waitTicks(3);
+                    driver.onClient(client -> {
+                        CoreSettings settings = element.getElementConfig().getCoreSettings();
+                        ElementCorners bounds = HudElementEditor.CORE_SETTINGS_ELEMENTS.get(settings.elementId).corners;
+                        check(bounds.left == previous[0] && bounds.top == previous[1],
+                                "Anchor cycling moved " + element.getClass().getSimpleName()
+                                        + " with padding " + padding + " at " + settings.elementAnchor);
+                    });
+                }
+            }
         }
         driver.onClient(client -> ((HudElementEditor) client.gui.screen()).closeWithoutSaving());
     }
@@ -359,6 +375,7 @@ public final class HudClientScenarios {
         public Settings third = new Settings("Third", 16, 66);
         public Settings fourth = new Settings("Fourth", 16, 90);
         public Settings text = new Settings("Text", 130, 18);
+        public Settings padded = new Settings("Padded custom", 16, 116);
     }
 
     public static final class Settings implements ICoreSettingsContainer {
@@ -388,6 +405,29 @@ public final class HudClientScenarios {
             lines.add("A long HUD line wraps into several short lines");
             lines.addEmpty();
             return lines;
+        }
+    }
+
+    private static final class PaddedProbe implements CoreHudElement<Settings> {
+        @Override
+        public Settings getElementConfig() {
+            return AutoConfig.getConfigHolder(FixtureConfig.class).getConfig().padded;
+        }
+
+        @Override
+        public void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+            CoreSettings settings = getElementConfig().getCoreSettings();
+            int padding = HudRendererLib.getPadding(settings);
+            int x = HudRenderer.getPosX(settings, 80);
+            int y = HudRenderer.getPosY(settings, 16);
+            switch (settings.elementAnchor) {
+                case BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT -> y -= padding * 2;
+                case LEFT, CENTER, RIGHT -> y -= padding;
+            }
+            ElementCorners bounds = HudRenderer.getCornersWithPadding(x, y, x + 80, y + 16, settings);
+            bounds.bottom += padding * 2;
+            HudRenderer.setElementBounds(settings, bounds);
+            graphics.fill(bounds.left, bounds.top, bounds.right, bounds.bottom, 0x80000000);
         }
     }
 

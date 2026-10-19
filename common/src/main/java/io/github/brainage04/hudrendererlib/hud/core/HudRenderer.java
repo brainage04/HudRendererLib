@@ -199,12 +199,40 @@ public class HudRenderer {
     public static ElementCorners getCornersWithPadding(int left, int top, int right, int bottom, CoreSettings coreSettings) {
         int elementPadding = HudRendererLib.getPadding(coreSettings);
 
-        return new ElementCorners(
+        return new PaddedElementCorners(
                 left - elementPadding * 2,
                 top - elementPadding * 2,
                 right + elementPadding * 2,
                 bottom
         );
+    }
+
+    static int getEditorPosX(CoreSettings settings, ElementCorners corners) {
+        int width = corners.right - corners.left;
+        return corners instanceof PaddedElementCorners
+                ? settings.x + getXOffsetNoPadding(settings.elementAnchor, width)
+                : getPosX(settings, width);
+    }
+
+    static int getEditorPosY(CoreSettings settings, ElementCorners corners) {
+        int y = getPosY(settings, corners.bottom - corners.top);
+        if (corners instanceof PaddedElementCorners) {
+            int padding = HudRendererLib.getPadding(settings);
+            y -= switch (settings.elementAnchor) {
+                case TOP_LEFT, TOP, TOP_RIGHT -> padding * 2;
+                case LEFT, CENTER, RIGHT -> padding;
+                default -> 0;
+            };
+        }
+        return y;
+    }
+
+    // Keep the padding contract with the bounds, not the element interface: custom renderers can
+    // use the same padded bounds as BasicCoreHudElement, and can extend them before registration.
+    private static final class PaddedElementCorners extends ElementCorners {
+        private PaddedElementCorners(int left, int top, int right, int bottom) {
+            super(left, top, right, bottom);
+        }
     }
 
     public static int getScaledWidth() {

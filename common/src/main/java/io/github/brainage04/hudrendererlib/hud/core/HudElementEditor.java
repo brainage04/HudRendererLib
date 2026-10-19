@@ -1,6 +1,5 @@
 package io.github.brainage04.hudrendererlib.hud.core;
 
-import io.github.brainage04.hudrendererlib.HudRendererLib;
 import io.github.brainage04.hudrendererlib.config.core.*;
 import io.github.brainage04.hudrendererlib.util.ConfigUtils;
 import io.github.brainage04.hudrendererlib.util.MathUtils;
@@ -183,22 +182,12 @@ public class HudElementEditor extends Screen {
             if (keyCode == GLFW.GLFW_KEY_SPACE) {
                 ElementCorners corners = coreSettingsElement.corners;
 
-                int elementWidth = corners.right - corners.left;
-                int elementHeight = corners.bottom - corners.top;
-                for (CoreHudElement<?> element : HudRenderer.REGISTERED_ELEMENTS) {
-                    if (element.getElementConfig().getCoreSettings() == coreSettings
-                            && element instanceof BasicCoreHudElement<?>) {
-                        elementWidth -= HudRendererLib.getPadding(coreSettings) * 4;
-                        elementHeight -= HudRendererLib.getPadding(coreSettings) * 2;
-                        break;
-                    }
-                }
-                int beforeX = HudRenderer.getPosX(coreSettings, elementWidth);
-                int beforeY = HudRenderer.getPosY(coreSettings, elementHeight);
+                int beforeX = HudRenderer.getEditorPosX(coreSettings, corners);
+                int beforeY = HudRenderer.getEditorPosY(coreSettings, corners);
                 ElementAnchor[] anchors = ElementAnchor.values();
                 coreSettings.elementAnchor = anchors[(coreSettings.elementAnchor.ordinal() + 1) % anchors.length];
-                coreSettings.x += beforeX - HudRenderer.getPosX(coreSettings, elementWidth);
-                coreSettings.y += beforeY - HudRenderer.getPosY(coreSettings, elementHeight);
+                coreSettings.x += beforeX - HudRenderer.getEditorPosX(coreSettings, corners);
+                coreSettings.y += beforeY - HudRenderer.getEditorPosY(coreSettings, corners);
 
                 selectedElementX = coreSettings.x;
                 selectedElementY = coreSettings.y;
