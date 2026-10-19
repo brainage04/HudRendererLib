@@ -1,5 +1,8 @@
 package io.github.brainage04.hudrendererlib.gametest;
 
+import io.github.brainage04.hudrendererlib.hud.core.BasicCoreHudElement;
+import io.github.brainage04.hudrendererlib.keys.ModKeys;
+import io.github.brainage04.hudrendererlib.util.TextList;
 import io.github.brainage04.hudrendererlib.HudRendererLib;
 import io.github.brainage04.hudrendererlib.config.core.CoreSettings;
 import io.github.brainage04.hudrendererlib.config.core.CoreSettingsIdAssigner;
@@ -21,6 +24,11 @@ import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
@@ -38,6 +46,8 @@ public final class HudClientScenarios {
     private static final Probe AFTER_FIRST = new Probe("after-first", false, 2);
     private static final Probe AFTER_SECOND = new Probe("after-second", false, 3);
     private static boolean collectOrder;
+    private static final TextProbe TEXT = new TextProbe();
+    private static final boolean[] HIDE_EFFECTS = {false};
 
     private HudClientScenarios() {}
 
@@ -54,7 +64,10 @@ public final class HudClientScenarios {
             HudRendererLib.registerHudElement(BEFORE_SECOND);
             HudRendererLib.registerHudElement(AFTER_FIRST);
             HudRendererLib.registerHudElement(AFTER_SECOND);
+            HudRendererLib.registerHudElement(TEXT);
+            HudRendererLib.registerVanillaStatusEffectsHider(() -> HIDE_EFFECTS[0]);
             HudElementEditor.populateCoreSettingsElements();
+            ConfigUtils.saveConfigClasses();
             ORDER.clear();
             collectOrder = true;
         });
@@ -76,8 +89,12 @@ public final class HudClientScenarios {
             assertStopped(driver, BEFORE_FIRST, "F1 must hide chat-attached elements");
             driver.onClient(client -> client.gui.hud.toggle());
             assertRendering(driver, BEFORE_FIRST, "Restoring the HUD must resume rendering");
+            commandsAndKeys(driver);
             editorDrag(driver);
-            System.out.println("HUD_CLIENT_SCENARIOS_PASS: late registration, layer order, enable/disable, F1, custom bounds and editor drag");
+            configSaveAndUndo(driver);
+            textWrapping(driver);
+            statusEffects(driver);
+            System.out.println("HUD_CLIENT_SCENARIOS_PASS: registration/order, F1, enabled, commands/keys, editor, save/undo, text wrapping, status effects");
         } finally {
             driver.onClient(client -> {
                 collectOrder = false;
@@ -86,6 +103,8 @@ public final class HudClientScenarios {
                 for (Probe probe : List.of(BEFORE_FIRST, BEFORE_SECOND, AFTER_FIRST, AFTER_SECOND)) {
                     probe.getElementConfig().getCoreSettings().enabled = false;
                 }
+                TEXT.getElementConfig().getCoreSettings().enabled = false;
+                HIDE_EFFECTS[0] = false;
             });
         }
     }
@@ -122,6 +141,136 @@ public final class HudClientScenarios {
         driver.onClient(client -> check(probe.renders == before[0], message));
     }
 
+    private static void commandsAndKeys(Driver driver) {
+        driver.onClient(client -> client.player.connection.sendCommand("hudelementeditor"));
+        driver.waitTicks(4);
+        driver.onClient(client -> {
+            check(client.gui.screen() instanceof HudElementEditor, "/hudelementeditor must open the editor");
+            ((HudElementEditor) client.gui.screen()).closeWithoutSaving();
+            client.player.connection.sendCommand("hudrendererlibconfig");
+        });
+        driver.waitTicks(4);
+        driver.onClient(client -> {
+            check(client.gui.screen() != null && client.gui.screen().getClass().getName().startsWith("me.shedaniel.clothconfig2."),
+                    "/hudrendererlibconfig must open Cloth Config");
+            client.gui.screen().onClose();
+            KeyMapping.click(ModKeys.openElementEditor.getDefaultKey());
+        });
+        driver.waitTicks(4);
+        driver.onClient(client -> {
+            check(client.gui.screen() instanceof HudElementEditor, "Editor key must open the editor");
+            ((HudElementEditor) client.gui.screen()).closeWithoutSaving();
+            KeyMapping configKey = ModKeys.openConfigKeyMap.entrySet().stream()
+                    .filter(entry -> entry.getValue() == io.github.brainage04.hudrendererlib.config.core.HudRendererLibConfig.class)
+                    .findFirst().orElseThrow().getKey();
+            KeyMapping.click(configKey.getDefaultKey());
+        });
+        driver.waitTicks(4);
+        driver.onClient(client -> {
+            check(client.gui.screen() != null && client.gui.screen().getClass().getName().startsWith("me.shedaniel.clothconfig2."),
+                    "Config key must open Cloth Config");
+            client.gui.screen().onClose();
+        });
+    }
+
+    private static void configSaveAndUndo(Driver driver) {
+        driver.onClient(client -> {
+            CoreSettings settings = BEFORE_FIRST.getElementConfig().getCoreSettings();
+            settings.x = 20;
+            settings.y = 24;
+            settings.elementAnchor = ElementAnchor.TOP_LEFT;
+            ConfigUtils.saveConfigClasses();
+            client.setScreen(new HudElementEditor());
+        });
+        driver.waitTicks(3);
+        driver.onClient(client -> {
+            HudElementEditor editor = (HudElementEditor) client.gui.screen();
+            CoreSettings settings = BEFORE_FIRST.getElementConfig().getCoreSettings();
+            editor.selectedElementIndex = settings.elementId;
+            editor.keyPressed(new KeyEvent(GLFW.GLFW_KEY_RIGHT, 0, GLFW.GLFW_MOD_CONTROL | GLFW.GLFW_MOD_SHIFT));
+            check(settings.x == 70 && settings.y == 24, "Ctrl+Shift+Right must move 50 pixels");
+            int x = HudRenderer.getPosX(settings, 80);
+            int y = HudRenderer.getPosY(settings, 16);
+            editor.keyPressed(new KeyEvent(GLFW.GLFW_KEY_SPACE, 0, 0));
+            check(settings.elementAnchor == ElementAnchor.TOP, "Space must cycle the anchor");
+            check(HudRenderer.getPosX(settings, 80) == x && HudRenderer.getPosY(settings, 16) == y,
+                    "Cycling the anchor must preserve screen position");
+            int savedX = settings.x;
+            editor.onClose();
+            settings.x = -500;
+            ConfigUtils.loadConfigClasses();
+            CoreSettings loaded = BEFORE_FIRST.getElementConfig().getCoreSettings();
+            check(loaded.x == savedX, "Saving the editor must persist its position");
+            check(loaded.elementAnchor == ElementAnchor.TOP, "Saving must persist its anchor");
+            check(HudElementEditor.CORE_SETTINGS_ELEMENTS.get(loaded.elementId).coreSettings == loaded,
+                    "Reload must rebuild the editor map with the new settings objects");
+            client.setScreen(new HudElementEditor());
+            BEFORE_FIRST.getElementConfig().getCoreSettings().x = 1234;
+            ((HudElementEditor) client.gui.screen()).closeWithoutSaving();
+            check(BEFORE_FIRST.getElementConfig().getCoreSettings().x == savedX,
+                    "Undo must restore the saved position");
+        });
+    }
+
+    private static void textWrapping(Driver driver) {
+        int[] originalHeight = new int[1];
+        driver.onClient(client -> {
+            CoreSettings settings = TEXT.getElementConfig().getCoreSettings();
+            settings.elementOverrides.maxWidth.enabled = true;
+            settings.elementOverrides.maxWidth.value = 0;
+            settings.elementOverrides.padding.enabled = true;
+            settings.elementOverrides.padding.value = 3;
+        });
+        driver.waitTicks(4);
+        driver.onClient(client -> {
+            CoreSettings settings = TEXT.getElementConfig().getCoreSettings();
+            ElementCorners bounds = HudElementEditor.CORE_SETTINGS_ELEMENTS.get(settings.elementId).corners;
+            originalHeight[0] = bounds.bottom - bounds.top;
+            settings.elementOverrides.maxWidth.value = 45;
+        });
+        driver.waitTicks(4);
+        driver.onClient(client -> {
+            CoreSettings settings = TEXT.getElementConfig().getCoreSettings();
+            ElementCorners bounds = HudElementEditor.CORE_SETTINGS_ELEMENTS.get(settings.elementId).corners;
+            check(bounds.right - bounds.left <= 45 + 12, "Wrapped text must respect maximum width plus padding");
+            check(bounds.bottom - bounds.top > originalHeight[0], "Wrapping must increase the text element's height");
+        });
+    }
+
+    private static void statusEffects(Driver driver) {
+        driver.onClient(client -> {
+            var config = ConfigUtils.getConfig();
+            boolean show = config.showVanillaStatusEffects;
+            boolean adjust = config.adjustTopRightElementsWithStatusEffects;
+            int amount = config.adjustTopRightElementsWithStatusEffectsAmount;
+            try {
+                config.showVanillaStatusEffects = true;
+                config.adjustTopRightElementsWithStatusEffects = true;
+                config.adjustTopRightElementsWithStatusEffectsAmount = 21;
+                CoreSettings settings = new CoreSettings("Effect offset", true, 0, 0, ElementAnchor.TOP_RIGHT);
+                int base = HudRenderer.getPosY(settings, 16);
+                client.player.addEffect(new MobEffectInstance(MobEffects.SPEED, 200, 0, false, false, true));
+                check(HudRenderer.getPosY(settings, 16) == base + 21, "Visible effect icons must shift top-right elements");
+                HIDE_EFFECTS[0] = true;
+                check(HudRendererLib.shouldHideVanillaStatusEffects(), "A registered hider must hide vanilla status effects");
+                check(HudRenderer.getPosY(settings, 16) == base, "Hidden effect icons must not shift top-right elements");
+                HIDE_EFFECTS[0] = false;
+                config.showVanillaStatusEffects = false;
+                check(HudRendererLib.shouldHideVanillaStatusEffects(), "Global toggle must hide vanilla status effects");
+                check(HudRenderer.getPosY(settings, 16) == base, "Global hidden icons must not shift elements");
+                config.showVanillaStatusEffects = true;
+                config.adjustTopRightElementsWithStatusEffects = false;
+                check(HudRenderer.getPosY(settings, 16) == base, "Disabled adjustment must leave elements in place");
+            } finally {
+                HIDE_EFFECTS[0] = false;
+                config.showVanillaStatusEffects = show;
+                config.adjustTopRightElementsWithStatusEffects = adjust;
+                config.adjustTopRightElementsWithStatusEffectsAmount = amount;
+                client.player.removeEffect(MobEffects.SPEED);
+            }
+        });
+    }
+
     private static void assertRendering(Driver driver, Probe probe, String message) {
         int[] before = new int[1];
         driver.onClient(client -> before[0] = probe.renders);
@@ -139,6 +288,7 @@ public final class HudClientScenarios {
         public Settings second = new Settings("Second", 16, 42);
         public Settings third = new Settings("Third", 16, 66);
         public Settings fourth = new Settings("Fourth", 16, 90);
+        public Settings text = new Settings("Text", 130, 18);
     }
 
     public static final class Settings implements ICoreSettingsContainer {
@@ -154,6 +304,20 @@ public final class HudClientScenarios {
         @Override
         public void setCoreSettings(CoreSettings settings) { coreSettings = settings; }
     }
+    private static final class TextProbe implements BasicCoreHudElement<Settings> {
+        @Override
+        public Settings getElementConfig() {
+            return AutoConfig.getConfigHolder(FixtureConfig.class).getConfig().text;
+        }
+
+        @Override
+        public TextList getLines() {
+            TextList lines = new TextList();
+            lines.add("A long HUD line wraps into several short lines");
+            lines.addEmpty();
+            return lines;
+        }
+    }
 
     private static final class Probe implements CoreHudElement<Settings> {
         private final String label;
@@ -166,6 +330,7 @@ public final class HudClientScenarios {
             this.before = before;
             this.index = index;
         }
+
 
         @Override
         public Settings getElementConfig() {

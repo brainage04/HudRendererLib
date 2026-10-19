@@ -31,3 +31,9 @@ heavy --label hudrendererlib-wave -- ./gradlew --no-daemon -Pfabricmoddingconven
 ```
 
 `runAllGameTests` includes the Fabric production client suite and the NeoForge integrated-world client suite. Dedicated-server GameTests are disabled because this library is client-only. Both clients use the same production HUD/editor assertions in `common/src/gametest`.
+
+## Coverage gaps filled
+
+The original suites did not exercise command dispatch, key handling, config save/load, undo, keyboard editing, anchor cycling, text wrapping or status-effect offsets. The shared client suite now checks both commands and both default keys, a real custom-element drag, Ctrl+Shift movement, anchor-position preservation, save/reload/undo with fresh config objects, text wrapping with padding, and global/per-mod status-effect hiding and offsets on both loaders.
+
+Remaining gaps: pixel-level styling, all vanilla layer/game-mode combinations, optional Mod Menu and NeoForge Mods-list navigation, and rendering across resource reloads. The server has no commands, gamerules or lifecycle behaviour in this client-only library. The tests check extraction order and bounds, not screenshot pixels or sound.
