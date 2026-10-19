@@ -16,7 +16,7 @@ public final class HudRendererLibClientGameTest implements FabricClientGameTest 
                     HudClientScenarios.run(new HudClientScenarios.Driver() {
                         @Override
                         public void onClient(Consumer<Minecraft> action) {
-                            context.runOnClient(action);
+                            context.runOnClient(action::accept);
                         }
 
                         @Override

@@ -112,7 +112,7 @@ public final class HudClientScenarios {
     }
 
     private static void editorDrag(Driver driver) {
-        driver.onClient(client -> client.setScreen(new HudElementEditor()));
+        driver.onClient(client -> client.setScreenAndShow(new HudElementEditor()));
         driver.waitTicks(4);
         driver.onClient(client -> {
             HudElementEditor editor = (HudElementEditor) client.gui.screen();
@@ -185,7 +185,7 @@ public final class HudClientScenarios {
             settings.y = 24;
             settings.elementAnchor = ElementAnchor.TOP_LEFT;
             ConfigUtils.saveConfigClasses();
-            client.setScreen(new HudElementEditor());
+            client.setScreenAndShow(new HudElementEditor());
         });
         driver.waitTicks(3);
         driver.onClient(client -> {
@@ -209,7 +209,7 @@ public final class HudClientScenarios {
             check(loaded.elementAnchor == ElementAnchor.TOP, "Saving must persist its anchor");
             check(HudElementEditor.CORE_SETTINGS_ELEMENTS.get(loaded.elementId).coreSettings == loaded,
                     "Reload must rebuild the editor map with the new settings objects");
-            client.setScreen(new HudElementEditor());
+            client.setScreenAndShow(new HudElementEditor());
             BEFORE_FIRST.getElementConfig().getCoreSettings().x = 1234;
             ((HudElementEditor) client.gui.screen()).closeWithoutSaving();
             check(BEFORE_FIRST.getElementConfig().getCoreSettings().x == savedX,
@@ -247,19 +247,19 @@ public final class HudClientScenarios {
             int previous = client.options.menuBackgroundBlurriness().get();
             try {
                 client.options.menuBackgroundBlurriness().set(7);
-                client.setScreen(new HudElementEditor());
+                client.setScreenAndShow(new HudElementEditor());
                 check(client.options.menuBackgroundBlurriness().get() == 0, "Editor must disable blur while open");
-                client.setScreen(new HudElementEditor());
+                client.setScreenAndShow(new HudElementEditor());
                 check(client.options.menuBackgroundBlurriness().get() == 0, "Replacing an editor must keep blur disabled");
-                client.setScreen(null);
+                client.setScreenAndShow(null);
                 check(client.options.menuBackgroundBlurriness().get() == 7, "Replacing the editor must restore the previous blur");
             } finally {
-                client.setScreen(null);
+                client.setScreenAndShow(null);
                 client.options.menuBackgroundBlurriness().set(previous);
             }
         });
         int[] oldBounds = new int[2];
-        driver.onClient(client -> client.setScreen(new HudElementEditor()));
+        driver.onClient(client -> client.setScreenAndShow(new HudElementEditor()));
         driver.waitTicks(4);
         driver.onClient(client -> {
             CoreSettings settings = TEXT.getElementConfig().getCoreSettings();
@@ -280,7 +280,7 @@ public final class HudClientScenarios {
     }
 
     private static void basicAnchorCycle(Driver driver) {
-        driver.onClient(client -> client.setScreen(new HudElementEditor()));
+        driver.onClient(client -> client.setScreenAndShow(new HudElementEditor()));
         driver.waitTicks(4);
         for (int i = 0; i < ElementAnchor.values().length; i++) {
             int[] previous = new int[2];
