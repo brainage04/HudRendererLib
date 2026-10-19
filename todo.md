@@ -8,3 +8,4 @@ The loader-neutral HUD contract is in place: `CoreHudElement`, `LayerInfo` and `
 - [x] Queue `registerHudElement` calls made after `RegisterGuiLayersEvent`. NeoForge now installs persistent attachment points and draws late registrations in the same order as Fabric.
 - [x] Add NeoForge client GameTests. Both loaders run shared assertions for late registration, ordering, enable/disable, F1, custom bounds and editor dragging.
 - [x] Update the README, which still says 1.0.7. Now says 1.0.12.
+- [x] Align Gradle conventions and reusable workflows with template version 2.4.26.
