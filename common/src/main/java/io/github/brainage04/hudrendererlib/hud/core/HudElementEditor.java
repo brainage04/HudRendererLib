@@ -246,6 +246,7 @@ public class HudElementEditor extends Screen {
                 // update position in config
                 updateElementPosition(xDirection, yDirection);
             }
+            return true;
         }
 
         return super.keyPressed(event);

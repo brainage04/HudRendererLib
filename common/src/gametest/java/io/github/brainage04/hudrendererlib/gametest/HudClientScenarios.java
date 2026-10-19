@@ -192,6 +192,7 @@ public final class HudClientScenarios {
             HudElementEditor editor = (HudElementEditor) client.gui.screen();
             CoreSettings settings = BEFORE_FIRST.getElementConfig().getCoreSettings();
             editor.selectedElementIndex = settings.elementId;
+            editor.setFocused(editor.button1);
             editor.keyPressed(new KeyEvent(GLFW.GLFW_KEY_RIGHT, 0, GLFW.GLFW_MOD_CONTROL | GLFW.GLFW_MOD_SHIFT));
             check(settings.x == 70 && settings.y == 24, "Ctrl+Shift+Right must move 50 pixels");
             int x = HudRenderer.getPosX(settings, 80);
@@ -200,6 +201,8 @@ public final class HudClientScenarios {
             check(settings.elementAnchor == ElementAnchor.TOP, "Space must cycle the anchor");
             check(HudRenderer.getPosX(settings, 80) == x && HudRenderer.getPosY(settings, 16) == y,
                     "Cycling the anchor must preserve screen position");
+            check(client.gui.screen() == editor && BEFORE_FIRST.getElementConfig().getCoreSettings() == settings,
+                    "Editing shortcuts must not activate a focused close button or reload the config");
             int savedX = settings.x;
             editor.onClose();
             settings.x = -500;
