@@ -72,6 +72,7 @@ public final class FabricHudRendererPlatform implements HudRendererPlatform {
 			case MOUNT_HEALTH -> VanillaHudElements.MOUNT_HEALTH;
 			case INFO_BAR -> VanillaHudElements.INFO_BAR;
 			case EXPERIENCE_LEVEL -> VanillaHudElements.EXPERIENCE_LEVEL;
+			case INFO_BAR_FOREGROUND -> VanillaHudElements.INFO_BAR_FOREGROUND;
 			case HELD_ITEM_TOOLTIP -> VanillaHudElements.HELD_ITEM_TOOLTIP;
 			case SPECTATOR_TOOLTIP -> VanillaHudElements.SPECTATOR_TOOLTIP;
 			case STATUS_EFFECTS -> VanillaHudElements.MOB_EFFECTS;

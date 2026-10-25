@@ -118,6 +118,7 @@ public final class NeoForgeHudRendererPlatform implements HudRendererPlatform {
 			case MOUNT_HEALTH -> VanillaGuiLayers.VEHICLE_HEALTH;
 			case INFO_BAR -> VanillaGuiLayers.CONTEXTUAL_INFO_BAR_BACKGROUND;
 			case EXPERIENCE_LEVEL -> VanillaGuiLayers.EXPERIENCE_LEVEL;
+			case INFO_BAR_FOREGROUND -> VanillaGuiLayers.CONTEXTUAL_INFO_BAR;
 			case HELD_ITEM_TOOLTIP -> VanillaGuiLayers.SELECTED_ITEM_NAME;
 			case SPECTATOR_TOOLTIP -> VanillaGuiLayers.SPECTATOR_TOOLTIP;
 			case STATUS_EFFECTS -> VanillaGuiLayers.EFFECTS;

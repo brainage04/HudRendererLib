@@ -15,6 +15,8 @@ class VanillaHudLayerTest {
 		assertEquals(VanillaHudLayer.STATUS_EFFECTS, VanillaHudLayer.fromId(Identifier.withDefaultNamespace("mob_effects")));
 		assertEquals(VanillaHudLayer.STATUS_EFFECTS, VanillaHudLayer.fromId(Identifier.withDefaultNamespace("effects")));
 		assertEquals(VanillaHudLayer.PLAYER_LIST, VanillaHudLayer.fromId(Identifier.withDefaultNamespace("tab_list")));
+		assertEquals(VanillaHudLayer.INFO_BAR_FOREGROUND, VanillaHudLayer.fromId(Identifier.withDefaultNamespace("info_bar_foreground")));
+		assertEquals(VanillaHudLayer.INFO_BAR_FOREGROUND, VanillaHudLayer.fromId(Identifier.withDefaultNamespace("contextual_info_bar")));
 	}
 
 	@Test

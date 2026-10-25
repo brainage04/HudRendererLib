@@ -31,6 +31,8 @@ public enum VanillaHudLayer {
 	/** The contextual info bar background (experience, locator or jump bar). */
 	INFO_BAR("info_bar", "contextual_info_bar_background"),
 	EXPERIENCE_LEVEL("experience_level"),
+	/** The contextual info bar itself (experience, locator or jump bar), drawn over {@link #INFO_BAR}. */
+	INFO_BAR_FOREGROUND("info_bar_foreground", "contextual_info_bar"),
 	HELD_ITEM_TOOLTIP("held_item_tooltip", "selected_item_name"),
 	SPECTATOR_TOOLTIP("spectator_tooltip"),
 	STATUS_EFFECTS("mob_effects", "effects", "status_effects"),
