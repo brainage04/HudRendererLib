@@ -1,6 +1,6 @@
 # HudRendererLib todo
 
-The loader-neutral HUD contract is in place: `CoreHudElement`, `LayerInfo` and `HudRendererPlatform` live in `common`, with Fabric (`HudElementRegistry`) and NeoForge (`RegisterGuiLayersEvent`) adapters, and both loaders publish 1.0.12.
+The loader-neutral HUD contract is in place: `CoreHudElement`, `LayerInfo` and `HudRendererPlatform` live in `common`, with Fabric (`HudElementRegistry`) and NeoForge (`RegisterGuiLayersEvent`) adapters, and both loaders publish 1.1.0 for Minecraft 26.3 (1.0.x is the 26.2 line).
 
 - [x] Hide elements with F1 on NeoForge. Fixed in 1.0.12: the NeoForge adapter draws each element only when vanilla draws its anchor (F1, game mode, spectator, experience, vehicle), the same call-site conditions Fabric's attached elements inherit.
 - [x] Add a NeoForge config screen. NeoForge registers an `IConfigScreenFactory` that opens the same Cloth Config screen Mod Menu opens on Fabric.
