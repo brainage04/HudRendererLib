@@ -19,7 +19,7 @@ import me.shedaniel.autoconfig.serializer.ConfigSerializer;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLScancode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +60,7 @@ public class HudRendererLib {
 
         // keys
         ModKeys.initialize();
-        registerConfigKey(HudRendererLibConfig.class, GLFW.GLFW_KEY_KP_ENTER, MOD_ID, MOD_NAME);
+        registerConfigKey(HudRendererLibConfig.class, SDLScancode.SDL_SCANCODE_KP_ENTER, MOD_ID, MOD_NAME);
 
         LOGGER.info(MOD_NAME + " initialized.");
     }
@@ -96,12 +96,15 @@ public class HudRendererLib {
      * Registers a key that opens {@code configClass}'s config screen, grouped under the mod's own
      * key category (see {@link #getKeyCategory(String)}). The mod provides the translations
      * {@code key.<modId>.openConfig} and {@code key.category.<modId>.keys}.
+     *
+     * @param keycode the default key as an SDL3 scancode ({@code org.lwjgl.sdl.SDLScancode}), the key codes
+     *                Minecraft uses since 26.3
      */
     @SuppressWarnings("unused")
     public static void registerConfigKey(Class<? extends ConfigData> configClass, int keycode, String modId, String modName) {
         KeyMapping keyMapping = new KeyMapping(
                 "key.%s.openConfig".formatted(modId),
-                InputConstants.Type.KEYSYM,
+                InputConstants.Type.KEYBOARD,
                 keycode,
                 getKeyCategory(modId)
         );

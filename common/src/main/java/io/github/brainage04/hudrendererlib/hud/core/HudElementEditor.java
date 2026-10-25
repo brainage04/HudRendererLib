@@ -1,10 +1,9 @@
 package io.github.brainage04.hudrendererlib.hud.core;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.github.brainage04.hudrendererlib.config.core.*;
 import io.github.brainage04.hudrendererlib.util.ConfigUtils;
-import io.github.brainage04.hudrendererlib.util.MathUtils;
 import io.github.brainage04.hudrendererlib.util.TextList;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -167,10 +166,9 @@ public class HudElementEditor extends Screen {
     @Override
     public boolean keyPressed(KeyEvent event) {
         int keyCode = event.key();
-        int modifiers = event.modifiers();
 
         // from net.minecraft.client.gui.screen.Screen
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE && this.shouldCloseOnEsc()) {
+        if (event.isEscape() && this.shouldCloseOnEsc()) {
             closeWithoutSaving();
             return true;
         }
@@ -179,7 +177,7 @@ public class HudElementEditor extends Screen {
             CoreSettingsElement coreSettingsElement = CORE_SETTINGS_ELEMENTS.get(selectedElementIndex);
             CoreSettings coreSettings = coreSettingsElement.coreSettings;
 
-            if (keyCode == GLFW.GLFW_KEY_SPACE) {
+            if (keyCode == InputConstants.KEY_SPACE) {
                 ElementCorners corners = coreSettingsElement.corners;
 
                 int beforeX = HudRenderer.getEditorPosX(coreSettings, corners);
@@ -196,16 +194,16 @@ public class HudElementEditor extends Screen {
                 int yDirection = 0;
 
                 switch (keyCode) {
-                    case GLFW.GLFW_KEY_UP:
+                    case InputConstants.KEY_UP:
                         yDirection = 1;
                         break;
-                    case GLFW.GLFW_KEY_DOWN:
+                    case InputConstants.KEY_DOWN:
                         yDirection = -1;
                         break;
-                    case GLFW.GLFW_KEY_LEFT:
+                    case InputConstants.KEY_LEFT:
                         xDirection = 1;
                         break;
-                    case GLFW.GLFW_KEY_RIGHT:
+                    case InputConstants.KEY_RIGHT:
                         xDirection = -1;
                         break;
                 }
@@ -215,15 +213,12 @@ public class HudElementEditor extends Screen {
                     return super.keyPressed(event);
                 }
 
-                // deal with modifiers here
-                // https://www.glfw.org/docs/3.3/group__mods.html
-                // shift keys
-                if (MathUtils.isBitOn(modifiers, 0)) {
+                // shift moves 10 times as far, control 5 times (both: 50)
+                if (event.hasShiftDown()) {
                     xDirection *= 10;
                     yDirection *= 10;
                 }
-                // ctrl keys
-                if (MathUtils.isBitOn(modifiers, 1)) {
+                if (event.hasControlDown()) {
                     xDirection *= 5;
                     yDirection *= 5;
                 }

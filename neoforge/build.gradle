@@ -62,6 +62,8 @@ tasks.named('runClientGameTest') {
 	dependsOn clearClientGameTestWorld
 	dependsOn prepareClientGameTestRun
 	getUseXvfb().set(true)
+	// A log left by an earlier run must not pass this one.
+	doFirst { new File(clientGameTestDirectory, 'logs/latest.log').delete() }
 	doLast {
 		def log = new File(clientGameTestDirectory, 'logs/latest.log')
 		if (!log.exists() || !log.text.contains('HUD_NEOFORGE_CLIENT_GAMETEST_PASS')) {

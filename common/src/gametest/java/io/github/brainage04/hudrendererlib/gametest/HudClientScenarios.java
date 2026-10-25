@@ -28,7 +28,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
@@ -139,7 +139,7 @@ public final class HudClientScenarios {
     }
 
     private static MouseButtonEvent mouse(double x, double y) {
-        return new MouseButtonEvent(x, y, new MouseButtonInfo(0, 0));
+        return new MouseButtonEvent(x, y, new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0));
     }
 
     private static void assertStopped(Driver driver, Probe probe, String message) {
@@ -196,11 +196,11 @@ public final class HudClientScenarios {
             CoreSettings settings = BEFORE_FIRST.getElementConfig().getCoreSettings();
             editor.selectedElementIndex = settings.elementId;
             editor.setFocused(editor.button1);
-            editor.keyPressed(new KeyEvent(GLFW.GLFW_KEY_RIGHT, 0, GLFW.GLFW_MOD_CONTROL | GLFW.GLFW_MOD_SHIFT));
+            editor.keyPressed(new KeyEvent(InputConstants.KEY_RIGHT, 0, InputConstants.MOD_CONTROL | InputConstants.MOD_SHIFT));
             check(settings.x == 70 && settings.y == 24, "Ctrl+Shift+Right must move 50 pixels");
             int x = HudRenderer.getPosX(settings, 80);
             int y = HudRenderer.getPosY(settings, 16);
-            editor.keyPressed(new KeyEvent(GLFW.GLFW_KEY_SPACE, 0, 0));
+            editor.keyPressed(new KeyEvent(InputConstants.KEY_SPACE, 0, 0));
             check(settings.elementAnchor == ElementAnchor.TOP, "Space must cycle the anchor");
             check(HudRenderer.getPosX(settings, 80) == x && HudRenderer.getPosY(settings, 16) == y,
                     "Cycling the anchor must preserve screen position");
@@ -307,7 +307,7 @@ public final class HudClientScenarios {
                         previous[1] = bounds.top;
                         HudElementEditor editor = (HudElementEditor) client.gui.screen();
                         editor.selectedElementIndex = settings.elementId;
-                        editor.keyPressed(new KeyEvent(GLFW.GLFW_KEY_SPACE, 0, 0));
+                        editor.keyPressed(new KeyEvent(InputConstants.KEY_SPACE, 0, 0));
                     });
                     driver.waitTicks(3);
                     driver.onClient(client -> {

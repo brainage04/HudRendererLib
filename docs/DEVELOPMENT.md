@@ -2,7 +2,7 @@
 
 ## Setup
 
-HudRendererLib 1.0.12 targets Minecraft 26.2 on both loaders.
+HudRendererLib 1.1.0 targets Minecraft 26.3 on both loaders.
 
 ### Fabric Loom
 
@@ -175,13 +175,13 @@ public void onInitializeClient() {
     // THEN register your commands/keys
     // HUD elements can be registered before/after commands/keys as long as they are registered after the main config class
     HudRendererLib.registerConfigCommand(ModConfig.class, MOD_ID);
-    HudRendererLib.registerConfigKey(ModConfig.class, GLFW.GLFW_KEY_KP_SUBTRACT, MOD_ID, MOD_NAME);
+    HudRendererLib.registerConfigKey(ModConfig.class, SDLScancode.SDL_SCANCODE_KP_MINUS, MOD_ID, MOD_NAME);
 
     // ...
 }
 ```
 
-Where `MOD_ID` is the ID of your mod, `MOD_NAME` is its display name, and the GLFW constant selects the default key.
+Where `MOD_ID` is the ID of your mod, `MOD_NAME` is its display name, and the SDL3 scancode (`org.lwjgl.sdl.SDLScancode`, the key codes Minecraft uses since 26.3; GLFW key codes no longer work) selects the default key.
 The key is listed in the controls screen under your mod's own category, `HudRendererLib.getKeyCategory(MOD_ID)`; use the same category for any other keys your mod registers so they appear together.
 Provide the translations `key.<MOD_ID>.openConfig` for the key and `key.category.<MOD_ID>.keys` for the category title.
 

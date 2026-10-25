@@ -1,6 +1,6 @@
 # HudRendererLib
 
-HudRendererLib is a client-side only library for rendering Heads-Up Display (HUD) elements in Fabric and NeoForge mods for Minecraft 26.2.
+HudRendererLib is a client-side only library for rendering Heads-Up Display (HUD) elements in Fabric and NeoForge mods for Minecraft 26.3.
 
 This mod integrates with Cloth Config's AutoConfig system, and uses annotations from it.
 
@@ -15,9 +15,9 @@ Top-right elements move down while the game's status effect icons are showing, s
 
 ## Getting started
 
-- Minecraft 26.2 and Java 25.
-- Fabric Loader >=0.19.3 with Fabric API, or NeoForge >=26.2.0.88.
-- Cloth Config >=26.2.155 for your loader.
+- Minecraft 26.3 and Java 25.
+- Fabric Loader >=0.19.5 with Fabric API, or NeoForge >=26.3.0.99.
+- Cloth Config >=26.3.159 for your loader.
 - Install on the client, alongside a mod that uses HudRendererLib.
 - Mod Menu is optional on Fabric.
 
