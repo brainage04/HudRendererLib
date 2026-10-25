@@ -99,11 +99,11 @@ public class HudElementEditor extends Screen {
     }
 
     public final Button button1 = Button.builder(Component.literal("Undo & Close"), button -> closeWithoutSaving())
-            .bounds(HudRenderer.getScaledWidth() / 2 - 210, HudRenderer.getScaledHeight() - 40, 200, 20)
+            .size(200, 20)
             .tooltip(Tooltip.create(Component.literal("Reverts the current positions to what they were before and closes the screen.")))
             .build();
     public final Button button2 = Button.builder(Component.literal("Save & Close"), button -> this.onClose())
-            .bounds(HudRenderer.getScaledWidth() / 2 + 10, HudRenderer.getScaledHeight() - 40, 200, 20)
+            .size(200, 20)
             .tooltip(Tooltip.create(Component.literal("Saves the current positions and closes the screen.")))
             .build();
 
@@ -140,6 +140,9 @@ public class HudElementEditor extends Screen {
     @Override
     protected void init() {
         disableBlur();
+        // init() runs again on every resize and GUI scale change, so place the buttons here.
+        button1.setPosition(width / 2 - 210, height - 40);
+        button2.setPosition(width / 2 + 10, height - 40);
         addRenderableWidget(button1);
         addRenderableWidget(button2);
     }
@@ -165,7 +168,7 @@ public class HudElementEditor extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        int keyCode = event.key();
+        int scancode = event.key();
 
         // from net.minecraft.client.gui.screen.Screen
         if (event.isEscape() && this.shouldCloseOnEsc()) {
@@ -177,7 +180,7 @@ public class HudElementEditor extends Screen {
             CoreSettingsElement coreSettingsElement = CORE_SETTINGS_ELEMENTS.get(selectedElementIndex);
             CoreSettings coreSettings = coreSettingsElement.coreSettings;
 
-            if (keyCode == InputConstants.KEY_SPACE) {
+            if (scancode == InputConstants.KEY_SPACE) {
                 ElementCorners corners = coreSettingsElement.corners;
 
                 int beforeX = HudRenderer.getEditorPosX(coreSettings, corners);
@@ -193,7 +196,7 @@ public class HudElementEditor extends Screen {
                 int xDirection = 0;
                 int yDirection = 0;
 
-                switch (keyCode) {
+                switch (scancode) {
                     case InputConstants.KEY_UP:
                         yDirection = 1;
                         break;
@@ -322,6 +325,10 @@ public class HudElementEditor extends Screen {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if (event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
+            return super.mouseClicked(event, doubleClick);
+        }
+
         double mouseX = event.x();
         double mouseY = event.y();
 
@@ -342,7 +349,7 @@ public class HudElementEditor extends Screen {
 
     @Override
     public boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY) {
-        if (selectedElementIndex != INVALID_ID) {
+        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && selectedElementIndex != INVALID_ID) {
             double mouseX = event.x();
             double mouseY = event.y();
             updateElementPosition((int) (selectedMouseX - mouseX), (int) (selectedMouseY - mouseY));

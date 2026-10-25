@@ -1,5 +1,6 @@
 package io.github.brainage04.hudrendererlib.gametest;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.github.brainage04.hudrendererlib.hud.core.BasicCoreHudElement;
 import io.github.brainage04.hudrendererlib.keys.ModKeys;
 import io.github.brainage04.hudrendererlib.util.TextList;
@@ -28,7 +29,6 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
@@ -98,7 +98,7 @@ public final class HudClientScenarios {
             anchorCycles(driver);
             editorLifecycle(driver);
             statusEffects(driver);
-            System.out.println("HUD_CLIENT_SCENARIOS_PASS: registration/order, F1, enabled, commands/keys, editor, save/undo, text wrapping, padded/unpadded anchor cycles, status effects");
+            System.out.println("HUD_CLIENT_SCENARIOS_PASS: registration/order, F1, enabled, commands/keys, editor, mouse buttons, resize, modifier keys, save/undo, text wrapping, padded/unpadded anchor cycles, status effects");
         } finally {
             driver.onClient(client -> {
                 collectOrder = false;
@@ -127,19 +127,31 @@ public final class HudClientScenarios {
             double y = bounds.top + 2;
             int oldX = settings.x;
             int oldY = settings.y;
+            editor.mouseClicked(mouse(InputConstants.MOUSE_BUTTON_RIGHT, x, y), false);
+            check(editor.selectedElementIndex == CoreSettingsIdAssigner.INVALID_ID, "A right click must not select an element");
             editor.mouseClicked(mouse(x, y), false);
             check(editor.selectedElementIndex == settings.elementId, "Click must select the custom HUD element");
+            editor.mouseDragged(mouse(InputConstants.MOUSE_BUTTON_RIGHT, x + 12, y + 9), 12, 9);
+            check(settings.x == oldX && settings.y == oldY, "A right-button drag must not move the element");
             editor.mouseDragged(mouse(x + 12, y + 9), 12, 9);
             check(settings.x == oldX + 12 && settings.y == oldY + 9, "Dragging must move the selected element");
             BEFORE_FIRST.getElementConfig().getCoreSettings().enabled = false;
             check(editor.mouseInElement(x, y) != settings.elementId, "Disabled elements must not remain selectable");
             BEFORE_FIRST.getElementConfig().getCoreSettings().enabled = true;
+            editor.resize(600, 400);
+            check(editor.button1.getX() == 90 && editor.button1.getY() == 360
+                            && editor.button2.getX() == 310 && editor.button2.getY() == 360,
+                    "Resizing the editor must move the Undo and Save buttons with the screen");
             editor.closeWithoutSaving();
         });
     }
 
     private static MouseButtonEvent mouse(double x, double y) {
-        return new MouseButtonEvent(x, y, new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0));
+        return mouse(InputConstants.MOUSE_BUTTON_LEFT, x, y);
+    }
+
+    private static MouseButtonEvent mouse(int button, double x, double y) {
+        return new MouseButtonEvent(x, y, new MouseButtonInfo(button, 0));
     }
 
     private static void assertStopped(Driver driver, Probe probe, String message) {
@@ -162,6 +174,8 @@ public final class HudClientScenarios {
             check(client.gui.screen() != null && client.gui.screen().getClass().getName().startsWith("me.shedaniel.clothconfig2."),
                     "/hudrendererlibconfig must open Cloth Config");
             client.gui.screen().onClose();
+            check(ModKeys.openElementEditor.getDefaultKey().getName().equals("key.keyboard.keypad.add"),
+                    "Editor key must default to Numpad Plus");
             KeyMapping.click(ModKeys.openElementEditor.getDefaultKey());
         });
         driver.waitTicks(4);
@@ -171,6 +185,8 @@ public final class HudClientScenarios {
             KeyMapping configKey = ModKeys.openConfigKeyMap.entrySet().stream()
                     .filter(entry -> entry.getValue() == io.github.brainage04.hudrendererlib.config.core.HudRendererLibConfig.class)
                     .findFirst().orElseThrow().getKey();
+            check(configKey.getDefaultKey().getName().equals("key.keyboard.keypad.enter"),
+                    "Config key must default to Numpad Enter");
             KeyMapping.click(configKey.getDefaultKey());
         });
         driver.waitTicks(4);
@@ -196,8 +212,14 @@ public final class HudClientScenarios {
             CoreSettings settings = BEFORE_FIRST.getElementConfig().getCoreSettings();
             editor.selectedElementIndex = settings.elementId;
             editor.setFocused(editor.button1);
-            editor.keyPressed(new KeyEvent(InputConstants.KEY_RIGHT, 0, InputConstants.MOD_CONTROL | InputConstants.MOD_SHIFT));
-            check(settings.x == 70 && settings.y == 24, "Ctrl+Shift+Right must move 50 pixels");
+            // SDL modifier bits: left Shift 0x1, right Shift 0x2, left Ctrl 0x40, right Ctrl 0x80.
+            int[][] steps = {{0, 1}, {0x1, 10}, {0x2, 10}, {0x40, 5}, {0x80, 5}, {0x1 | 0x40, 50}, {0x2 | 0x80, 50}};
+            for (int[] step : steps) {
+                settings.x = 20;
+                editor.keyPressed(new KeyEvent(InputConstants.KEY_RIGHT, 0, step[0]));
+                check(settings.x == 20 + step[1] && settings.y == 24,
+                        "Right with modifiers 0x%x must move %d pixels, moved %d".formatted(step[0], step[1], settings.x - 20));
+            }
             int x = HudRenderer.getPosX(settings, 80);
             int y = HudRenderer.getPosY(settings, 16);
             editor.keyPressed(new KeyEvent(InputConstants.KEY_SPACE, 0, 0));
