@@ -5,8 +5,7 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 @SuppressWarnings("CanBeFinal")
 public class ColourOverride {
     public boolean enabled;
-    @ConfigEntry.ColorPicker
-    public int value;
+    @ConfigEntry.ColorPicker public int value;
 
     public ColourOverride(boolean enabled, int value) {
         this.enabled = enabled;

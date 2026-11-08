@@ -35,16 +35,31 @@ public final class HudRendererLibNeoForgeClientGameTest {
         try {
             if (!worldRequested && client.gui.screen() != null) {
                 worldRequested = true;
-                LevelSettings settings = new LevelSettings("HudRendererLib GameTest", GameType.CREATIVE,
-                        new LevelSettings.DifficultySettings(Difficulty.PEACEFUL, false, false),
-                        true, WorldDataConfiguration.DEFAULT);
-                client.createWorldOpenFlows().createFreshLevel("hudrendererlib-client-gametest", settings,
-                        new WorldOptions(0L, false, false),
-                        registries -> registries.lookupOrThrow(Registries.WORLD_PRESET)
-                                .getOrThrow(WorldPresets.FLAT).value().createWorldDimensions(),
-                        client.gui.screen());
+                LevelSettings settings =
+                        new LevelSettings(
+                                "HudRendererLib GameTest",
+                                GameType.CREATIVE,
+                                new LevelSettings.DifficultySettings(
+                                        Difficulty.PEACEFUL, false, false),
+                                true,
+                                WorldDataConfiguration.DEFAULT);
+                client.createWorldOpenFlows()
+                        .createFreshLevel(
+                                "hudrendererlib-client-gametest",
+                                settings,
+                                new WorldOptions(0L, false, false),
+                                registries ->
+                                        registries
+                                                .lookupOrThrow(Registries.WORLD_PRESET)
+                                                .getOrThrow(WorldPresets.FLAT)
+                                                .value()
+                                                .createWorldDimensions(),
+                                client.gui.screen());
             }
-            if (!started && client.player != null && client.level != null && client.gui.screen() == null) {
+            if (!started
+                    && client.player != null
+                    && client.level != null
+                    && client.gui.screen() == null) {
                 started = true;
                 Thread.ofVirtual().name("hudrendererlib-client-gametest").start(() -> run(client));
             }
@@ -55,40 +70,43 @@ public final class HudRendererLibNeoForgeClientGameTest {
 
     private static void run(Minecraft client) {
         try {
-            HudClientScenarios.run(new HudClientScenarios.Driver() {
-                @Override
-                public void onClient(Consumer<Minecraft> action) {
-                    CompletableFuture<Void> completed = new CompletableFuture<>();
-                    client.execute(() -> {
-                        try {
-                            action.accept(client);
-                            completed.complete(null);
-                        } catch (Throwable failure) {
-                            completed.completeExceptionally(failure);
+            HudClientScenarios.run(
+                    new HudClientScenarios.Driver() {
+                        @Override
+                        public void onClient(Consumer<Minecraft> action) {
+                            CompletableFuture<Void> completed = new CompletableFuture<>();
+                            client.execute(
+                                    () -> {
+                                        try {
+                                            action.accept(client);
+                                            completed.complete(null);
+                                        } catch (Throwable failure) {
+                                            completed.completeExceptionally(failure);
+                                        }
+                                    });
+                            try {
+                                completed.get(30, TimeUnit.SECONDS);
+                            } catch (Exception failure) {
+                                throw new AssertionError("Client action failed", failure);
+                            }
+                        }
+
+                        @Override
+                        public void waitTicks(int ticks) {
+                            long target = TICKS.get() + ticks;
+                            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(30);
+                            while (TICKS.get() < target) {
+                                if (System.nanoTime() >= deadline)
+                                    throw new AssertionError("Client ticks stalled");
+                                try {
+                                    Thread.sleep(5);
+                                } catch (InterruptedException failure) {
+                                    Thread.currentThread().interrupt();
+                                    throw new AssertionError("Client test interrupted", failure);
+                                }
+                            }
                         }
                     });
-                    try {
-                        completed.get(30, TimeUnit.SECONDS);
-                    } catch (Exception failure) {
-                        throw new AssertionError("Client action failed", failure);
-                    }
-                }
-
-                @Override
-                public void waitTicks(int ticks) {
-                    long target = TICKS.get() + ticks;
-                    long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(30);
-                    while (TICKS.get() < target) {
-                        if (System.nanoTime() >= deadline) throw new AssertionError("Client ticks stalled");
-                        try {
-                            Thread.sleep(5);
-                        } catch (InterruptedException failure) {
-                            Thread.currentThread().interrupt();
-                            throw new AssertionError("Client test interrupted", failure);
-                        }
-                    }
-                }
-            });
             HudRendererLib.LOGGER.info("HUD_NEOFORGE_CLIENT_GAMETEST_PASS");
             client.execute(client::stop);
         } catch (Throwable failure) {

@@ -5,6 +5,7 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 @SuppressWarnings("CanBeFinal")
 public class OpacityOverride {
     public boolean enabled;
+
     @ConfigEntry.BoundedDiscrete(max = 255)
     public int value;
 

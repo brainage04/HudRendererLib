@@ -1,7 +1,13 @@
 package io.github.brainage04.hudrendererlib.hud.core;
 
+import static io.github.brainage04.hudrendererlib.util.ConfigUtils.getConfig;
+
 import io.github.brainage04.hudrendererlib.HudRendererLib;
-import io.github.brainage04.hudrendererlib.config.core.*;
+import io.github.brainage04.hudrendererlib.config.core.CoreSettings;
+import io.github.brainage04.hudrendererlib.config.core.CoreSettingsElement;
+import io.github.brainage04.hudrendererlib.config.core.ElementAnchor;
+import io.github.brainage04.hudrendererlib.config.core.ElementCorners;
+import io.github.brainage04.hudrendererlib.config.core.ICoreSettingsContainer;
 import io.github.brainage04.hudrendererlib.util.TextList;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,14 +19,18 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 
-import static io.github.brainage04.hudrendererlib.util.ConfigUtils.getConfig;
-
 public class HudRenderer {
-    public static final List<CoreHudElement<? extends ICoreSettingsContainer>> REGISTERED_ELEMENTS = new ArrayList<>();
+    public static final List<CoreHudElement<? extends ICoreSettingsContainer>> REGISTERED_ELEMENTS =
+            new ArrayList<>();
 
-    public static void renderElement(Font renderer, GuiGraphicsExtractor drawContext, TextList lines, CoreSettings coreSettings) {
+    public static void renderElement(
+            Font renderer,
+            GuiGraphicsExtractor drawContext,
+            TextList lines,
+            CoreSettings coreSettings) {
         if (lines.isEmpty()) {
-            CoreSettingsElement element = HudElementEditor.CORE_SETTINGS_ELEMENTS.get(coreSettings.elementId);
+            CoreSettingsElement element =
+                    HudElementEditor.CORE_SETTINGS_ELEMENTS.get(coreSettings.elementId);
             if (element != null) {
                 element.corners.left = -1;
                 element.corners.top = -1;
@@ -33,7 +43,8 @@ public class HudRenderer {
         int elementWidth = 0;
 
         int elementPadding = HudRendererLib.getPadding(coreSettings);
-        List<WrappedLine> wrappedLines = wrapLines(renderer, lines, HudRendererLib.getMaxWidth(coreSettings));
+        List<WrappedLine> wrappedLines =
+                wrapLines(renderer, lines, HudRendererLib.getMaxWidth(coreSettings));
 
         int lineHeight = renderer.lineHeight + elementPadding;
         int elementHeight = lineHeight * wrappedLines.size() + elementPadding;
@@ -49,10 +60,15 @@ public class HudRenderer {
         int posX = getPosX(coreSettings, elementWidth);
 
         // adjust for padding
-        ElementCorners corners = setElementBounds(
-                coreSettings,
-                getCornersWithPadding(posX, posY, posX + elementWidth, posY + elementHeight, coreSettings)
-        );
+        ElementCorners corners =
+                setElementBounds(
+                        coreSettings,
+                        getCornersWithPadding(
+                                posX,
+                                posY,
+                                posX + elementWidth,
+                                posY + elementHeight,
+                                coreSettings));
         renderBackdrop(drawContext, corners, coreSettings);
 
         for (int i = 0; i < wrappedLines.size(); i++) {
@@ -66,8 +82,7 @@ public class HudRenderer {
                     linePosX,
                     posY + (lineHeight * i),
                     HudRendererLib.getTextColour(coreSettings),
-                    HudRendererLib.getTextShadows(coreSettings)
-            );
+                    HudRendererLib.getTextShadows(coreSettings));
         }
     }
 
@@ -76,9 +91,10 @@ public class HudRenderer {
         List<WrappedLine> wrappedLines = new ArrayList<>();
 
         for (Component line : lines) {
-            List<FormattedCharSequence> splitLines = maxWidth > 0
-                    ? renderer.split(line, wrapWidth)
-                    : List.of(line.getVisualOrderText());
+            List<FormattedCharSequence> splitLines =
+                    maxWidth > 0
+                            ? renderer.split(line, wrapWidth)
+                            : List.of(line.getVisualOrderText());
 
             if (splitLines.isEmpty()) {
                 wrappedLines.add(new WrappedLine(FormattedCharSequence.EMPTY, 0));
@@ -97,7 +113,8 @@ public class HudRenderer {
         int elementPadding = HudRendererLib.getPadding(coreSettings);
 
         return switch (coreSettings.elementAnchor) {
-            case TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> getScaledWidth() - elementWidth - elementPadding * 2;
+            case TOP_RIGHT, RIGHT, BOTTOM_RIGHT ->
+                    getScaledWidth() - elementWidth - elementPadding * 2;
             case TOP, CENTER, BOTTOM -> (getScaledWidth() - elementWidth) / 2;
             default -> elementPadding * 2;
         };
@@ -140,7 +157,8 @@ public class HudRenderer {
             LocalPlayer player = Minecraft.getInstance().player;
             boolean hasVisibleEffectIcon =
                     player != null
-                            && player.getActiveEffects().stream().anyMatch(effect -> effect.showIcon());
+                            && player.getActiveEffects().stream()
+                                    .anyMatch(effect -> effect.showIcon());
             if (hasVisibleEffectIcon
                     && !HudRendererLib.shouldHideVanillaStatusEffects()
                     && getConfig().adjustTopRightElementsWithStatusEffects) {
@@ -151,7 +169,10 @@ public class HudRenderer {
         return posY;
     }
 
-    public static void render(GuiGraphicsExtractor drawContext, DeltaTracker tickCounter, CoreHudElement<? extends ICoreSettingsContainer> coreHudElement) {
+    public static void render(
+            GuiGraphicsExtractor drawContext,
+            DeltaTracker tickCounter,
+            CoreHudElement<? extends ICoreSettingsContainer> coreHudElement) {
         if (!coreHudElement.getElementConfig().getCoreSettings().enabled) return;
 
         if (coreHudElement instanceof BasicCoreHudElement<?> basicHudElement) {
@@ -159,12 +180,12 @@ public class HudRenderer {
                     Minecraft.getInstance().font,
                     drawContext,
                     basicHudElement.getLines(),
-                    coreHudElement.getElementConfig().getCoreSettings()
-            );
+                    coreHudElement.getElementConfig().getCoreSettings());
         } else coreHudElement.render(drawContext, tickCounter);
     }
 
-    public static int alignContentX(CoreSettings coreSettings, int elementX, int elementWidth, int contentWidth) {
+    public static int alignContentX(
+            CoreSettings coreSettings, int elementX, int elementWidth, int contentWidth) {
         return switch (coreSettings.elementAnchor) {
             case TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> elementX + elementWidth - contentWidth;
             case TOP, CENTER, BOTTOM -> elementX + (elementWidth - contentWidth) / 2;
@@ -172,39 +193,47 @@ public class HudRenderer {
         };
     }
 
-    public static ElementCorners setElementBounds(CoreSettings coreSettings, int left, int top, int right, int bottom) {
+    public static ElementCorners setElementBounds(
+            CoreSettings coreSettings, int left, int top, int right, int bottom) {
         return setElementBounds(coreSettings, new ElementCorners(left, top, right, bottom));
     }
 
-    public static ElementCorners setElementBounds(CoreSettings coreSettings, ElementCorners corners) {
-        CoreSettingsElement coreSettingsElement = HudElementEditor.CORE_SETTINGS_ELEMENTS.get(coreSettings.elementId);
+    public static ElementCorners setElementBounds(
+            CoreSettings coreSettings, ElementCorners corners) {
+        CoreSettingsElement coreSettingsElement =
+                HudElementEditor.CORE_SETTINGS_ELEMENTS.get(coreSettings.elementId);
         if (coreSettingsElement == null) {
             HudRendererLib.LOGGER.error(
                     "Core settings element with element ID {} in HudElementEditor.CORE_SETTINGS_ELEMENTS does not exist - this shouldn't happen!",
-                    coreSettings.elementId
-            );
+                    coreSettings.elementId);
         } else {
             coreSettingsElement.corners = corners;
         }
         return corners;
     }
 
-    public static void renderBackdrop(GuiGraphicsExtractor drawContext, ElementCorners corners, CoreSettings coreSettings) {
+    public static void renderBackdrop(
+            GuiGraphicsExtractor drawContext, ElementCorners corners, CoreSettings coreSettings) {
         int backdropOpacity = HudRendererLib.getOpacity(coreSettings);
         if (backdropOpacity > 0) {
-            drawContext.fill(corners.left, corners.top, corners.right, corners.bottom, backdropOpacity << 24);
+            drawContext.fill(
+                    corners.left,
+                    corners.top,
+                    corners.right,
+                    corners.bottom,
+                    backdropOpacity << 24);
         }
     }
 
-    public static ElementCorners getCornersWithPadding(int left, int top, int right, int bottom, CoreSettings coreSettings) {
+    public static ElementCorners getCornersWithPadding(
+            int left, int top, int right, int bottom, CoreSettings coreSettings) {
         int elementPadding = HudRendererLib.getPadding(coreSettings);
 
         return new PaddedElementCorners(
                 left - elementPadding * 2,
                 top - elementPadding * 2,
                 right + elementPadding * 2,
-                bottom
-        );
+                bottom);
     }
 
     static int getEditorPosX(CoreSettings settings, ElementCorners corners) {
@@ -218,11 +247,12 @@ public class HudRenderer {
         int y = getPosY(settings, corners.bottom - corners.top);
         if (corners instanceof PaddedElementCorners) {
             int padding = HudRendererLib.getPadding(settings);
-            y -= switch (settings.elementAnchor) {
-                case TOP_LEFT, TOP, TOP_RIGHT -> padding * 2;
-                case LEFT, CENTER, RIGHT -> padding;
-                default -> 0;
-            };
+            y -=
+                    switch (settings.elementAnchor) {
+                        case TOP_LEFT, TOP, TOP_RIGHT -> padding * 2;
+                        case LEFT, CENTER, RIGHT -> padding;
+                        default -> 0;
+                    };
         }
         return y;
     }
@@ -243,6 +273,5 @@ public class HudRenderer {
         return Minecraft.getInstance().getWindow().getGuiScaledHeight();
     }
 
-    private record WrappedLine(FormattedCharSequence text, int width) {
-    }
+    private record WrappedLine(FormattedCharSequence text, int width) {}
 }

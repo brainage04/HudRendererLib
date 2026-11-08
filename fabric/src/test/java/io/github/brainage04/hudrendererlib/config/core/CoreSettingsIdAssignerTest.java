@@ -1,10 +1,10 @@
 package io.github.brainage04.hudrendererlib.config.core;
 
-import me.shedaniel.autoconfig.ConfigData;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+import me.shedaniel.autoconfig.ConfigData;
+import org.junit.jupiter.api.Test;
 
 class CoreSettingsIdAssignerTest {
     @Test
@@ -17,7 +17,8 @@ class CoreSettingsIdAssignerTest {
         CoreSettingsIdAssigner.assignElementIds(first);
         CoreSettingsIdAssigner.assignElementIds(second);
 
-        assertNotEquals(first.element.coreSettings.elementId, second.element.coreSettings.elementId);
+        assertNotEquals(
+                first.element.coreSettings.elementId, second.element.coreSettings.elementId);
     }
 
     @Test
@@ -27,7 +28,8 @@ class CoreSettingsIdAssignerTest {
         config.child.coreSettings.elementId = CoreSettingsIdAssigner.INVALID_ID;
         CoreSettingsIdAssigner.assignElementIds(config);
         assertNotEquals(CoreSettingsIdAssigner.INVALID_ID, config.inherited.coreSettings.elementId);
-        assertNotEquals(config.inherited.coreSettings.elementId, config.child.coreSettings.elementId);
+        assertNotEquals(
+                config.inherited.coreSettings.elementId, config.child.coreSettings.elementId);
         int inheritedId = config.inherited.coreSettings.elementId;
         int childId = config.child.coreSettings.elementId;
         CoreSettingsIdAssigner.assignElementIds(config);
@@ -41,7 +43,8 @@ class CoreSettingsIdAssignerTest {
         try {
             StaticConfig.SHARED.coreSettings.elementId = CoreSettingsIdAssigner.INVALID_ID;
             CoreSettingsIdAssigner.assignElementIds(new StaticConfig());
-            assertEquals(CoreSettingsIdAssigner.INVALID_ID, StaticConfig.SHARED.coreSettings.elementId);
+            assertEquals(
+                    CoreSettingsIdAssigner.INVALID_ID, StaticConfig.SHARED.coreSettings.elementId);
         } finally {
             StaticConfig.SHARED.coreSettings.elementId = previous;
         }

@@ -15,7 +15,8 @@ public class CoreSettings {
 
     @ConfigEntry.Gui.CollapsibleObject public ElementOverrides elementOverrides;
 
-    public CoreSettings(String elementName, boolean enabled, int x, int y, ElementAnchor elementAnchor) {
+    public CoreSettings(
+            String elementName, boolean enabled, int x, int y, ElementAnchor elementAnchor) {
         this.elementId = CoreSettingsIdAssigner.assignIdIfUnset(this.elementId);
         this.elementName = elementName;
 

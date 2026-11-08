@@ -1,9 +1,8 @@
 package io.github.brainage04.hudrendererlib.config.core;
 
-import me.shedaniel.autoconfig.ConfigData;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import me.shedaniel.autoconfig.ConfigData;
 
 public class CoreSettingsIdAssigner {
     public static final int INVALID_ID = 0;
@@ -13,7 +12,6 @@ public class CoreSettingsIdAssigner {
     public static synchronized int assignIdIfUnset(int current) {
         return current == INVALID_ID ? nextId++ : current;
     }
-
 
     public static <T extends ConfigData> void assignElementIds(T config) {
         for (Class<?> type = config.getClass(); type != Object.class; type = type.getSuperclass()) {
@@ -30,7 +28,8 @@ public class CoreSettingsIdAssigner {
                 Object value = field.get(config);
                 if (value instanceof ICoreSettingsContainer coreSettingsContainer) {
                     CoreSettings coreSettings = coreSettingsContainer.getCoreSettings();
-                    coreSettings.elementId = assignIdIfUnset(coreSettingsContainer.getCoreSettings().elementId);
+                    coreSettings.elementId =
+                            assignIdIfUnset(coreSettingsContainer.getCoreSettings().elementId);
                     coreSettingsContainer.setCoreSettings(coreSettings);
                 }
             } catch (IllegalAccessException e) {

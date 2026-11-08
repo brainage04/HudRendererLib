@@ -8,13 +8,10 @@ import net.minecraft.client.Minecraft;
 public class ScreenUtils {
     public static void openConfig(Minecraft client, Class<? extends ConfigData> configClass) {
         client.setScreenAndShow(
-                AutoConfigClient.getConfigScreen(configClass, client.gui.screen()).get()
-        );
+                AutoConfigClient.getConfigScreen(configClass, client.gui.screen()).get());
     }
 
     public static void openElementEditor(Minecraft client) {
-        client.setScreenAndShow(
-                new HudElementEditor()
-        );
+        client.setScreenAndShow(new HudElementEditor());
     }
 }
