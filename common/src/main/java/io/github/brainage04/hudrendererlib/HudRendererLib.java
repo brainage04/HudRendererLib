@@ -54,14 +54,11 @@ public class HudRendererLib {
 
         LOGGER.info(MOD_NAME + " initialising...");
 
-        // config
         AutoConfig.register(HudRendererLibConfig.class, GsonConfigSerializer::new);
 
-        // commands
         ModCommands.initialize();
         registerConfigCommand(HudRendererLibConfig.class, MOD_ID);
 
-        // keys
         ModKeys.initialize();
         registerConfigKey(
                 HudRendererLibConfig.class, SDLScancode.SDL_SCANCODE_KP_ENTER, MOD_ID, MOD_NAME);
@@ -187,7 +184,6 @@ public class HudRendererLib {
         return false;
     }
 
-    // override util methods
     public static int getPadding(CoreSettings coreSettings) {
         if (coreSettings.elementOverrides.padding.enabled) {
             return coreSettings.elementOverrides.padding.value;

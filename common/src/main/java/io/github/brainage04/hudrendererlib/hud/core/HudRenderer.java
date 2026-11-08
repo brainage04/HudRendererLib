@@ -49,17 +49,14 @@ public class HudRenderer {
         int lineHeight = renderer.lineHeight + elementPadding;
         int elementHeight = lineHeight * wrappedLines.size() + elementPadding;
 
-        // vertical adjustments
         int posY = getPosY(coreSettings, elementHeight);
 
         for (WrappedLine line : wrappedLines) {
             elementWidth = Math.max(elementWidth, line.width());
         }
 
-        // horizontal adjustments (for element)
         int posX = getPosX(coreSettings, elementWidth);
 
-        // adjust for padding
         ElementCorners corners =
                 setElementBounds(
                         coreSettings,
@@ -73,7 +70,6 @@ public class HudRenderer {
 
         for (int i = 0; i < wrappedLines.size(); i++) {
             WrappedLine line = wrappedLines.get(i);
-            // horizontal adjustments (for line)
             int linePosX = getPosX(coreSettings, line.width());
 
             drawContext.text(

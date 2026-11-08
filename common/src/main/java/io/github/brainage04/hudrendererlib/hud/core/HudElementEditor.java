@@ -25,7 +25,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
 public class HudElementEditor extends Screen {
-    // element id -> core settings element
     public static final Map<Integer, CoreSettingsElement> CORE_SETTINGS_ELEMENTS = new HashMap<>();
 
     static {
@@ -200,7 +199,6 @@ public class HudElementEditor extends Screen {
     public boolean keyPressed(KeyEvent event) {
         int scancode = event.key();
 
-        // from net.minecraft.client.gui.screen.Screen
         if (event.isEscape() && this.shouldCloseOnEsc()) {
             closeWithoutSaving();
             return true;
@@ -243,7 +241,6 @@ public class HudElementEditor extends Screen {
                         break;
                 }
 
-                // if no arrow keys were pressed, return
                 if (xDirection == 0 && yDirection == 0) {
                     return super.keyPressed(event);
                 }
@@ -258,11 +255,9 @@ public class HudElementEditor extends Screen {
                     yDirection *= 5;
                 }
 
-                // update selected element position
                 selectedElementX = coreSettings.x;
                 selectedElementY = coreSettings.y;
 
-                // update position in config
                 updateElementPosition(xDirection, yDirection);
             }
             return true;
@@ -284,9 +279,6 @@ public class HudElementEditor extends Screen {
         lines.add("Escape to close without saving");
         lines.addEmpty();
 
-        // render backdrops
-        // if both indices are the same, use highlighted
-        // otherwise, render separately
         if (highlightedElementIndex != INVALID_ID
                 && highlightedElementIndex == selectedElementIndex) {
             ElementCorners corners = CORE_SETTINGS_ELEMENTS.get(highlightedElementIndex).corners;
@@ -304,7 +296,6 @@ public class HudElementEditor extends Screen {
             }
         }
 
-        // render element information
         if (highlightedElementIndex != INVALID_ID) {
             CoreSettingsElement coreSettingsElement =
                     CORE_SETTINGS_ELEMENTS.get(highlightedElementIndex);

@@ -18,7 +18,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 
-/** Test-only integrated-world runner; no game-test code is included in the published library. */
 @EventBusSubscriber(modid = HudRendererLib.MOD_ID, value = Dist.CLIENT)
 public final class HudRendererLibNeoForgeClientGameTest {
     private static final AtomicLong TICKS = new AtomicLong();

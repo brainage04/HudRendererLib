@@ -3,7 +3,7 @@ package io.github.brainage04.hudrendererlib.util;
 public class StringUtils {
     public static char toUpperCase(char c) {
         if (c >= 'a' && c <= 'z') {
-            return (char) (c & ~32); // Bitwise uppercase (a -> A)
+            return (char) (c & ~32);
         }
 
         return c;

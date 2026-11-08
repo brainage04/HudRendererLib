@@ -33,7 +33,6 @@ import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 
-/** The same assertions run against each loader's actual HUD and editor. */
 public final class HudClientScenarios {
     public interface Driver {
         void onClient(Consumer<Minecraft> action);

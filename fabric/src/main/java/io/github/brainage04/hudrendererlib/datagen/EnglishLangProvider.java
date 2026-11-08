@@ -55,18 +55,15 @@ public class EnglishLangProvider extends FabricLanguageProvider {
     @Override
     public void generateTranslations(
             HolderLookup.Provider wrapperLookup, TranslationBuilder translationBuilder) {
-        // element editor
         translationBuilder.add(
                 "text.autoconfig.%s.title".formatted(HudRendererLib.MOD_ID),
                 "%s Config Editor".formatted(HudRendererLib.MOD_NAME));
 
-        // keybinds
         addAutomaticTranslations(
                 new String[] {"openConfig", "openElementEditor"}, "key", translationBuilder);
         translationBuilder.add(
                 "key.category.%s.keys".formatted(HudRendererLib.MOD_ID), HudRendererLib.MOD_NAME);
 
-        // config
         generateReflectedTranslations(
                 HudRendererLibConfig.class, autoConfigPrefix, translationBuilder);
 

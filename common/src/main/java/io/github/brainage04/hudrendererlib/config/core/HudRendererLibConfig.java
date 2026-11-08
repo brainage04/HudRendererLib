@@ -10,7 +10,6 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 public class HudRendererLibConfig implements ConfigData {
     public int screenMargin = 5;
 
-    // global element settings
     public int elementPadding = 2;
     public int maxElementWidth = 0;
     public boolean textShadows = true;
@@ -19,7 +18,6 @@ public class HudRendererLibConfig implements ConfigData {
     @ConfigEntry.BoundedDiscrete(min = 0, max = 255)
     public int backdropOpacity = 0;
 
-    // quality of life settings
     @ConfigEntry.Gui.Tooltip() public boolean showVanillaStatusEffects = true;
     @ConfigEntry.Gui.Tooltip() public boolean adjustTopRightElementsWithStatusEffects = true;
     public int adjustTopRightElementsWithStatusEffectsAmount = 21;
