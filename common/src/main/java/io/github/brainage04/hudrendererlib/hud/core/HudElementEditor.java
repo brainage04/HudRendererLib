@@ -1,11 +1,16 @@
 package io.github.brainage04.hudrendererlib.hud.core;
 
-import io.github.brainage04.hudrendererlib.config.core.*;
-import io.github.brainage04.hudrendererlib.util.ConfigUtils;
-import io.github.brainage04.hudrendererlib.util.MathUtils;
-import io.github.brainage04.hudrendererlib.util.TextList;
-import org.lwjgl.glfw.GLFW;
+import static io.github.brainage04.hudrendererlib.config.core.CoreSettingsIdAssigner.INVALID_ID;
+import static io.github.brainage04.hudrendererlib.util.ConfigUtils.getConfig;
 
+import com.mojang.blaze3d.platform.InputConstants;
+import io.github.brainage04.hudrendererlib.config.core.CoreSettings;
+import io.github.brainage04.hudrendererlib.config.core.CoreSettingsElement;
+import io.github.brainage04.hudrendererlib.config.core.ElementAnchor;
+import io.github.brainage04.hudrendererlib.config.core.ElementCorners;
+import io.github.brainage04.hudrendererlib.config.core.ICoreSettingsContainer;
+import io.github.brainage04.hudrendererlib.util.ConfigUtils;
+import io.github.brainage04.hudrendererlib.util.TextList;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
@@ -19,12 +24,10 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
-import static io.github.brainage04.hudrendererlib.config.core.CoreSettingsIdAssigner.INVALID_ID;
-import static io.github.brainage04.hudrendererlib.util.ConfigUtils.getConfig;
-
 public class HudElementEditor extends Screen {
     // element id -> core settings element
     public static final Map<Integer, CoreSettingsElement> CORE_SETTINGS_ELEMENTS = new HashMap<>();
+
     static {
         populateCoreSettingsElements();
     }
@@ -45,26 +48,29 @@ public class HudElementEditor extends Screen {
         super(Component.literal("HUD Element Editor"));
 
         populateCoreSettingsElements();
-
     }
 
     public static void populateCoreSettingsElements() {
         CORE_SETTINGS_ELEMENTS.clear();
 
-        for (CoreHudElement<? extends ICoreSettingsContainer> coreHudElement : HudRenderer.REGISTERED_ELEMENTS) {
+        for (CoreHudElement<? extends ICoreSettingsContainer> coreHudElement :
+                HudRenderer.REGISTERED_ELEMENTS) {
             CORE_SETTINGS_ELEMENTS.put(
                     coreHudElement.getElementConfig().getCoreSettings().elementId,
-                    new CoreSettingsElement(new ElementCorners(), coreHudElement.getElementConfig().getCoreSettings())
-            );
+                    new CoreSettingsElement(
+                            new ElementCorners(),
+                            coreHudElement.getElementConfig().getCoreSettings()));
         }
     }
 
-    public static boolean mouseInRect(int x1, int y1, int x2, int y2, double mouseX, double mouseY) {
+    public static boolean mouseInRect(
+            int x1, int y1, int x2, int y2, double mouseX, double mouseY) {
         return (x1 <= mouseX && mouseX <= x2 && y1 <= mouseY && mouseY <= y2);
     }
 
     public void disableBlur() {
-        OptionInstance<Integer> menuBackgroundBlurriness = Minecraft.getInstance().options.menuBackgroundBlurriness();
+        OptionInstance<Integer> menuBackgroundBlurriness =
+                Minecraft.getInstance().options.menuBackgroundBlurriness();
         if (previousMenuBackgroundBlurriness == null) {
             previousMenuBackgroundBlurriness = menuBackgroundBlurriness.get();
         }
@@ -73,7 +79,10 @@ public class HudElementEditor extends Screen {
 
     public void revertBlur() {
         if (previousMenuBackgroundBlurriness != null) {
-            Minecraft.getInstance().options.menuBackgroundBlurriness().set(previousMenuBackgroundBlurriness);
+            Minecraft.getInstance()
+                    .options
+                    .menuBackgroundBlurriness()
+                    .set(previousMenuBackgroundBlurriness);
             previousMenuBackgroundBlurriness = null;
         }
     }
@@ -85,13 +94,7 @@ public class HudElementEditor extends Screen {
             ElementCorners corners = element.corners;
 
             if (mouseInRect(
-                    corners.left,
-                    corners.top,
-                    corners.right,
-                    corners.bottom,
-                    mouseX,
-                    mouseY
-            )) {
+                    corners.left, corners.top, corners.right, corners.bottom, mouseX, mouseY)) {
                 return i;
             }
         }
@@ -99,14 +102,22 @@ public class HudElementEditor extends Screen {
         return INVALID_ID;
     }
 
-    public final Button button1 = Button.builder(Component.literal("Undo & Close"), button -> closeWithoutSaving())
-            .bounds(HudRenderer.getScaledWidth() / 2 - 210, HudRenderer.getScaledHeight() - 40, 200, 20)
-            .tooltip(Tooltip.create(Component.literal("Reverts the current positions to what they were before and closes the screen.")))
-            .build();
-    public final Button button2 = Button.builder(Component.literal("Save & Close"), button -> this.onClose())
-            .bounds(HudRenderer.getScaledWidth() / 2 + 10, HudRenderer.getScaledHeight() - 40, 200, 20)
-            .tooltip(Tooltip.create(Component.literal("Saves the current positions and closes the screen.")))
-            .build();
+    public final Button button1 =
+            Button.builder(Component.literal("Undo & Close"), button -> closeWithoutSaving())
+                    .size(200, 20)
+                    .tooltip(
+                            Tooltip.create(
+                                    Component.literal(
+                                            "Reverts the current positions to what they were before and closes the screen.")))
+                    .build();
+    public final Button button2 =
+            Button.builder(Component.literal("Save & Close"), button -> this.onClose())
+                    .size(200, 20)
+                    .tooltip(
+                            Tooltip.create(
+                                    Component.literal(
+                                            "Saves the current positions and closes the screen.")))
+                    .build();
 
     public void updateElementPosition(int deltaX, int deltaY) {
         CoreSettingsElement coreSettingsElement = CORE_SETTINGS_ELEMENTS.get(selectedElementIndex);
@@ -115,32 +126,53 @@ public class HudElementEditor extends Screen {
         int elementWidth = corners.right - corners.left;
         int elementHeight = corners.bottom - corners.top;
 
-        int minX = switch (coreSettings.elementAnchor) {
-            case TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> getConfig().screenMargin - (HudRenderer.getScaledWidth() - elementWidth);
-            case TOP, CENTER, BOTTOM -> getConfig().screenMargin - (HudRenderer.getScaledWidth() - elementWidth) / 2;
-            default -> getConfig().screenMargin;
-        };
-        int minY = switch (coreSettings.elementAnchor) {
-            case BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT -> getConfig().screenMargin - (HudRenderer.getScaledHeight() - elementHeight);
-            case LEFT, CENTER, RIGHT -> getConfig().screenMargin - (HudRenderer.getScaledHeight() - elementHeight) / 2;
-            default -> getConfig().screenMargin;
-        };
+        int minX =
+                switch (coreSettings.elementAnchor) {
+                    case TOP_RIGHT, RIGHT, BOTTOM_RIGHT ->
+                            getConfig().screenMargin
+                                    - (HudRenderer.getScaledWidth() - elementWidth);
+                    case TOP, CENTER, BOTTOM ->
+                            getConfig().screenMargin
+                                    - (HudRenderer.getScaledWidth() - elementWidth) / 2;
+                    default -> getConfig().screenMargin;
+                };
+        int minY =
+                switch (coreSettings.elementAnchor) {
+                    case BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT ->
+                            getConfig().screenMargin
+                                    - (HudRenderer.getScaledHeight() - elementHeight);
+                    case LEFT, CENTER, RIGHT ->
+                            getConfig().screenMargin
+                                    - (HudRenderer.getScaledHeight() - elementHeight) / 2;
+                    default -> getConfig().screenMargin;
+                };
 
-        coreSettings.x = (int) (Mth.clamp(
-                selectedElementX - deltaX,
-                minX,
-                minX + HudRenderer.getScaledWidth() - elementWidth - getConfig().screenMargin * 2
-        ));
-        coreSettings.y = (int) (Mth.clamp(
-                selectedElementY - deltaY,
-                minY,
-                minY + HudRenderer.getScaledHeight() - elementHeight - getConfig().screenMargin * 2
-        ));
+        coreSettings.x =
+                (int)
+                        (Mth.clamp(
+                                selectedElementX - deltaX,
+                                minX,
+                                minX
+                                        + HudRenderer.getScaledWidth()
+                                        - elementWidth
+                                        - getConfig().screenMargin * 2));
+        coreSettings.y =
+                (int)
+                        (Mth.clamp(
+                                selectedElementY - deltaY,
+                                minY,
+                                minY
+                                        + HudRenderer.getScaledHeight()
+                                        - elementHeight
+                                        - getConfig().screenMargin * 2));
     }
 
     @Override
     protected void init() {
         disableBlur();
+        // init() runs again on every resize and GUI scale change, so place the buttons here.
+        button1.setPosition(width / 2 - 210, height - 40);
+        button2.setPosition(width / 2 + 10, height - 40);
         addRenderableWidget(button1);
         addRenderableWidget(button2);
     }
@@ -166,26 +198,27 @@ public class HudElementEditor extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        int keyCode = event.key();
-        int modifiers = event.modifiers();
+        int scancode = event.key();
 
         // from net.minecraft.client.gui.screen.Screen
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE && this.shouldCloseOnEsc()) {
+        if (event.isEscape() && this.shouldCloseOnEsc()) {
             closeWithoutSaving();
             return true;
         }
 
         if (selectedElementIndex != INVALID_ID) {
-            CoreSettingsElement coreSettingsElement = CORE_SETTINGS_ELEMENTS.get(selectedElementIndex);
+            CoreSettingsElement coreSettingsElement =
+                    CORE_SETTINGS_ELEMENTS.get(selectedElementIndex);
             CoreSettings coreSettings = coreSettingsElement.coreSettings;
 
-            if (keyCode == GLFW.GLFW_KEY_SPACE) {
+            if (scancode == InputConstants.KEY_SPACE) {
                 ElementCorners corners = coreSettingsElement.corners;
 
                 int beforeX = HudRenderer.getEditorPosX(coreSettings, corners);
                 int beforeY = HudRenderer.getEditorPosY(coreSettings, corners);
                 ElementAnchor[] anchors = ElementAnchor.values();
-                coreSettings.elementAnchor = anchors[(coreSettings.elementAnchor.ordinal() + 1) % anchors.length];
+                coreSettings.elementAnchor =
+                        anchors[(coreSettings.elementAnchor.ordinal() + 1) % anchors.length];
                 coreSettings.x += beforeX - HudRenderer.getEditorPosX(coreSettings, corners);
                 coreSettings.y += beforeY - HudRenderer.getEditorPosY(coreSettings, corners);
 
@@ -195,17 +228,17 @@ public class HudElementEditor extends Screen {
                 int xDirection = 0;
                 int yDirection = 0;
 
-                switch (keyCode) {
-                    case GLFW.GLFW_KEY_UP:
+                switch (scancode) {
+                    case InputConstants.KEY_UP:
                         yDirection = 1;
                         break;
-                    case GLFW.GLFW_KEY_DOWN:
+                    case InputConstants.KEY_DOWN:
                         yDirection = -1;
                         break;
-                    case GLFW.GLFW_KEY_LEFT:
+                    case InputConstants.KEY_LEFT:
                         xDirection = 1;
                         break;
-                    case GLFW.GLFW_KEY_RIGHT:
+                    case InputConstants.KEY_RIGHT:
                         xDirection = -1;
                         break;
                 }
@@ -215,15 +248,12 @@ public class HudElementEditor extends Screen {
                     return super.keyPressed(event);
                 }
 
-                // deal with modifiers here
-                // https://www.glfw.org/docs/3.3/group__mods.html
-                // shift keys
-                if (MathUtils.isBitOn(modifiers, 0)) {
+                // shift moves 10 times as far, control 5 times (both: 50)
+                if (event.hasShiftDown()) {
                     xDirection *= 10;
                     yDirection *= 10;
                 }
-                // ctrl keys
-                if (MathUtils.isBitOn(modifiers, 1)) {
+                if (event.hasControlDown()) {
                     xDirection *= 5;
                     yDirection *= 5;
                 }
@@ -242,7 +272,8 @@ public class HudElementEditor extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(
+            GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
         highlightedElementIndex = mouseInElement(mouseX, mouseY);
 
         TextList lines = new TextList();
@@ -256,42 +287,27 @@ public class HudElementEditor extends Screen {
         // render backdrops
         // if both indices are the same, use highlighted
         // otherwise, render separately
-        if (highlightedElementIndex != INVALID_ID && highlightedElementIndex == selectedElementIndex) {
+        if (highlightedElementIndex != INVALID_ID
+                && highlightedElementIndex == selectedElementIndex) {
             ElementCorners corners = CORE_SETTINGS_ELEMENTS.get(highlightedElementIndex).corners;
-            context.fill(
-                    corners.left,
-                    corners.top,
-                    corners.right,
-                    corners.bottom,
-                    0x7fffffff
-            );
+            context.fill(corners.left, corners.top, corners.right, corners.bottom, 0x7fffffff);
         } else {
             if (highlightedElementIndex != INVALID_ID) {
-                ElementCorners corners = CORE_SETTINGS_ELEMENTS.get(highlightedElementIndex).corners;
-                context.fill(
-                        corners.left,
-                        corners.top,
-                        corners.right,
-                        corners.bottom,
-                        0x7fffffff
-                );
+                ElementCorners corners =
+                        CORE_SETTINGS_ELEMENTS.get(highlightedElementIndex).corners;
+                context.fill(corners.left, corners.top, corners.right, corners.bottom, 0x7fffffff);
             }
 
             if (selectedElementIndex != INVALID_ID) {
                 ElementCorners corners = CORE_SETTINGS_ELEMENTS.get(selectedElementIndex).corners;
-                context.fill(
-                        corners.left,
-                        corners.top,
-                        corners.right,
-                        corners.bottom,
-                        0x7fffffff
-                );
+                context.fill(corners.left, corners.top, corners.right, corners.bottom, 0x7fffffff);
             }
         }
 
         // render element information
         if (highlightedElementIndex != INVALID_ID) {
-            CoreSettingsElement coreSettingsElement = CORE_SETTINGS_ELEMENTS.get(highlightedElementIndex);
+            CoreSettingsElement coreSettingsElement =
+                    CORE_SETTINGS_ELEMENTS.get(highlightedElementIndex);
             CoreSettings coreSettings = coreSettingsElement.coreSettings;
 
             lines.add(coreSettings.elementName);
@@ -304,7 +320,8 @@ public class HudElementEditor extends Screen {
                 lines.add("Highlighted");
             }
         } else if (selectedElementIndex != INVALID_ID) {
-            CoreSettings coreSettings = CORE_SETTINGS_ELEMENTS.get(selectedElementIndex).coreSettings;
+            CoreSettings coreSettings =
+                    CORE_SETTINGS_ELEMENTS.get(selectedElementIndex).coreSettings;
 
             lines.add(coreSettings.elementName);
             lines.add("X: %d Y: %d".formatted(coreSettings.x, coreSettings.y));
@@ -318,8 +335,7 @@ public class HudElementEditor extends Screen {
                     lines.get(i),
                     width / 2,
                     10 + (font.lineHeight + 2) * i,
-                    0xFF_00_00_00 + getConfig().textColour
-            );
+                    0xFF_00_00_00 + getConfig().textColour);
         }
 
         super.extractRenderState(context, mouseX, mouseY, delta);
@@ -327,13 +343,18 @@ public class HudElementEditor extends Screen {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if (event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
+            return super.mouseClicked(event, doubleClick);
+        }
+
         double mouseX = event.x();
         double mouseY = event.y();
 
         selectedElementIndex = mouseInElement(mouseX, mouseY);
 
         if (selectedElementIndex != INVALID_ID) {
-            CoreSettings coreSettings = CORE_SETTINGS_ELEMENTS.get(selectedElementIndex).coreSettings;
+            CoreSettings coreSettings =
+                    CORE_SETTINGS_ELEMENTS.get(selectedElementIndex).coreSettings;
 
             selectedElementX = coreSettings.x;
             selectedElementY = coreSettings.y;
@@ -347,7 +368,8 @@ public class HudElementEditor extends Screen {
 
     @Override
     public boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY) {
-        if (selectedElementIndex != INVALID_ID) {
+        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT
+                && selectedElementIndex != INVALID_ID) {
             double mouseX = event.x();
             double mouseY = event.y();
             updateElementPosition((int) (selectedMouseX - mouseX), (int) (selectedMouseY - mouseY));

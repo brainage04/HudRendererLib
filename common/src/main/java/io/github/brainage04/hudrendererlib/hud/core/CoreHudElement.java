@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public interface CoreHudElement<T extends ICoreSettingsContainer> {
     T getElementConfig();
+
     default LayerInfo getLayerInfo() {
         return new LayerInfo(VanillaHudLayer.CHAT, true);
     }
@@ -16,6 +17,5 @@ public interface CoreHudElement<T extends ICoreSettingsContainer> {
         HudRenderer.render(graphics, deltaTracker, this);
     }
 
-    default void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
-    }
+    default void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {}
 }

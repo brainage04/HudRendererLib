@@ -11,10 +11,11 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 @Mod(value = HudRendererLib.MOD_ID, dist = Dist.CLIENT)
 public final class HudRendererLibNeoForge {
-	public HudRendererLibNeoForge(IEventBus modBus, ModContainer container) {
-		HudRendererLib.initialize(new NeoForgeHudRendererPlatform(modBus));
-		container.registerExtensionPoint(
-				IConfigScreenFactory.class,
-				(modContainer, parent) -> AutoConfigClient.getConfigScreen(HudRendererLibConfig.class, parent).get());
-	}
+    public HudRendererLibNeoForge(IEventBus modBus, ModContainer container) {
+        HudRendererLib.initialize(new NeoForgeHudRendererPlatform(modBus));
+        container.registerExtensionPoint(
+                IConfigScreenFactory.class,
+                (modContainer, parent) ->
+                        AutoConfigClient.getConfigScreen(HudRendererLibConfig.class, parent).get());
+    }
 }

@@ -8,44 +8,47 @@ import io.github.brainage04.hudrendererlib.config.core.HudRendererLibConfig;
 import io.github.brainage04.hudrendererlib.config.core.ICoreSettingsContainer;
 import io.github.brainage04.hudrendererlib.hud.core.CoreHudElement;
 import io.github.brainage04.hudrendererlib.hud.core.HudRenderer;
-import io.github.brainage04.hudrendererlib.platform.HudRendererPlatform;
 import io.github.brainage04.hudrendererlib.keys.ModKeys;
+import io.github.brainage04.hudrendererlib.platform.HudRendererPlatform;
 import io.github.brainage04.hudrendererlib.util.ConfigUtils;
 import io.github.brainage04.hudrendererlib.util.LayerInfo;
 import io.github.brainage04.hudrendererlib.util.ScreenUtils;
-import me.shedaniel.autoconfig.AutoConfig;
-import me.shedaniel.autoconfig.ConfigData;
-import me.shedaniel.autoconfig.serializer.ConfigSerializer;
-import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.resources.Identifier;
-import org.lwjgl.glfw.GLFW;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BooleanSupplier;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.ConfigData;
+import me.shedaniel.autoconfig.serializer.ConfigSerializer;
+import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.Identifier;
+import org.lwjgl.sdl.SDLScancode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HudRendererLib {
     public static final String MOD_ID = "hudrendererlib";
     public static final String MOD_NAME = "HudRendererLib";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static final KeyMapping.Category KEY_CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(MOD_ID, "keys"));
+    public static final KeyMapping.Category KEY_CATEGORY =
+            KeyMapping.Category.register(Identifier.fromNamespaceAndPath(MOD_ID, "keys"));
     private static final Map<String, KeyMapping.Category> KEY_CATEGORIES = new HashMap<>();
-    private static final List<BooleanSupplier> VANILLA_STATUS_EFFECTS_HIDERS = new CopyOnWriteArrayList<>();
+    private static final List<BooleanSupplier> VANILLA_STATUS_EFFECTS_HIDERS =
+            new CopyOnWriteArrayList<>();
     private static HudRendererPlatform platform;
 
     public static synchronized void initialize(HudRendererPlatform loaderPlatform) {
-        HudRendererPlatform requestedPlatform = Objects.requireNonNull(loaderPlatform, "loaderPlatform");
+        HudRendererPlatform requestedPlatform =
+                Objects.requireNonNull(loaderPlatform, "loaderPlatform");
         if (platform != null) {
             if (platform.getClass() == requestedPlatform.getClass()) {
                 return;
             }
-            throw new IllegalStateException("HudRendererLib is already initialized with " + platform.getClass().getName());
+            throw new IllegalStateException(
+                    "HudRendererLib is already initialized with " + platform.getClass().getName());
         }
         platform = requestedPlatform;
 
@@ -60,7 +63,8 @@ public class HudRendererLib {
 
         // keys
         ModKeys.initialize();
-        registerConfigKey(HudRendererLibConfig.class, GLFW.GLFW_KEY_KP_ENTER, MOD_ID, MOD_NAME);
+        registerConfigKey(
+                HudRendererLibConfig.class, SDLScancode.SDL_SCANCODE_KP_ENTER, MOD_ID, MOD_NAME);
 
         LOGGER.info(MOD_NAME + " initialized.");
     }
@@ -74,82 +78,91 @@ public class HudRendererLib {
     }
 
     @SuppressWarnings("unused")
-    public static <T extends ConfigData> void register(Class<T> configClass, ConfigSerializer.Factory<T> serializerFactory) {
+    public static <T extends ConfigData> void register(
+            Class<T> configClass, ConfigSerializer.Factory<T> serializerFactory) {
         AutoConfig.register(configClass, serializerFactory);
         ConfigUtils.addConfigClass(configClass);
 
-        CoreSettingsIdAssigner.assignElementIds(AutoConfig.getConfigHolder(configClass).getConfig());
+        CoreSettingsIdAssigner.assignElementIds(
+                AutoConfig.getConfigHolder(configClass).getConfig());
 
         AutoConfig.getConfigHolder(configClass).registerSaveListener(ConfigUtils::onSave);
         AutoConfig.getConfigHolder(configClass).registerLoadListener(ConfigUtils::onLoad);
     }
 
     @SuppressWarnings("unused")
-    public static void registerConfigCommand(Class<? extends ConfigData> configClass, String modId) {
-        platform().registerClientCommand(
-                modId + "config",
-                client -> ScreenUtils.openConfig(client, configClass)
-        );
+    public static void registerConfigCommand(
+            Class<? extends ConfigData> configClass, String modId) {
+        platform()
+                .registerClientCommand(
+                        modId + "config", client -> ScreenUtils.openConfig(client, configClass));
     }
 
     /**
      * Registers a key that opens {@code configClass}'s config screen, grouped under the mod's own
-     * key category (see {@link #getKeyCategory(String)}). The mod provides the translations
-     * {@code key.<modId>.openConfig} and {@code key.category.<modId>.keys}.
+     * key category (see {@link #getKeyCategory(String)}). The mod provides the translations {@code
+     * key.<modId>.openConfig} and {@code key.category.<modId>.keys}.
+     *
+     * @param keycode the default key as an SDL3 scancode ({@code org.lwjgl.sdl.SDLScancode}), the
+     *     key codes Minecraft uses since 26.3
      */
     @SuppressWarnings("unused")
-    public static void registerConfigKey(Class<? extends ConfigData> configClass, int keycode, String modId, String modName) {
-        KeyMapping keyMapping = new KeyMapping(
-                "key.%s.openConfig".formatted(modId),
-                InputConstants.Type.KEYSYM,
-                keycode,
-                getKeyCategory(modId)
-        );
+    public static void registerConfigKey(
+            Class<? extends ConfigData> configClass, int keycode, String modId, String modName) {
+        KeyMapping keyMapping =
+                new KeyMapping(
+                        "key.%s.openConfig".formatted(modId),
+                        InputConstants.Type.KEYBOARD,
+                        keycode,
+                        getKeyCategory(modId));
         platform().registerKeyMapping(keyMapping);
         ModKeys.openConfigKeyMap.put(keyMapping, configClass);
     }
 
     /**
      * The key category {@code <modId>:keys}, created and registered on first use, so that a mod's
-     * config key and any keys the mod registers itself appear together in the controls screen.
-     * Its title is the translation {@code key.category.<modId>.keys}.
+     * config key and any keys the mod registers itself appear together in the controls screen. Its
+     * title is the translation {@code key.category.<modId>.keys}.
      */
     public static synchronized KeyMapping.Category getKeyCategory(String modId) {
         if (modId.equals(MOD_ID)) return KEY_CATEGORY;
 
-        return KEY_CATEGORIES.computeIfAbsent(modId, id -> {
-            KeyMapping.Category category = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(id, "keys"));
-            platform().registerKeyCategory(category);
-            return category;
-        });
+        return KEY_CATEGORIES.computeIfAbsent(
+                modId,
+                id -> {
+                    KeyMapping.Category category =
+                            KeyMapping.Category.register(
+                                    Identifier.fromNamespaceAndPath(id, "keys"));
+                    platform().registerKeyCategory(category);
+                    return category;
+                });
     }
 
     /**
-     * Registers {@code coreHudElement}, drawn next to the vanilla layer named by its
-     * {@link CoreHudElement#getLayerInfo()}.
+     * Registers {@code coreHudElement}, drawn next to the vanilla layer named by its {@link
+     * CoreHudElement#getLayerInfo()}.
      *
      * @throws IllegalArgumentException if the element's layer info names no vanilla HUD layer
      */
     @SuppressWarnings("unused")
-    public static void registerHudElement(CoreHudElement<? extends ICoreSettingsContainer> coreHudElement) {
+    public static void registerHudElement(
+            CoreHudElement<? extends ICoreSettingsContainer> coreHudElement) {
         LayerInfo layerInfo;
         try {
             layerInfo = coreHudElement.getLayerInfo();
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(
-                    "HUD element %s has an invalid anchor: %s".formatted(coreHudElement.getClass().getName(), e.getMessage()),
-                    e
-            );
+                    "HUD element %s has an invalid anchor: %s"
+                            .formatted(coreHudElement.getClass().getName(), e.getMessage()),
+                    e);
         }
-        Identifier layerId = Identifier.fromNamespaceAndPath(MOD_ID, "hud-layer-%d".formatted(HudRenderer.REGISTERED_ELEMENTS.size()));
+        Identifier layerId =
+                Identifier.fromNamespaceAndPath(
+                        MOD_ID, "hud-layer-%d".formatted(HudRenderer.REGISTERED_ELEMENTS.size()));
 
         HudRenderer.REGISTERED_ELEMENTS.add(coreHudElement);
-        platform().registerHudElement(
-                layerInfo.layer(),
-                layerInfo.before(),
-                layerId,
-                coreHudElement
-        );
+        platform()
+                .registerHudElement(layerInfo.layer(), layerInfo.before(), layerId, coreHudElement);
     }
 
     /**

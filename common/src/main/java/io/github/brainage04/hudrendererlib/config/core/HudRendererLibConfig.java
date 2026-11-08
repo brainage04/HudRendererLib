@@ -14,15 +14,13 @@ public class HudRendererLibConfig implements ConfigData {
     public int elementPadding = 2;
     public int maxElementWidth = 0;
     public boolean textShadows = true;
-    @ConfigEntry.ColorPicker
-    public int textColour = 0xffffff;
+    @ConfigEntry.ColorPicker public int textColour = 0xffffff;
+
     @ConfigEntry.BoundedDiscrete(min = 0, max = 255)
     public int backdropOpacity = 0;
 
     // quality of life settings
-    @ConfigEntry.Gui.Tooltip()
-    public boolean showVanillaStatusEffects = true;
-    @ConfigEntry.Gui.Tooltip()
-    public boolean adjustTopRightElementsWithStatusEffects = true;
+    @ConfigEntry.Gui.Tooltip() public boolean showVanillaStatusEffects = true;
+    @ConfigEntry.Gui.Tooltip() public boolean adjustTopRightElementsWithStatusEffects = true;
     public int adjustTopRightElementsWithStatusEffectsAmount = 21;
 }

@@ -2,11 +2,11 @@
 
 ## Setup
 
-HudRendererLib 1.0.12 targets Minecraft 26.2 on both loaders.
+HudRendererLib 1.1.0 targets Minecraft 26.3 on both loaders. The 1.0.x line is for Minecraft 26.2 and the 1.1.x line for Minecraft 26.3; see [Upgrading from 1.0.x](#upgrading-from-10x-minecraft-262) when moving a mod across.
 
 ### Fabric Loom
 
-HudRendererLib 1.0.12 is published on Maven Central:
+HudRendererLib 1.1.0 is published on Maven Central:
 
 ```groovy
 repositories {
@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    modImplementation "io.github.brainage04:hudrendererlib:1.0.12"
+    modImplementation "io.github.brainage04:hudrendererlib:1.1.0"
 }
 ```
 
@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    implementation "io.github.brainage04:hudrendererlib-neoforge:1.0.12"
+    implementation "io.github.brainage04:hudrendererlib-neoforge:1.1.0"
 }
 ```
 
@@ -175,13 +175,13 @@ public void onInitializeClient() {
     // THEN register your commands/keys
     // HUD elements can be registered before/after commands/keys as long as they are registered after the main config class
     HudRendererLib.registerConfigCommand(ModConfig.class, MOD_ID);
-    HudRendererLib.registerConfigKey(ModConfig.class, GLFW.GLFW_KEY_KP_SUBTRACT, MOD_ID, MOD_NAME);
+    HudRendererLib.registerConfigKey(ModConfig.class, SDLScancode.SDL_SCANCODE_KP_MINUS, MOD_ID, MOD_NAME);
 
     // ...
 }
 ```
 
-Where `MOD_ID` is the ID of your mod, `MOD_NAME` is its display name, and the GLFW constant selects the default key.
+Where `MOD_ID` is the ID of your mod, `MOD_NAME` is its display name, and the SDL3 scancode (`org.lwjgl.sdl.SDLScancode`, the key codes Minecraft uses since 26.3; GLFW key codes no longer work) selects the default key.
 The key is listed in the controls screen under your mod's own category, `HudRendererLib.getKeyCategory(MOD_ID)`; use the same category for any other keys your mod registers so they appear together.
 Provide the translations `key.<MOD_ID>.openConfig` for the key and `key.category.<MOD_ID>.keys` for the category title.
 
@@ -204,6 +204,20 @@ HudRendererLib.registerVanillaStatusEffectsHider(() -> getConfig().statusEffectH
 ```
 
 The icons are hidden while any registered supplier returns true, and top-right elements are not moved down for them.
+
+## Upgrading from 1.0.x (Minecraft 26.2)
+
+| HudRendererLib | Minecraft |
+|---|---|
+| 1.0.x | 26.2 |
+| 1.1.x | 26.3 |
+
+1.1.0 changes the public API in two places:
+
+- `registerConfigKey(Class, int, String, String)` keeps its signature, but the `int` is now an SDL3 scancode (`org.lwjgl.sdl.SDLScancode`) instead of a GLFW key code, because Minecraft 26.3 reads keys through SDL3. Calls using `GLFW.GLFW_KEY_*` constants stop compiling, since GLFW is no longer on the classpath. Integer literals and values copied from a 26.2 build still compile but bind a different key (GLFW 66 is `B`, SDL scancode 66 is F9), so convert them too, e.g. `GLFW.GLFW_KEY_KP_SUBTRACT` becomes `SDLScancode.SDL_SCANCODE_KP_MINUS`.
+- `io.github.brainage04.hudrendererlib.util.MathUtils` (`getBit`, `isBitOn`) was removed. Copy the two methods into your mod if you used them.
+
+`VanillaHudLayer` gained `INFO_BAR_FOREGROUND`, the contextual info bar drawn over `INFO_BAR`'s background.
 
 ## Building and running tests
 

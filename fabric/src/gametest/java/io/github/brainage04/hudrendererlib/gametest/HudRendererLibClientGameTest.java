@@ -10,20 +10,24 @@ import net.minecraft.client.Minecraft;
 public final class HudRendererLibClientGameTest implements FabricClientGameTest {
     @Override
     public void runTest(ClientGameTestContext context) {
-        ClientGameTestServers.withDedicatedServer(context, ClientGameTestServers.flatServerProperties(),
-                "HudRendererLib HUD API GameTest", server -> {
+        ClientGameTestServers.withDedicatedServer(
+                context,
+                ClientGameTestServers.flatServerProperties(),
+                "HudRendererLib HUD API GameTest",
+                server -> {
                     ClientGameTestServers.assertClientWorldAndPlayerAvailable(context);
-                    HudClientScenarios.run(new HudClientScenarios.Driver() {
-                        @Override
-                        public void onClient(Consumer<Minecraft> action) {
-                            context.runOnClient(action::accept);
-                        }
+                    HudClientScenarios.run(
+                            new HudClientScenarios.Driver() {
+                                @Override
+                                public void onClient(Consumer<Minecraft> action) {
+                                    context.runOnClient(action::accept);
+                                }
 
-                        @Override
-                        public void waitTicks(int ticks) {
-                            context.waitTicks(ticks);
-                        }
-                    });
+                                @Override
+                                public void waitTicks(int ticks) {
+                                    context.waitTicks(ticks);
+                                }
+                            });
                 });
     }
 }

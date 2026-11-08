@@ -9,12 +9,16 @@ public class ElementOverrides {
     // todo: create generic override class with custom gui handlers
     @ConfigEntry.Gui.CollapsibleObject
     public IntegerOverride padding = new IntegerOverride(false, 2);
+
     @ConfigEntry.Gui.CollapsibleObject
     public IntegerOverride maxWidth = new IntegerOverride(false, 0);
+
     @ConfigEntry.Gui.CollapsibleObject
     public BooleanOverride textShadows = new BooleanOverride(false, true);
+
     @ConfigEntry.Gui.CollapsibleObject
     public ColourOverride textColour = new ColourOverride(false, 0xffffff);
+
     @ConfigEntry.Gui.CollapsibleObject
     public OpacityOverride backdropOpacity = new OpacityOverride(false, 100);
 }
