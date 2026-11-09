@@ -4,6 +4,7 @@ import static io.github.brainage04.hudrendererlib.config.core.CoreSettingsIdAssi
 import static io.github.brainage04.hudrendererlib.util.ConfigUtils.getConfig;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import io.github.brainage04.hudrendererlib.HudRendererLib;
 import io.github.brainage04.hudrendererlib.config.core.CoreSettings;
 import io.github.brainage04.hudrendererlib.config.core.CoreSettingsElement;
 import io.github.brainage04.hudrendererlib.config.core.ElementAnchor;
@@ -41,6 +42,17 @@ public class HudElementEditor extends Screen {
     public double selectedMouseY = -1;
 
     public int highlightedElementIndex = INVALID_ID;
+
+    /** The narrowest max width the editor sets, in GUI pixels. */
+    public static final int MIN_MAX_WIDTH = 10;
+
+    /** How far from the max width handle a click still grabs it, in GUI pixels. */
+    private static final int HANDLE_REACH = 2;
+
+    private static final int HANDLE_COLOUR = 0xFF_FF_AA_00;
+
+    /** Whether the left button is dragging the selected element's max width handle. */
+    public boolean resizingMaxWidth;
 
     private Integer previousMenuBackgroundBlurriness;
 
@@ -100,6 +112,110 @@ public class HudElementEditor extends Screen {
         }
 
         return INVALID_ID;
+    }
+
+    /** The registered element with {@code elementId}, or {@code null}. */
+    private static CoreHudElement<? extends ICoreSettingsContainer> findElement(int elementId) {
+        for (CoreHudElement<? extends ICoreSettingsContainer> element :
+                HudRenderer.REGISTERED_ELEMENTS) {
+            if (element.getElementConfig().getCoreSettings().elementId == elementId) {
+                return element;
+            }
+        }
+        return null;
+    }
+
+    /** Whether the element with {@code elementId} wraps at its max width. */
+    public static boolean supportsMaxWidth(int elementId) {
+        CoreHudElement<? extends ICoreSettingsContainer> element = findElement(elementId);
+        return element != null && element.supportsMaxWidth();
+    }
+
+    /**
+     * The element's max width, or the width of its content while it has none, so that the handle
+     * starts at the element's edge.
+     */
+    private static int getEffectiveMaxWidth(CoreSettingsElement element) {
+        int maxWidth = HudRendererLib.getMaxWidth(element.coreSettings);
+        return maxWidth > 0
+                ? maxWidth
+                : HudRenderer.getContentWidth(element.coreSettings, element.corners);
+    }
+
+    /** The padding on each side of the element's content inside its bounds. */
+    private static int getSidePadding(CoreSettingsElement element) {
+        ElementCorners corners = element.corners;
+        int contentWidth = HudRenderer.getContentWidth(element.coreSettings, corners);
+        return (corners.right - corners.left - contentWidth) / 2;
+    }
+
+    /**
+     * The x of the max width handle: the element's free edge at its max width. A right-anchored
+     * element keeps its right edge, so the handle is on its left; a centred one grows both ways, so
+     * the handle is on its right and moves half as far as the width changes.
+     */
+    public static int getMaxWidthHandleX(CoreSettingsElement element) {
+        ElementCorners corners = element.corners;
+        int maxWidth = getEffectiveMaxWidth(element);
+        int padding = getSidePadding(element);
+        return switch (element.coreSettings.elementAnchor) {
+            case TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> corners.right - padding * 2 - maxWidth;
+            case TOP, CENTER, BOTTOM -> (corners.left + corners.right + maxWidth) / 2 + padding;
+            default -> corners.left + padding * 2 + maxWidth;
+        };
+    }
+
+    /** The max width that puts the handle of {@code element} at {@code mouseX}. */
+    private static int getMaxWidthAt(CoreSettingsElement element, double mouseX) {
+        ElementCorners corners = element.corners;
+        int padding = getSidePadding(element);
+        double width =
+                switch (element.coreSettings.elementAnchor) {
+                    case TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> corners.right - padding * 2 - mouseX;
+                    case TOP, CENTER, BOTTOM ->
+                            (mouseX - padding - (corners.left + corners.right) / 2.0) * 2;
+                    default -> mouseX - corners.left - padding * 2;
+                };
+        return (int) Math.round(width);
+    }
+
+    /** Turns the element's own max width on at {@code maxWidth} GUI pixels. */
+    public static void setMaxWidth(CoreSettings coreSettings, int maxWidth) {
+        coreSettings.elementOverrides.maxWidth.enabled = true;
+        coreSettings.elementOverrides.maxWidth.value =
+                Mth.clamp(
+                        maxWidth,
+                        MIN_MAX_WIDTH,
+                        Math.max(MIN_MAX_WIDTH, HudRenderer.getScaledWidth()));
+    }
+
+    /** Turns the element's own max width off, back to the global Max Element Width. */
+    public static void clearMaxWidth(CoreSettings coreSettings) {
+        coreSettings.elementOverrides.maxWidth.enabled = false;
+    }
+
+    /** Whether the element is drawn and wraps at its max width, so the editor shows its handle. */
+    private static boolean hasMaxWidthHandle(int elementId) {
+        if (elementId == INVALID_ID || !supportsMaxWidth(elementId)) return false;
+        ElementCorners corners = CORE_SETTINGS_ELEMENTS.get(elementId).corners;
+        return corners.right > corners.left;
+    }
+
+    private boolean mouseOnMaxWidthHandle(double mouseX, double mouseY) {
+        if (!hasMaxWidthHandle(selectedElementIndex)) return false;
+        CoreSettingsElement element = CORE_SETTINGS_ELEMENTS.get(selectedElementIndex);
+        ElementCorners corners = element.corners;
+        return Math.abs(mouseX - getMaxWidthHandleX(element)) <= HANDLE_REACH
+                && corners.top <= mouseY
+                && mouseY <= corners.bottom;
+    }
+
+    private static String describeMaxWidth(CoreSettings coreSettings) {
+        int maxWidth = HudRendererLib.getMaxWidth(coreSettings);
+        if (maxWidth <= 0) return "Max Width: off";
+        return coreSettings.elementOverrides.maxWidth.enabled
+                ? "Max Width: %d".formatted(maxWidth)
+                : "Max Width: %d (global)".formatted(maxWidth);
     }
 
     public final Button button1 =
@@ -224,6 +340,18 @@ public class HudElementEditor extends Screen {
 
                 selectedElementX = coreSettings.x;
                 selectedElementY = coreSettings.y;
+            } else if (supportsMaxWidth(selectedElementIndex)
+                    && (scancode == InputConstants.KEY_LBRACKET
+                            || scancode == InputConstants.KEY_RBRACKET)) {
+                // the same steps as the arrow keys: Ctrl = x5, Shift = x10
+                int step = scancode == InputConstants.KEY_LBRACKET ? -1 : 1;
+                if (event.hasShiftDown()) step *= 10;
+                if (event.hasControlDown()) step *= 5;
+                setMaxWidth(coreSettings, getEffectiveMaxWidth(coreSettingsElement) + step);
+            } else if (supportsMaxWidth(selectedElementIndex)
+                    && (scancode == InputConstants.KEY_BACKSPACE
+                            || scancode == InputConstants.KEY_DELETE)) {
+                clearMaxWidth(coreSettings);
             } else {
                 int xDirection = 0;
                 int yDirection = 0;
@@ -281,6 +409,8 @@ public class HudElementEditor extends Screen {
         lines.add("Click to select, hold click and drag to move");
         lines.add("Arrow keys for precise movement, Ctrl = x5, Shift = x10");
         lines.add("Space to cycle alignment");
+        lines.add(
+                "Drag the orange bar or press [ and ] to set the max width, Backspace to remove it");
         lines.add("Escape to close without saving");
         lines.addEmpty();
 
@@ -304,6 +434,14 @@ public class HudElementEditor extends Screen {
             }
         }
 
+        // the selected element's max width handle, at the edge its max width puts it
+        if (hasMaxWidthHandle(selectedElementIndex)) {
+            CoreSettingsElement element = CORE_SETTINGS_ELEMENTS.get(selectedElementIndex);
+            ElementCorners corners = element.corners;
+            int handleX = getMaxWidthHandleX(element);
+            context.fill(handleX - 1, corners.top, handleX + 1, corners.bottom, HANDLE_COLOUR);
+        }
+
         // render element information
         if (highlightedElementIndex != INVALID_ID) {
             CoreSettingsElement coreSettingsElement =
@@ -313,6 +451,9 @@ public class HudElementEditor extends Screen {
             lines.add(coreSettings.elementName);
             lines.add("X: %d Y: %d".formatted(coreSettings.x, coreSettings.y));
             lines.add("Anchor: %s".formatted(coreSettings.elementAnchor.toString()));
+            if (supportsMaxWidth(highlightedElementIndex)) {
+                lines.add(describeMaxWidth(coreSettings));
+            }
 
             if (highlightedElementIndex == selectedElementIndex) {
                 lines.add("Highlighted & Selected");
@@ -326,6 +467,9 @@ public class HudElementEditor extends Screen {
             lines.add(coreSettings.elementName);
             lines.add("X: %d Y: %d".formatted(coreSettings.x, coreSettings.y));
             lines.add("Anchor: %s".formatted(coreSettings.elementAnchor.toString()));
+            if (supportsMaxWidth(selectedElementIndex)) {
+                lines.add(describeMaxWidth(coreSettings));
+            }
             lines.add("Selected");
         }
 
@@ -350,6 +494,11 @@ public class HudElementEditor extends Screen {
         double mouseX = event.x();
         double mouseY = event.y();
 
+        // the selected element's max width handle may lie outside the element, so it is checked
+        // before the click selects another element
+        resizingMaxWidth = mouseOnMaxWidthHandle(mouseX, mouseY);
+        if (resizingMaxWidth) return true;
+
         selectedElementIndex = mouseInElement(mouseX, mouseY);
 
         if (selectedElementIndex != INVALID_ID) {
@@ -372,9 +521,22 @@ public class HudElementEditor extends Screen {
                 && selectedElementIndex != INVALID_ID) {
             double mouseX = event.x();
             double mouseY = event.y();
-            updateElementPosition((int) (selectedMouseX - mouseX), (int) (selectedMouseY - mouseY));
+            if (resizingMaxWidth) {
+                CoreSettingsElement element = CORE_SETTINGS_ELEMENTS.get(selectedElementIndex);
+                setMaxWidth(element.coreSettings, getMaxWidthAt(element, mouseX));
+            } else {
+                updateElementPosition(
+                        (int) (selectedMouseX - mouseX), (int) (selectedMouseY - mouseY));
+            }
         }
 
         return super.mouseDragged(event, deltaX, deltaY);
+    }
+
+    @Override
+    public boolean mouseReleased(MouseButtonEvent event) {
+        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) resizingMaxWidth = false;
+
+        return super.mouseReleased(event);
     }
 }

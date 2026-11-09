@@ -28,11 +28,14 @@ For mod developers, dependency setup and the public API examples are in [docs/DE
 - `/hudelementeditor` or `Numpad Plus` - open the HUD Element Editor.
 - `/hudrendererlibconfig` or `Numpad Enter` - open the HudRendererLib Config Editor.
 - In the element editor: click to select, drag to move, arrow keys for precise movement, `Ctrl` for x5, `Shift` for x10, and `Space` to cycle alignment.
+- A selected element that wraps shows an orange bar on its free edge (the left edge for right-anchored elements): drag it to set the element's max width, or use `[` and `]` (same `Ctrl`/`Shift` steps); `Backspace` removes it.
 - `Save & Close` saves positions; `Undo & Close` or `Escape` closes without saving.
 
 ## Configuration
 
 The config editor controls the screen margin, element padding, maximum text width, text shadows, text colour and backdrop opacity.
+
+The maximum width (Max Element Width, or an element's own Max Width override) is off by default (`0`). When set, text wraps at it between words, never inside one, and each element keeps its alignment: a right-anchored element still ends at its right edge.
 
 Show Vanilla Status Effects controls the game's status effect icons; the top-right adjustment settings control whether and how far elements move down for them.
 
