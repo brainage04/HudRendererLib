@@ -9,6 +9,7 @@ import io.github.brainage04.hudrendererlib.config.core.ElementAnchor;
 import io.github.brainage04.hudrendererlib.config.core.ElementCorners;
 import io.github.brainage04.hudrendererlib.config.core.ICoreSettingsContainer;
 import io.github.brainage04.hudrendererlib.util.TextList;
+import io.github.brainage04.hudrendererlib.util.TextWrapper;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.DeltaTracker;
@@ -28,6 +29,21 @@ public class HudRenderer {
             GuiGraphicsExtractor drawContext,
             TextList lines,
             CoreSettings coreSettings) {
+        renderElement(renderer, drawContext, lines, coreSettings, false);
+    }
+
+    /**
+     * Draws {@code lines} as a text element. Unless {@code linesWrapped} says the lines already fit
+     * the element's max width (see {@link BasicCoreHudElement#wrapsOwnLines()}), each line is
+     * wrapped at its spaces with {@link TextWrapper#wrapWords}, never inside a word. Every line is
+     * aligned on its own to the element's anchor: left, centred or right.
+     */
+    public static void renderElement(
+            Font renderer,
+            GuiGraphicsExtractor drawContext,
+            TextList lines,
+            CoreSettings coreSettings,
+            boolean linesWrapped) {
         if (lines.isEmpty()) {
             CoreSettingsElement element =
                     HudElementEditor.CORE_SETTINGS_ELEMENTS.get(coreSettings.elementId);
@@ -44,7 +60,10 @@ public class HudRenderer {
 
         int elementPadding = HudRendererLib.getPadding(coreSettings);
         List<WrappedLine> wrappedLines =
-                wrapLines(renderer, lines, HudRendererLib.getMaxWidth(coreSettings));
+                wrapLines(
+                        renderer,
+                        lines,
+                        linesWrapped ? 0 : HudRendererLib.getMaxWidth(coreSettings));
 
         int lineHeight = renderer.lineHeight + elementPadding;
         int elementHeight = lineHeight * wrappedLines.size() + elementPadding;
@@ -83,22 +102,13 @@ public class HudRenderer {
     }
 
     private static List<WrappedLine> wrapLines(Font renderer, TextList lines, int maxWidth) {
-        int wrapWidth = Math.max(1, maxWidth);
         List<WrappedLine> wrappedLines = new ArrayList<>();
 
         for (Component line : lines) {
-            List<FormattedCharSequence> splitLines =
-                    maxWidth > 0
-                            ? renderer.split(line, wrapWidth)
-                            : List.of(line.getVisualOrderText());
-
-            if (splitLines.isEmpty()) {
-                wrappedLines.add(new WrappedLine(FormattedCharSequence.EMPTY, 0));
-                continue;
-            }
-
-            for (FormattedCharSequence splitLine : splitLines) {
-                wrappedLines.add(new WrappedLine(splitLine, renderer.width(splitLine)));
+            for (Component wrapped :
+                    TextWrapper.wrapWords(line, maxWidth, TextWrapper.widthOf(renderer))) {
+                FormattedCharSequence text = wrapped.getVisualOrderText();
+                wrappedLines.add(new WrappedLine(text, renderer.width(text)));
             }
         }
 
@@ -106,13 +116,23 @@ public class HudRenderer {
     }
 
     public static int getXOffset(CoreSettings coreSettings, int elementWidth) {
-        int elementPadding = HudRendererLib.getPadding(coreSettings);
+        return getXOffset(
+                coreSettings.elementAnchor,
+                getScaledWidth(),
+                elementWidth,
+                HudRendererLib.getPadding(coreSettings));
+    }
 
-        return switch (coreSettings.elementAnchor) {
-            case TOP_RIGHT, RIGHT, BOTTOM_RIGHT ->
-                    getScaledWidth() - elementWidth - elementPadding * 2;
-            case TOP, CENTER, BOTTOM -> (getScaledWidth() - elementWidth) / 2;
-            default -> elementPadding * 2;
+    /**
+     * The x offset of content {@code width} wide from an element anchored at {@code anchor} on a
+     * screen {@code screenWidth} wide: right anchors keep its right edge, centre anchors its
+     * centre, left anchors its left edge.
+     */
+    public static int getXOffset(ElementAnchor anchor, int screenWidth, int width, int padding) {
+        return switch (anchor) {
+            case TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> screenWidth - width - padding * 2;
+            case TOP, CENTER, BOTTOM -> (screenWidth - width) / 2;
+            default -> padding * 2;
         };
     }
 
@@ -176,7 +196,8 @@ public class HudRenderer {
                     Minecraft.getInstance().font,
                     drawContext,
                     basicHudElement.getLines(),
-                    coreHudElement.getElementConfig().getCoreSettings());
+                    coreHudElement.getElementConfig().getCoreSettings(),
+                    basicHudElement.wrapsOwnLines());
         } else coreHudElement.render(drawContext, tickCounter);
     }
 
@@ -230,6 +251,17 @@ public class HudRenderer {
                 top - elementPadding * 2,
                 right + elementPadding * 2,
                 bottom);
+    }
+
+    /**
+     * The width of an element's content inside its editor bounds: padded bounds (from {@link
+     * #getCornersWithPadding}) lose their padding on both sides, other bounds are all content.
+     */
+    static int getContentWidth(CoreSettings settings, ElementCorners corners) {
+        int width = corners.right - corners.left;
+        return corners instanceof PaddedElementCorners
+                ? width - HudRendererLib.getPadding(settings) * 4
+                : width;
     }
 
     static int getEditorPosX(CoreSettings settings, ElementCorners corners) {

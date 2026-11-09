@@ -125,6 +125,20 @@ Call `HudRenderer.setElementBounds(...)` on every rendered frame with the elemen
 The HUD Element Editor uses those bounds to select and drag custom elements; text-only elements set them automatically.
 For padded custom layouts, pass the `ElementCorners` returned by `HudRenderer.getCornersWithPadding(...)` directly to `setElementBounds(...)`; it retains the padding information the editor needs when cycling alignment.
 
+Every element has an optional max width (`HudRendererLib.getMaxWidth(settings)`): the element's Style Overrides > Max Width, else the global Max Element Width; `0`, the default, means none.
+Users set it in the config editor or in the HUD Element Editor, where a selected element that wraps shows an orange handle on its free edge (`[`/`]` adjust it, Backspace turns it off).
+A text element's lines wrap at it between words (`TextWrapper.wrapWords`), never inside one; a word wider than the max width stays whole on its own line.
+Every line keeps the element's alignment, so a right-anchored element still ends at its right edge.
+
+An element whose lines have their own break points (lists, `name: value` pairs) wraps them itself with `TextWrapper.wrapParts(prefix, parts, separator, maxWidth, TextWrapper.widthOf(font))`, which breaks only between parts and leaves the separator's visible part at the end of a wrapped line (`", "` leaves `","`, `" / "` leaves `" /"`), and says so:
+```java
+    @Override
+    public boolean wrapsOwnLines() {
+        return true;
+    }
+```
+A custom element that reads the max width overrides `supportsMaxWidth()` to return `true`, so that the editor offers its handle.
+
 If you wish to change the layer that a given element (basic or custom) is rendered with:
 ```java
     @Override

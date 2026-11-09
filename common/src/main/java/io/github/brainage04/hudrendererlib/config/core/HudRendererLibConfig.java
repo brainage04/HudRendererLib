@@ -11,7 +11,7 @@ public class HudRendererLibConfig implements ConfigData {
     public int screenMargin = 5;
 
     public int elementPadding = 2;
-    public int maxElementWidth = 0;
+    @ConfigEntry.Gui.Tooltip() public int maxElementWidth = 0;
     public boolean textShadows = true;
     @ConfigEntry.ColorPicker public int textColour = 0xffffff;
 

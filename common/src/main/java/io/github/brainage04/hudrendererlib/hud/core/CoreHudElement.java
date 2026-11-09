@@ -13,6 +13,16 @@ public interface CoreHudElement<T extends ICoreSettingsContainer> {
         return new LayerInfo(VanillaHudLayer.CHAT, true);
     }
 
+    /**
+     * Whether the element wraps its text at its max width ({@link
+     * io.github.brainage04.hudrendererlib.HudRendererLib#getMaxWidth}); the HUD Element Editor only
+     * offers its max width controls for elements that do. Text elements do; a custom element that
+     * reads the max width overrides this.
+     */
+    default boolean supportsMaxWidth() {
+        return false;
+    }
+
     default void extractRenderState(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         HudRenderer.render(graphics, deltaTracker, this);
     }
