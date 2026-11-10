@@ -13,7 +13,8 @@ public class CoreSettings {
     public int y;
     public ElementAnchor elementAnchor;
 
-    @ConfigEntry.Gui.CollapsibleObject public ElementOverrides elementOverrides;
+    @ConfigEntry.Gui.CollapsibleObject
+    public ElementOverrides elementOverrides = new ElementOverrides();
 
     public CoreSettings(
             String elementName, boolean enabled, int x, int y, ElementAnchor elementAnchor) {
@@ -24,7 +25,14 @@ public class CoreSettings {
         this.x = x;
         this.y = y;
         this.elementAnchor = elementAnchor;
+    }
 
-        this.elementOverrides = new ElementOverrides();
+    /**
+     * Without it Gson allocates through Unsafe and skips the field initialisers above (Gson 2.14.0
+     * {@code ConstructorConstructor#newUnsafeAllocator}), so a config file that leaves
+     * {@code elementOverrides} out would load it null. The name is only ever read from the file.
+     */
+    private CoreSettings() {
+        this.elementName = null;
     }
 }
