@@ -13,8 +13,8 @@ import net.minecraft.resources.Identifier;
  * identifier.
  *
  * <p>An element anchored to a layer is drawn under the same conditions as that layer on both
- * loaders: hidden with the rest of the HUD by F1 (except {@link #SLEEP} and {@link #SUBTITLES},
- * which the game keeps drawing), and only when the game draws the layer itself, e.g. {@link
+ * loaders: hidden with the rest of the HUD by F1 (except {@link #SLEEP}, and {@link #SUBTITLES}
+ * while an in-game screen is open), and only when the game draws the layer itself, e.g. {@link
  * #HEALTH_BAR} only in survival/adventure and {@link #HOTBAR} only outside spectator mode.
  */
 public enum VanillaHudLayer {
