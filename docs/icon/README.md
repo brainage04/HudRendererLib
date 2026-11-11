@@ -1,8 +1,8 @@
 # HudRendererLib icon
 
-## What this is
+## Overview
 
-`icon.png` — the HudRendererLib mod icon, 1024 x 1024 PNG, SHA-256
+`icon.png` is the HudRendererLib mod icon, 1024 x 1024 PNG, SHA-256
 `f2c61f3a4a5e7d6207644dee3e8da58fe5b989553ae435a7ee65336c071ed328`.
 
 Copied byte-identically from `.local-icon-variants/provenance/from-round3/blender-z/hudrendererlib-06-library-mosaic.png`
@@ -11,18 +11,18 @@ Copied byte-identically from `.local-icon-variants/provenance/from-round3/blende
 
 ## How it was made
 
-Blender render, not a screenshot.
+The icon is a Blender render, not an in-game screenshot.
 
 * Blender 5.1.1, headless `--background -noaudio --threads 2`, Cycles CPU (no GPU), 64 samples,
   1024 x 1024, 67.346 s. No display server, no audio sink, no Minecraft shader pack.
 * Arrangement: the owner's skin head replaces the upper-right block of a two-by-two bookshelf
-  mosaic — three complete unmodified vanilla bookshelf cubes plus the head. Heads use the exact
+  mosaic: three complete unmodified vanilla bookshelf cubes plus the head. Heads use the exact
   reference base/outer head mesh and UVs (no sculpting, no stretched volumes), and positive-volume
   intersections are zero.
 * Camera is orthographic and fixed: location `(6.928203582763672, -6.9282026290893555, 8.053203582763672)`,
   Euler rotation `(0.9553165435791016, -6.96e-08, 0.7853983044624329)` rad, `ortho_scale` 3.969080686569214.
   Head orientation is the NMSR one: front on screen-right, player-right side on screen-left, top visible.
-* Imagery — **extracted from the real Minecraft client**, not shipped and not re-drawn. The assets come
+* Imagery: **extracted from the real Minecraft client**, not shipped and not re-drawn. The assets come
   from the Minecraft **26.2** merged client jar at
   `~/.gradle/caches/fabric-loom/26.2/minecraft-merged.jar`:
 
@@ -34,24 +34,24 @@ Blender render, not a screenshot.
   `provenance/asset-provenance.json`. The owner-supplied skin
   (SHA-256 `e9ebbeece495d9c96040e235dc865fdb1a530cf6a2243a6c8fcec22e72f03e3f`) and the reference head
   scene (`assets/reference-head.blend`, from `provenance/from-round3/blender-h/npc-addons-head-2.blend`) are also here.
-  The client jar itself is not copied — re-extraction is described below.
+  The client jar itself is not copied; re-extraction is described below.
 
 ## Provenance files
 
-* `hudrendererlib-06-library-mosaic.py` — entry point (`scene.render('06-library-mosaic')`);
-  `scene.py` — the shared scene author for the six candidate arrangements.
+* `hudrendererlib-06-library-mosaic.py`: entry point (`scene.render('06-library-mosaic')`);
+  `scene.py`: the shared scene author for the six candidate arrangements.
 * `hudrendererlib-06-library-mosaic.blend` (packed, embeds its entry point and `scene.py`),
   `-metadata.json` (arrangement, geometry, camera, packed textures, render settings).
-* `assets/` — the extracted client assets, the reference head scene and the supplied skin.
-* `run-blender.py` — the recorded cgroup-limited CPU launcher; `inspect-source.py` — source inspection;
+* `assets/`: the extracted client assets, the reference head scene and the supplied skin.
+* `run-blender.py`: the recorded cgroup-limited CPU launcher; `inspect-source.py`: source inspection;
   `verify-scenes.py` (reopens the packed scene and asserts geometry/UV hashes) and `verify-pngs.py`
   (PNG decode + content checks).
 * `asset-provenance.json`, `reproduction.json`, `script-hashes.json`, `manifest.json`,
   `png-verification.json`, `saved-scene-verification.json`, `render-report.json`, `visual-review.json`,
-  `cleanup-report.json` — curated to the selected arrangement only (see `CURATION.json`).
-* `evidence/*-run.json`, `evidence/reference-inspection.json`, `evidence/live-resource-snapshot.json` —
+  `cleanup-report.json`: curated to the selected arrangement only (see `CURATION.json`).
+* `evidence/*-run.json`, `evidence/reference-inspection.json`, `evidence/live-resource-snapshot.json`:
   machine-readable run and inspection records.
-* `CURATION.json` — what was copied, which aggregate rows were dropped, and what was left in round-3.
+* `CURATION.json`: what was copied, which aggregate rows were dropped, and what was left in round-3.
 
 ## How to regenerate
 
