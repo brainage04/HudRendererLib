@@ -10,8 +10,8 @@ public interface BasicCoreHudElement<T extends ICoreSettingsContainer> extends C
 
     /**
      * Whether {@link #getLines()} already fits the element's max width ({@link
-     * io.github.brainage04.hudrendererlib.HudRendererLib#getMaxWidth}), e.g. because the element
-     * wraps at its own separators with {@link
+     * io.github.brainage04.hudrendererlib.HudRendererLib#getMaxWidth(CoreHudElement)}), e.g.
+     * because the element wraps at its own separators with {@link
      * io.github.brainage04.hudrendererlib.util.TextWrapper}. When {@code false} (the default) the
      * renderer wraps each line at its spaces.
      */

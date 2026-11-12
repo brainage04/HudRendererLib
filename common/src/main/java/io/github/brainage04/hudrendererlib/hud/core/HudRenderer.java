@@ -29,21 +29,26 @@ public class HudRenderer {
             GuiGraphicsExtractor drawContext,
             TextList lines,
             CoreSettings coreSettings) {
-        renderElement(renderer, drawContext, lines, coreSettings, false);
+        renderElement(
+                renderer,
+                drawContext,
+                lines,
+                coreSettings,
+                HudRendererLib.getMaxWidth(coreSettings));
     }
 
     /**
-     * Draws {@code lines} as a text element. Unless {@code linesWrapped} says the lines already fit
-     * the element's max width (see {@link BasicCoreHudElement#wrapsOwnLines()}), each line is
-     * wrapped at its spaces with {@link TextWrapper#wrapWords}, never inside a word. Every line is
-     * aligned on its own to the element's anchor: left, centred or right.
+     * Draws {@code lines} as a text element, each line wrapped at its spaces at {@code maxWidth}
+     * GUI pixels with {@link TextWrapper#wrapWords}, never inside a word; {@code 0} or less draws
+     * the lines as they are. Every line is aligned on its own to the element's anchor: left,
+     * centred or right.
      */
     public static void renderElement(
             Font renderer,
             GuiGraphicsExtractor drawContext,
             TextList lines,
             CoreSettings coreSettings,
-            boolean linesWrapped) {
+            int maxWidth) {
         if (lines.isEmpty()) {
             CoreSettingsElement element =
                     HudElementEditor.CORE_SETTINGS_ELEMENTS.get(coreSettings.elementId);
@@ -59,11 +64,7 @@ public class HudRenderer {
         int elementWidth = 0;
 
         int elementPadding = HudRendererLib.getPadding(coreSettings);
-        List<WrappedLine> wrappedLines =
-                wrapLines(
-                        renderer,
-                        lines,
-                        linesWrapped ? 0 : HudRendererLib.getMaxWidth(coreSettings));
+        List<WrappedLine> wrappedLines = wrapLines(renderer, lines, maxWidth);
 
         int lineHeight = renderer.lineHeight + elementPadding;
         int elementHeight = lineHeight * wrappedLines.size() + elementPadding;
@@ -197,7 +198,9 @@ public class HudRenderer {
                     drawContext,
                     basicHudElement.getLines(),
                     coreHudElement.getElementConfig().getCoreSettings(),
-                    basicHudElement.wrapsOwnLines());
+                    basicHudElement.wrapsOwnLines()
+                            ? 0
+                            : HudRendererLib.getMaxWidth(basicHudElement));
         } else coreHudElement.render(drawContext, tickCounter);
     }
 

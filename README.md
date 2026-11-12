@@ -28,7 +28,7 @@ For mod developers, dependency setup and the public API examples are in [docs/DE
 - `/hudelementeditor` or `Numpad Plus` - open the HUD Element Editor.
 - `/hudrendererlibconfig` or `Numpad Enter` - open the HudRendererLib Config Editor.
 - In the element editor: click to select, drag to move, arrow keys for precise movement, `Ctrl` for x5, `Shift` for x10, and `Space` to cycle alignment.
-- A selected element that wraps shows an orange bar on its free edge (the left edge for right-anchored elements): drag it to set the element's max width, or use `[` and `]` (same `Ctrl`/`Shift` steps); `Backspace` removes it.
+- A selected element that wraps shows an orange bar on its free edge (the left edge for right-anchored elements): drag it to set the element's max width, or use `[` and `]` (same `Ctrl`/`Shift` steps); `Backspace` resets it to the global Max Element Width, or to the element's own default when that is off.
 - `Save & Close` saves positions; `Undo & Close` or `Escape` closes without saving.
 
 ## Configuration

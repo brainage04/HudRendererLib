@@ -130,12 +130,21 @@ public class HudElementEditor extends Screen {
         return element != null && element.supportsMaxWidth();
     }
 
+    /** The max width the element with these settings wraps at, its own default included. */
+    private static int getMaxWidth(CoreSettings coreSettings) {
+        CoreHudElement<? extends ICoreSettingsContainer> element =
+                findElement(coreSettings.elementId);
+        return element != null
+                ? HudRendererLib.getMaxWidth(element)
+                : HudRendererLib.getMaxWidth(coreSettings);
+    }
+
     /**
      * The element's max width, or the width of its content while it has none, so that the handle
      * starts at the element's edge.
      */
     private static int getEffectiveMaxWidth(CoreSettingsElement element) {
-        int maxWidth = HudRendererLib.getMaxWidth(element.coreSettings);
+        int maxWidth = getMaxWidth(element.coreSettings);
         return maxWidth > 0
                 ? maxWidth
                 : HudRenderer.getContentWidth(element.coreSettings, element.corners);
@@ -188,7 +197,10 @@ public class HudElementEditor extends Screen {
                         Math.max(MIN_MAX_WIDTH, HudRenderer.getScaledWidth()));
     }
 
-    /** Turns the element's own max width off, back to the global Max Element Width. */
+    /**
+     * Turns the element's own max width off, back to the global Max Element Width or, without one,
+     * the element's default.
+     */
     public static void clearMaxWidth(CoreSettings coreSettings) {
         coreSettings.elementOverrides.maxWidth.enabled = false;
     }
@@ -210,11 +222,14 @@ public class HudElementEditor extends Screen {
     }
 
     private static String describeMaxWidth(CoreSettings coreSettings) {
-        int maxWidth = HudRendererLib.getMaxWidth(coreSettings);
+        int maxWidth = getMaxWidth(coreSettings);
         if (maxWidth <= 0) return "Max Width: off";
-        return coreSettings.elementOverrides.maxWidth.enabled
-                ? "Max Width: %d".formatted(maxWidth)
-                : "Max Width: %d (global)".formatted(maxWidth);
+        if (coreSettings.elementOverrides.maxWidth.enabled) {
+            return "Max Width: %d".formatted(maxWidth);
+        }
+        return HudRendererLib.getMaxWidth(coreSettings) > 0
+                ? "Max Width: %d (global)".formatted(maxWidth)
+                : "Max Width: %d (default)".formatted(maxWidth);
     }
 
     public final Button button1 =
@@ -405,7 +420,7 @@ public class HudElementEditor extends Screen {
         lines.add("Arrow keys for precise movement, Ctrl = x5, Shift = x10");
         lines.add("Space to cycle alignment");
         lines.add(
-                "Drag the orange bar or press [ and ] to set the max width, Backspace to remove it");
+                "Drag the orange bar or press [ and ] to set the max width, Backspace to reset it");
         lines.add("Escape to close without saving");
         lines.addEmpty();
 

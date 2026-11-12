@@ -15,12 +15,21 @@ public interface CoreHudElement<T extends ICoreSettingsContainer> {
 
     /**
      * Whether the element wraps its text at its max width ({@link
-     * io.github.brainage04.hudrendererlib.HudRendererLib#getMaxWidth}); the HUD Element Editor only
-     * offers its max width controls for elements that do. Text elements do; a custom element that
-     * reads the max width overrides this.
+     * io.github.brainage04.hudrendererlib.HudRendererLib#getMaxWidth(CoreHudElement)}); the HUD
+     * Element Editor only offers its max width controls for elements that do. Text elements do; a
+     * custom element that reads the max width overrides this.
      */
     default boolean supportsMaxWidth() {
         return false;
+    }
+
+    /**
+     * The max width in GUI pixels the element wraps at while neither its own Max Width override nor
+     * the global Max Element Width sets one; {@code 0}, the default, means none. See {@link
+     * io.github.brainage04.hudrendererlib.HudRendererLib#getMaxWidth(CoreHudElement)}.
+     */
+    default int getDefaultMaxWidth() {
+        return 0;
     }
 
     default void extractRenderState(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
