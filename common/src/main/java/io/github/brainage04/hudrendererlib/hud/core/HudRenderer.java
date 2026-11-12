@@ -24,6 +24,20 @@ public class HudRenderer {
     public static final List<CoreHudElement<? extends ICoreSettingsContainer>> REGISTERED_ELEMENTS =
             new ArrayList<>();
 
+    /** The registered element with {@code elementId}, or {@code null}. */
+    public static CoreHudElement<? extends ICoreSettingsContainer> findElement(int elementId) {
+        for (CoreHudElement<? extends ICoreSettingsContainer> element : REGISTERED_ELEMENTS) {
+            if (element.getElementConfig().getCoreSettings().elementId == elementId) {
+                return element;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Draws {@code lines} as a text element wrapped at the max width of the element these settings
+     * belong to ({@link HudRendererLib#getMaxWidth(CoreSettings)}), its own default included.
+     */
     public static void renderElement(
             Font renderer,
             GuiGraphicsExtractor drawContext,

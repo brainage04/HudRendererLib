@@ -30,7 +30,9 @@ public final class TextWrapper {
     /**
      * Joins {@code parts} with {@code separator} after {@code prefix}, wrapping between parts so
      * that no line is wider than {@code maxWidth} unless a single part (with the prefix, on the
-     * first line) is wider on its own.
+     * first line) is wider on its own. A part that starts a line keeps the separator's line end
+     * after it when the line breaks there, so a line holding one part within the line end's width
+     * of {@code maxWidth} can overshoot it by that much.
      *
      * @param width measures text in the same unit as {@code maxWidth}
      */

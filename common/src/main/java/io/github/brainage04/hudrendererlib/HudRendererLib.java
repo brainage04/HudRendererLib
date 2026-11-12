@@ -193,9 +193,19 @@ public class HudRendererLib {
         }
     }
 
+    /**
+     * {@link #getMaxWidth(CoreHudElement)} for the registered element these settings belong to;
+     * settings no registered element uses have no default.
+     */
     public static int getMaxWidth(CoreSettings coreSettings) {
-        return getMaxWidth(
-                coreSettings.elementOverrides.maxWidth, ConfigUtils.getConfig().maxElementWidth, 0);
+        IntegerOverride override = coreSettings.elementOverrides.maxWidth;
+        int globalMaxWidth = ConfigUtils.getConfig().maxElementWidth;
+        if (override.enabled || globalMaxWidth > 0) {
+            return getMaxWidth(override, globalMaxWidth, 0);
+        }
+        CoreHudElement<? extends ICoreSettingsContainer> element =
+                HudRenderer.findElement(coreSettings.elementId);
+        return element != null ? element.getDefaultMaxWidth() : 0;
     }
 
     /**

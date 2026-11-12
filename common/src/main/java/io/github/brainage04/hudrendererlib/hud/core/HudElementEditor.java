@@ -113,30 +113,11 @@ public class HudElementEditor extends Screen {
         return INVALID_ID;
     }
 
-    /** The registered element with {@code elementId}, or {@code null}. */
-    private static CoreHudElement<? extends ICoreSettingsContainer> findElement(int elementId) {
-        for (CoreHudElement<? extends ICoreSettingsContainer> element :
-                HudRenderer.REGISTERED_ELEMENTS) {
-            if (element.getElementConfig().getCoreSettings().elementId == elementId) {
-                return element;
-            }
-        }
-        return null;
-    }
-
     /** Whether the element with {@code elementId} wraps at its max width. */
     public static boolean supportsMaxWidth(int elementId) {
-        CoreHudElement<? extends ICoreSettingsContainer> element = findElement(elementId);
-        return element != null && element.supportsMaxWidth();
-    }
-
-    /** The max width the element with these settings wraps at, its own default included. */
-    private static int getMaxWidth(CoreSettings coreSettings) {
         CoreHudElement<? extends ICoreSettingsContainer> element =
-                findElement(coreSettings.elementId);
-        return element != null
-                ? HudRendererLib.getMaxWidth(element)
-                : HudRendererLib.getMaxWidth(coreSettings);
+                HudRenderer.findElement(elementId);
+        return element != null && element.supportsMaxWidth();
     }
 
     /**
@@ -144,7 +125,7 @@ public class HudElementEditor extends Screen {
      * starts at the element's edge.
      */
     private static int getEffectiveMaxWidth(CoreSettingsElement element) {
-        int maxWidth = getMaxWidth(element.coreSettings);
+        int maxWidth = HudRendererLib.getMaxWidth(element.coreSettings);
         return maxWidth > 0
                 ? maxWidth
                 : HudRenderer.getContentWidth(element.coreSettings, element.corners);
@@ -222,12 +203,12 @@ public class HudElementEditor extends Screen {
     }
 
     private static String describeMaxWidth(CoreSettings coreSettings) {
-        int maxWidth = getMaxWidth(coreSettings);
+        int maxWidth = HudRendererLib.getMaxWidth(coreSettings);
         if (maxWidth <= 0) return "Max Width: off";
         if (coreSettings.elementOverrides.maxWidth.enabled) {
             return "Max Width: %d".formatted(maxWidth);
         }
-        return HudRendererLib.getMaxWidth(coreSettings) > 0
+        return ConfigUtils.getConfig().maxElementWidth > 0
                 ? "Max Width: %d (global)".formatted(maxWidth)
                 : "Max Width: %d (default)".formatted(maxWidth);
     }

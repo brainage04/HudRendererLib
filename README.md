@@ -35,7 +35,7 @@ For mod developers, dependency setup and the public API examples are in [docs/DE
 
 The config editor controls the screen margin, element padding, maximum text width, text shadows, text colour and backdrop opacity.
 
-The maximum width (Max Element Width, or an element's own Max Width override) is off by default (`0`). When set, text wraps at it between words, never inside one, and each element keeps its alignment: a right-anchored element still ends at its right edge.
+The maximum width comes from an element's own Max Width override when that is enabled (enabled at `0`, the element does not wrap), else from Max Element Width when it is above `0`, else from the element's own default. Most elements have no default, so they do not wrap; a mod can give a long element one (BrainageHUD's Enchant Info HUD wraps at 300 GUI pixels). Text wraps at the maximum width between words, never inside one, and each element keeps its alignment: a right-anchored element still ends at its right edge.
 
 Show Vanilla Status Effects controls the game's status effect icons; the top-right adjustment settings control whether and how far elements move down for them.
 
