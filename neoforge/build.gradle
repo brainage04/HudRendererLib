@@ -95,3 +95,19 @@ gradle.projectsEvaluated {
 		mustRunAfter project(':fabric').tasks.named('runProductionClientGameTest')
 	}
 }
+
+// Red control only, not for merge: the client gets a non-x11 SDL driver because the conventions' useX11 action is
+// removed, so the x11 guard above must fail the run.
+tasks.named('runClientGameTest') {
+	environment 'SDL_VIDEO_DRIVER', 'offscreen'
+}
+gradle.taskGraph.whenReady { graph ->
+	if (graph.hasTask(':neoforge:runClientGameTest')) {
+		def run = tasks.getByName('runClientGameTest')
+		def names = run.actions.collect { it.displayName }
+		if (!run.actions.removeIf { it.displayName == 'Execute useX11' }) {
+			throw new GradleException("No useX11 action to remove; actions: ${names}")
+		}
+		logger.lifecycle("Removed the useX11 action; actions were: ${names}")
+	}
+}
