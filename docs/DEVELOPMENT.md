@@ -255,3 +255,5 @@ heavy --mem 6G --label hudrendererlib-tests -- ./gradlew --no-daemon build runAl
 `runAllGameTests` includes the Fabric production client suite and the NeoForge integrated-world client suite.
 Dedicated-server GameTests are disabled because this library is client-only.
 The NeoForge client prepares a separate, muted options file through the conventions task rather than copying the owner's settings.
+
+`HudLayoutTest` checks `HudLayout`, the anchoring arithmetic of `HudRenderer` and `HudElementEditor`, with jqwik properties on GUI-scaled screens of every size and GUI scale: anchored edges, offsets, line alignment, anchor cycling, the editor's drag clamp and the effect icon rows. jqwik finds no properties inside the Fabric loader, so `:fabric:propertyTest` runs the `hud.core` tests without it and `:fabric:test` runs the rest; `check` runs both. `:fabric:pitest` runs mutation tests on `HudLayout`; it is not part of `check`, and the report is written to `fabric/build/reports/pitest`.
