@@ -263,6 +263,38 @@ class HudLayoutTest {
             @ForAll @IntRange(min = -500, max = 500) int y,
             @ForAll @IntRange(min = 0, max = 80) int iconOffset) {
         Assume.that(fits(screen, content, 0));
+        assertCyclingLeavesTheElementWhereItIs(from, to, screen, content, x, y, iconOffset);
+    }
+
+    /** Elements that end up to 40 px wider or taller than the screen once padded. */
+    @Property
+    void cyclingTheAnchorLeavesAnOversizedElementWhereItIs(
+            @ForAll ElementAnchor from,
+            @ForAll ElementAnchor to,
+            @ForAll("screens") Screen screen,
+            @ForAll @IntRange(min = 1, max = 20) int lineHeight,
+            @ForAll @IntRange(min = 0, max = 10) int padding,
+            @ForAll @IntRange(min = -40, max = 40) int overflowX,
+            @ForAll @IntRange(min = -40, max = 40) int overflowY,
+            @ForAll @IntRange(min = -500, max = 500) int x,
+            @ForAll @IntRange(min = -500, max = 500) int y,
+            @ForAll @IntRange(min = 0, max = 80) int iconOffset) {
+        int width = screen.width() - padding * 4 + overflowX;
+        int lines =
+                Math.max(1, (screen.height() - padding * 3 + overflowY) / (lineHeight + padding));
+        Content content = new Content(width, lines, lineHeight, padding);
+        Assume.that(!fits(screen, content, 0));
+        assertCyclingLeavesTheElementWhereItIs(from, to, screen, content, x, y, iconOffset);
+    }
+
+    private static void assertCyclingLeavesTheElementWhereItIs(
+            ElementAnchor from,
+            ElementAnchor to,
+            Screen screen,
+            Content content,
+            int x,
+            int y,
+            int iconOffset) {
         int padding = content.padding();
         Bounds before = render(from, x, y, screen, content, iconOffset);
         // HudElementEditor.keyPressed on Space, with the bounds of the last frame.
