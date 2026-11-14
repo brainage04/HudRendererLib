@@ -92,7 +92,7 @@ final class HudLayout {
     private static int editorMinX(ElementAnchor anchor, int margin, int screenWidth, int width) {
         return switch (anchor) {
             case TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> margin - (screenWidth - width);
-            case TOP, CENTER, BOTTOM -> margin - (screenWidth - width) / 2;
+            case TOP, CENTER, BOTTOM -> margin - Math.floorDiv(screenWidth - width, 2);
             default -> margin;
         };
     }
@@ -100,7 +100,7 @@ final class HudLayout {
     private static int editorMinY(ElementAnchor anchor, int margin, int screenHeight, int height) {
         return switch (anchor) {
             case BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT -> margin - (screenHeight - height);
-            case LEFT, CENTER, RIGHT -> margin - (screenHeight - height) / 2;
+            case LEFT, CENTER, RIGHT -> margin - Math.floorDiv(screenHeight - height, 2);
             default -> margin;
         };
     }
