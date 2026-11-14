@@ -47,6 +47,11 @@ public final class CoreSettingsDefaults {
             container.setCoreSettings(defaults);
             return;
         }
+        if (settings.elementName == null) {
+            warn(where + ".coreSettings.elementName", "is missing");
+            settings = withName(settings, defaults.elementName);
+            container.setCoreSettings(settings);
+        }
         if (settings.elementAnchor == null) {
             warn(where + ".coreSettings.elementAnchor", "is missing or not a known anchor");
             settings.elementAnchor = defaults.elementAnchor;
@@ -66,6 +71,18 @@ public final class CoreSettingsDefaults {
                         Utils.getUnsafely(field, defaults.elementOverrides));
             }
         }
+    }
+
+    private static CoreSettings withName(CoreSettings settings, String elementName) {
+        CoreSettings named =
+                new CoreSettings(
+                        elementName,
+                        settings.enabled,
+                        settings.x,
+                        settings.y,
+                        settings.elementAnchor);
+        named.elementOverrides = settings.elementOverrides;
+        return named;
     }
 
     private static void warn(String where, String problem) {
