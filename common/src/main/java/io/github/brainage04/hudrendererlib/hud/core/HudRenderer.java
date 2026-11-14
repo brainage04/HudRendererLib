@@ -19,6 +19,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.effect.MobEffectInstance;
 
 public class HudRenderer {
     public static final List<CoreHudElement<? extends ICoreSettingsContainer>> REGISTERED_ELEMENTS =
@@ -184,20 +185,35 @@ public class HudRenderer {
     public static int getPosY(CoreSettings coreSettings, int elementHeight) {
         int posY = coreSettings.y + getYOffset(coreSettings, elementHeight);
 
-        if (coreSettings.elementAnchor == ElementAnchor.TOP_RIGHT) {
-            LocalPlayer player = Minecraft.getInstance().player;
-            boolean hasVisibleEffectIcon =
-                    player != null
-                            && player.getActiveEffects().stream()
-                                    .anyMatch(effect -> effect.showIcon());
-            if (hasVisibleEffectIcon
-                    && !HudRendererLib.shouldHideVanillaStatusEffects()
-                    && getConfig().adjustTopRightElementsWithStatusEffects) {
-                posY += getConfig().adjustTopRightElementsWithStatusEffectsAmount;
-            }
+        if (coreSettings.elementAnchor == ElementAnchor.TOP_RIGHT
+                && !HudRendererLib.shouldHideVanillaStatusEffects()
+                && getConfig().adjustTopRightElementsWithStatusEffects) {
+            posY += getEffectIconOffset(getConfig().adjustTopRightElementsWithStatusEffectsAmount);
         }
 
         return posY;
+    }
+
+    /**
+     * How far top-right elements move down for the vanilla status effect icons: {@code amount}, and
+     * the second row's 26 px more while that row is drawn; none without a visible icon.
+     */
+    private static int getEffectIconOffset(int amount) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) return 0;
+
+        boolean anyIcon = false;
+        boolean harmfulIcon = false;
+        for (MobEffectInstance effect : player.getActiveEffects()) {
+            if (!effect.showIcon()) continue;
+            anyIcon = true;
+            if (!effect.getEffect().value().isBeneficial()) harmfulIcon = true;
+        }
+        if (!anyIcon) return 0;
+
+        // Hud.extractEffects (26.3 Hud.java:504-510) hardcodes the second row: every icon that is
+        // not beneficial is drawn 26 px below the first row.
+        return harmfulIcon ? amount + 26 : amount;
     }
 
     public static void render(

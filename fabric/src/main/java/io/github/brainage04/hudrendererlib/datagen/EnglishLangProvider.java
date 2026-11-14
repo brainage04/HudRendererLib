@@ -76,7 +76,7 @@ public class EnglishLangProvider extends FabricLanguageProvider {
                 new String[] {
                     "Wraps every element's text at this width in GUI pixels, between words and never inside one. At 0 each element uses its own default width, and most elements have none. An element's own Max Width override, also set in the HUD Element Editor, takes precedence.",
                     "Show the game's status effect icons in the top right of the screen.",
-                    "Shifts elements with the \"%s\" alignment down by the specified amount of pixels below if potion effects are being overlayed in the top right. Only applies while Show Vanilla Status Effects is on."
+                    "Shifts elements with the \"%s\" alignment down while the game's status effect icons are showing in the top right: by the amount below in pixels, and 26 pixels more while a second row of icons (harmful effects) is showing. Only applies while Show Vanilla Status Effects is on."
                             .formatted(ElementAnchor.TOP_RIGHT)
                 },
                 translationBuilder);
