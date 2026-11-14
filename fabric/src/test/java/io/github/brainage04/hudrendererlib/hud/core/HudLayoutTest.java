@@ -289,7 +289,14 @@ class HudLayoutTest {
         Bounds last = render(anchor, 0, 0, screen, content, iconOffset);
         Assume.that(last.height() + shift(anchor, iconOffset) <= screen.height() - margin * 2);
         int x = HudLayout.editorX(anchor, wantedX, margin, screen.width(), last.width());
-        int y = HudLayout.editorY(anchor, wantedY, margin, screen.height(), last.height());
+        int y =
+                HudLayout.editorY(
+                        anchor,
+                        wantedY,
+                        margin,
+                        screen.height(),
+                        last.height(),
+                        shift(anchor, iconOffset));
         Bounds dragged = render(anchor, x, y, screen, content, iconOffset);
         assertTrue(dragged.left() >= margin, dragged + " on " + screen);
         assertTrue(dragged.right() <= screen.width() - margin, dragged + " on " + screen);
@@ -309,7 +316,7 @@ class HudLayoutTest {
         Bounds last = render(anchor, 0, 0, screen, content, 0);
         Bounds wanted = render(anchor, wantedX, wantedY, screen, content, 0);
         int x = HudLayout.editorX(anchor, wantedX, margin, screen.width(), last.width());
-        int y = HudLayout.editorY(anchor, wantedY, margin, screen.height(), last.height());
+        int y = HudLayout.editorY(anchor, wantedY, margin, screen.height(), last.height(), 0);
         if (wanted.left() >= margin && wanted.right() <= screen.width() - margin) {
             assertEquals(wantedX, x);
         }

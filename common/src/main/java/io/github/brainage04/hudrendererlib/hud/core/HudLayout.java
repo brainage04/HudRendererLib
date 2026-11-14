@@ -79,10 +79,14 @@ final class HudLayout {
         return (int) clamp(x, minX, minX + screenWidth - width - margin * 2);
     }
 
-    /** The y the editor gives an element of bounds {@code height} high dragged to {@code y}. */
-    static int editorY(ElementAnchor anchor, double y, int margin, int screenHeight, int height) {
+    /**
+     * The y the editor gives an element of bounds {@code height} high dragged to {@code y}, where
+     * the element is drawn {@code shift} lower than its y says, below the effect icons.
+     */
+    static int editorY(
+            ElementAnchor anchor, double y, int margin, int screenHeight, int height, int shift) {
         int minY = editorMinY(anchor, margin, screenHeight, height);
-        return (int) clamp(y, minY, minY + screenHeight - height - margin * 2);
+        return (int) clamp(y, minY, minY + screenHeight - height - margin * 2 - shift);
     }
 
     private static int editorMinX(ElementAnchor anchor, int margin, int screenWidth, int width) {
