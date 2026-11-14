@@ -621,6 +621,20 @@ public final class HudClientScenarios {
                         check(
                                 HudRenderer.getPosY(settings, 16) == base + 21,
                                 "Visible effect icons must shift top-right elements");
+                        // harmful effects get a second row of icons, 26 px lower (Hud.java:489)
+                        client.player.addEffect(
+                                new MobEffectInstance(
+                                        MobEffects.SLOWNESS, 200, 0, false, false, true));
+                        check(
+                                HudRenderer.getPosY(settings, 16) == base + 21 + 26,
+                                "A harmful effect icon must move top-right elements below it");
+                        client.player.removeEffect(MobEffects.SPEED);
+                        check(
+                                HudRenderer.getPosY(settings, 16) == base + 21 + 26,
+                                "A harmful effect icon alone must still clear its row");
+                        client.player.addEffect(
+                                new MobEffectInstance(
+                                        MobEffects.SPEED, 200, 0, false, false, true));
                         HIDE_EFFECTS[0] = true;
                         check(
                                 HudRendererLib.shouldHideVanillaStatusEffects(),
@@ -647,6 +661,7 @@ public final class HudClientScenarios {
                         config.adjustTopRightElementsWithStatusEffects = adjust;
                         config.adjustTopRightElementsWithStatusEffectsAmount = amount;
                         client.player.removeEffect(MobEffects.SPEED);
+                        client.player.removeEffect(MobEffects.SLOWNESS);
                     }
                 });
     }
