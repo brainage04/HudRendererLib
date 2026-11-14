@@ -294,6 +294,11 @@ public class HudElementEditor extends Screen {
     @Override
     public void added() {
         settled = false;
+        // A screen that returns to this editor may come after its reload (removed() or Undo), which
+        // gave every element a new ID, so a selection from before would point at no element.
+        selectedElementIndex = INVALID_ID;
+        highlightedElementIndex = INVALID_ID;
+        resizingMaxWidth = false;
         super.added();
     }
 
