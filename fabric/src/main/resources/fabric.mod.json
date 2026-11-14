@@ -9,7 +9,8 @@
 	],
 	"contact": {
 		"homepage": "https://github.com/brainage04/HudRendererLib",
-		"sources": "https://github.com/brainage04/HudRendererLib"
+		"sources": "https://github.com/brainage04/HudRendererLib",
+		"issues": "https://github.com/brainage04/HudRendererLib/issues"
 	},
 	"license": "MIT",
 	"icon": "assets/hudrendererlib/icon.png",
