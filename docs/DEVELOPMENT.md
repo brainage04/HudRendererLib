@@ -6,11 +6,12 @@ HudRendererLib 1.1.1 targets Minecraft 26.3 on both loaders. The 1.0.x line is f
 
 ### Fabric Loom
 
-HudRendererLib is published on Maven Central. Version 1.1.1 gets there with its tagged release; until then, build it from source as shown below. Add it with:
+HudRendererLib is published on Maven Central. Version 1.1.1 gets there with its tagged release; until then, build it from source as shown below. Both loader artifacts depend on Cloth Config at runtime, and Cloth Config is published on Shedaniel's Maven repository (`maven.shedaniel.me`), not on Maven Central, so add that repository too. Add it with:
 
 ```groovy
 repositories {
     mavenCentral()
+    maven { url = "https://maven.shedaniel.me/" }
 }
 
 dependencies {
@@ -20,11 +21,12 @@ dependencies {
 
 ### NeoForge with Architectury Loom
 
-The NeoForge artifact is also published on Maven Central:
+The NeoForge artifact is also published on Maven Central, with the same Cloth Config repository:
 
 ```groovy
 repositories {
     mavenCentral()
+    maven { url = "https://maven.shedaniel.me/" }
 }
 
 dependencies {
@@ -38,12 +40,13 @@ To build from source instead of using a Maven Central release, publish both load
 ./gradlew :fabric:publishAllPublicationsToLocalRepository :neoforge:publishAllPublicationsToLocalRepository
 ```
 
-Then add that directory to your mod's repositories, next to `mavenCentral()`. The path below assumes the clone sits next to your mod's directory:
+Then add that directory to your mod's repositories, next to the two above. The path below assumes the clone sits next to your mod's root directory; `rootProject.file` resolves it from there in a single-project mod and in a multiloader mod's `fabric` or `neoforge` subproject alike:
 
 ```groovy
 repositories {
     mavenCentral()
-    maven { url = uri("../HudRendererLib/build/local-repo") }
+    maven { url = "https://maven.shedaniel.me/" }
+    maven { url = rootProject.file("../HudRendererLib/build/local-repo") }
 }
 ```
 
