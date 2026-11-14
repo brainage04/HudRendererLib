@@ -9,11 +9,15 @@ import io.github.brainage04.hudrendererlib.config.core.ElementAnchor;
 final class HudLayout {
     private HudLayout() {}
 
+    // The centre anchors round with floorDiv, not /: the editor centres the padded bounds, which
+    // leave less than nothing beside them once an element is wider or taller than the screen minus
+    // its padding, and / would then round that the other way and move the element 1 px on Space.
+
     /** {@link HudRenderer#getXOffset(ElementAnchor, int, int, int)}. */
     static int xOffset(ElementAnchor anchor, int screenWidth, int width, int padding) {
         return switch (anchor) {
             case TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> screenWidth - width - padding * 2;
-            case TOP, CENTER, BOTTOM -> (screenWidth - width) / 2;
+            case TOP, CENTER, BOTTOM -> Math.floorDiv(screenWidth - width, 2);
             default -> padding * 2;
         };
     }
@@ -21,7 +25,7 @@ final class HudLayout {
     static int xOffsetNoPadding(ElementAnchor anchor, int screenWidth, int width) {
         return switch (anchor) {
             case TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> screenWidth - width;
-            case TOP, CENTER, BOTTOM -> (screenWidth - width) / 2;
+            case TOP, CENTER, BOTTOM -> Math.floorDiv(screenWidth - width, 2);
             default -> 0;
         };
     }
@@ -29,7 +33,7 @@ final class HudLayout {
     static int yOffset(ElementAnchor anchor, int screenHeight, int height, int padding) {
         return switch (anchor) {
             case BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT -> screenHeight - height;
-            case LEFT, CENTER, RIGHT -> (screenHeight - height) / 2 + padding;
+            case LEFT, CENTER, RIGHT -> Math.floorDiv(screenHeight - height, 2) + padding;
             default -> padding * 2;
         };
     }
@@ -37,7 +41,7 @@ final class HudLayout {
     static int yOffsetNoPadding(ElementAnchor anchor, int screenHeight, int height) {
         return switch (anchor) {
             case BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT -> screenHeight - height;
-            case LEFT, CENTER, RIGHT -> (screenHeight - height) / 2;
+            case LEFT, CENTER, RIGHT -> Math.floorDiv(screenHeight - height, 2);
             default -> 0;
         };
     }
