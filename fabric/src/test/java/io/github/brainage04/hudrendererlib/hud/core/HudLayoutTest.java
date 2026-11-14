@@ -304,6 +304,34 @@ class HudLayoutTest {
         assertTrue(dragged.bottom() <= screen.height() - margin, dragged + " on " + screen);
     }
 
+    /**
+     * The y a drag below the effect icons saves still keeps the element inside the screen margin
+     * once the icons are gone, also when the element is too tall to fit below them.
+     */
+    @Property
+    void aDragBelowTheEffectIconsStaysInsideTheMarginOnceTheIconsGo(
+            @ForAll ElementAnchor anchor,
+            @ForAll("screens") Screen screen,
+            @ForAll("contents") Content content,
+            @ForAll @IntRange(min = 0, max = 20) int margin,
+            @ForAll @IntRange(min = -5000, max = 5000) int wantedY,
+            @ForAll @IntRange(min = 0, max = 80) int iconOffset) {
+        Assume.that(fits(screen, content, margin));
+        Bounds last = render(anchor, 0, 0, screen, content, iconOffset);
+        int y =
+                HudLayout.editorY(
+                        anchor,
+                        wantedY,
+                        margin,
+                        screen.height(),
+                        last.height(),
+                        shift(anchor, iconOffset));
+        Bounds withoutIcons = render(anchor, 0, y, screen, content, 0);
+        assertTrue(withoutIcons.top() >= margin, withoutIcons + " on " + screen);
+        assertTrue(
+                withoutIcons.bottom() <= screen.height() - margin, withoutIcons + " on " + screen);
+    }
+
     @Property
     void aDragInsideTheMarginGoesWhereTheMouseSays(
             @ForAll ElementAnchor anchor,
