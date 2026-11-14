@@ -1,5 +1,5 @@
 {
-  "key.category.hudrendererlib.keys": "HudRendererLib",
+  "key.category.hudrendererlib.keys": "HUD Renderer Lib",
   "key.hudrendererlib.openConfig": "Open Config",
   "key.hudrendererlib.openElementEditor": "Open Element Editor",
   "text.autoconfig.hudrendererlib.option.adjustTopRightElementsWithStatusEffects": "Adjust Top Right Elements With Status Effects",
@@ -13,5 +13,5 @@
   "text.autoconfig.hudrendererlib.option.showVanillaStatusEffects.@Tooltip": "Show the game's status effect icons in the top right of the screen.",
   "text.autoconfig.hudrendererlib.option.textColour": "Text Colour",
   "text.autoconfig.hudrendererlib.option.textShadows": "Text Shadows",
-  "text.autoconfig.hudrendererlib.title": "HudRendererLib Config Editor"
+  "text.autoconfig.hudrendererlib.title": "HUD Renderer Lib Config Editor"
 }

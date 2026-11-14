@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 public class HudRendererLib {
     public static final String MOD_ID = "hudrendererlib";
-    public static final String MOD_NAME = "HudRendererLib";
+    public static final String MOD_NAME = "HUD Renderer Lib";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final KeyMapping.Category KEY_CATEGORY =
             KeyMapping.Category.register(Identifier.fromNamespaceAndPath(MOD_ID, "keys"));
