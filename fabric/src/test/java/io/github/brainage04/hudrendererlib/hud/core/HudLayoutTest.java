@@ -180,6 +180,33 @@ class HudLayoutTest {
         }
     }
 
+    /** getXOffsetNoPadding and getYOffsetNoPadding place bounds of their own size at the edges. */
+    @Property
+    void boundsWithoutPaddingTouchTheEdgesOfTheirAnchor(
+            @ForAll ElementAnchor anchor,
+            @ForAll("screens") Screen screen,
+            @ForAll @IntRange(min = 0, max = 320) int width,
+            @ForAll @IntRange(min = 0, max = 240) int height) {
+        int left = HudLayout.xOffsetNoPadding(anchor, screen.width(), width);
+        int top = HudLayout.yOffsetNoPadding(anchor, screen.height(), height);
+        int rightGap = screen.width() - (left + width);
+        int bottomGap = screen.height() - (top + height);
+        if (isLeft(anchor)) {
+            assertEquals(0, left);
+        } else if (isRight(anchor)) {
+            assertEquals(0, rightGap);
+        } else {
+            assertTrue(rightGap - left == 0 || rightGap - left == 1, left + " vs " + rightGap);
+        }
+        if (isTop(anchor)) {
+            assertEquals(0, top);
+        } else if (isBottom(anchor)) {
+            assertEquals(0, bottomGap);
+        } else {
+            assertTrue(bottomGap - top == 0 || bottomGap - top == 1, top + " vs " + bottomGap);
+        }
+    }
+
     @Property
     void theOffsetMovesTheElementByExactlyThatMuch(
             @ForAll ElementAnchor anchor,
