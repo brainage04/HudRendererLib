@@ -346,6 +346,39 @@ class HudLayoutTest {
         }
     }
 
+    /**
+     * An element wider or taller than the screen minus the margin, by up to 40 px, has no room to
+     * move along that side, so a drag leaves one of its edges on the margin.
+     */
+    @Property
+    void draggingAnOversizedElementLeavesAnEdgeOnTheMargin(
+            @ForAll ElementAnchor anchor,
+            @ForAll("screens") Screen screen,
+            @ForAll @IntRange(min = 1, max = 20) int lineHeight,
+            @ForAll @IntRange(min = 0, max = 10) int padding,
+            @ForAll @IntRange(min = 0, max = 20) int margin,
+            @ForAll @IntRange(min = 1, max = 40) int overflowX,
+            @ForAll @IntRange(min = 1, max = 40) int overflowY,
+            @ForAll @IntRange(min = -5000, max = 5000) int wantedX,
+            @ForAll @IntRange(min = -5000, max = 5000) int wantedY) {
+        int width = screen.width() - margin * 2 - padding * 4 + overflowX;
+        int lines =
+                Math.ceilDiv(
+                        screen.height() - margin * 2 - padding * 3 + overflowY,
+                        lineHeight + padding);
+        Content content = new Content(width, lines, lineHeight, padding);
+        Bounds last = render(anchor, 0, 0, screen, content, 0);
+        int x = HudLayout.editorX(anchor, wantedX, margin, screen.width(), last.width());
+        int y = HudLayout.editorY(anchor, wantedY, margin, screen.height(), last.height());
+        Bounds dragged = render(anchor, x, y, screen, content, 0);
+        assertTrue(
+                dragged.left() == margin || dragged.right() == screen.width() - margin,
+                dragged + " on " + screen);
+        assertTrue(
+                dragged.top() == margin || dragged.bottom() == screen.height() - margin,
+                dragged + " on " + screen);
+    }
+
     /** One active effect: whether it shows an icon and whether it is beneficial. */
     record Effect(boolean showIcon, boolean beneficial) {}
 
