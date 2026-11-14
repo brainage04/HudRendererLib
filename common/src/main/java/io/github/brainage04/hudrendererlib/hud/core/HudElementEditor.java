@@ -237,45 +237,20 @@ public class HudElementEditor extends Screen {
         int elementWidth = corners.right - corners.left;
         int elementHeight = corners.bottom - corners.top;
 
-        int minX =
-                switch (coreSettings.elementAnchor) {
-                    case TOP_RIGHT, RIGHT, BOTTOM_RIGHT ->
-                            getConfig().screenMargin
-                                    - (HudRenderer.getScaledWidth() - elementWidth);
-                    case TOP, CENTER, BOTTOM ->
-                            getConfig().screenMargin
-                                    - (HudRenderer.getScaledWidth() - elementWidth) / 2;
-                    default -> getConfig().screenMargin;
-                };
-        int minY =
-                switch (coreSettings.elementAnchor) {
-                    case BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT ->
-                            getConfig().screenMargin
-                                    - (HudRenderer.getScaledHeight() - elementHeight);
-                    case LEFT, CENTER, RIGHT ->
-                            getConfig().screenMargin
-                                    - (HudRenderer.getScaledHeight() - elementHeight) / 2;
-                    default -> getConfig().screenMargin;
-                };
-
         coreSettings.x =
-                (int)
-                        (Mth.clamp(
-                                selectedElementX - deltaX,
-                                minX,
-                                minX
-                                        + HudRenderer.getScaledWidth()
-                                        - elementWidth
-                                        - getConfig().screenMargin * 2));
+                HudLayout.editorX(
+                        coreSettings.elementAnchor,
+                        selectedElementX - deltaX,
+                        getConfig().screenMargin,
+                        HudRenderer.getScaledWidth(),
+                        elementWidth);
         coreSettings.y =
-                (int)
-                        (Mth.clamp(
-                                selectedElementY - deltaY,
-                                minY,
-                                minY
-                                        + HudRenderer.getScaledHeight()
-                                        - elementHeight
-                                        - getConfig().screenMargin * 2));
+                HudLayout.editorY(
+                        coreSettings.elementAnchor,
+                        selectedElementY - deltaY,
+                        getConfig().screenMargin,
+                        HudRenderer.getScaledHeight(),
+                        elementHeight);
     }
 
     @Override

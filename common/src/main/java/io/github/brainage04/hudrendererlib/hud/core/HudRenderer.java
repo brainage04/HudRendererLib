@@ -146,19 +146,11 @@ public class HudRenderer {
      * centre, left anchors its left edge.
      */
     public static int getXOffset(ElementAnchor anchor, int screenWidth, int width, int padding) {
-        return switch (anchor) {
-            case TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> screenWidth - width - padding * 2;
-            case TOP, CENTER, BOTTOM -> (screenWidth - width) / 2;
-            default -> padding * 2;
-        };
+        return HudLayout.xOffset(anchor, screenWidth, width, padding);
     }
 
     public static int getXOffsetNoPadding(ElementAnchor elementAnchor, int elementWidth) {
-        return switch (elementAnchor) {
-            case TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> getScaledWidth() - elementWidth;
-            case TOP, CENTER, BOTTOM -> (getScaledWidth() - elementWidth) / 2;
-            default -> 0;
-        };
+        return HudLayout.xOffsetNoPadding(elementAnchor, getScaledWidth(), elementWidth);
     }
 
     public static int getPosX(CoreSettings coreSettings, int elementWidth) {
@@ -166,21 +158,15 @@ public class HudRenderer {
     }
 
     public static int getYOffset(CoreSettings coreSettings, int elementHeight) {
-        int elementPadding = HudRendererLib.getPadding(coreSettings);
-
-        return switch (coreSettings.elementAnchor) {
-            case BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT -> getScaledHeight() - elementHeight;
-            case LEFT, CENTER, RIGHT -> (getScaledHeight() - elementHeight) / 2 + elementPadding;
-            default -> elementPadding * 2;
-        };
+        return HudLayout.yOffset(
+                coreSettings.elementAnchor,
+                getScaledHeight(),
+                elementHeight,
+                HudRendererLib.getPadding(coreSettings));
     }
 
     public static int getYOffsetNoPadding(ElementAnchor elementAnchor, int elementHeight) {
-        return switch (elementAnchor) {
-            case BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT -> getScaledHeight() - elementHeight;
-            case LEFT, CENTER, RIGHT -> (getScaledHeight() - elementHeight) / 2;
-            default -> 0;
-        };
+        return HudLayout.yOffsetNoPadding(elementAnchor, getScaledHeight(), elementHeight);
     }
 
     public static int getPosY(CoreSettings coreSettings, int elementHeight) {
@@ -214,15 +200,7 @@ public class HudRenderer {
             anyIcon = true;
             if (!effect.getEffect().value().isBeneficial()) harmfulIcon = true;
         }
-        return getEffectIconOffset(amount, anyIcon, harmfulIcon, minecraft.isDemo());
-    }
-
-    static int getEffectIconOffset(int amount, boolean anyIcon, boolean harmfulIcon, boolean demo) {
-        if (!anyIcon) return 0;
-
-        // Hud.extractEffects (26.3 Hud.java:500-510) hardcodes the rows: demo mode moves both 15 px
-        // lower, and every icon that is not beneficial is drawn 26 px below the first row.
-        return amount + (harmfulIcon ? 26 : 0) + (demo ? 15 : 0);
+        return HudLayout.effectIconOffset(amount, anyIcon, harmfulIcon, minecraft.isDemo());
     }
 
     public static void render(
@@ -245,11 +223,8 @@ public class HudRenderer {
 
     public static int alignContentX(
             CoreSettings coreSettings, int elementX, int elementWidth, int contentWidth) {
-        return switch (coreSettings.elementAnchor) {
-            case TOP_RIGHT, RIGHT, BOTTOM_RIGHT -> elementX + elementWidth - contentWidth;
-            case TOP, CENTER, BOTTOM -> elementX + (elementWidth - contentWidth) / 2;
-            default -> elementX;
-        };
+        return HudLayout.alignContentX(
+                coreSettings.elementAnchor, elementX, elementWidth, contentWidth);
     }
 
     public static ElementCorners setElementBounds(
@@ -316,13 +291,9 @@ public class HudRenderer {
     static int getEditorPosY(CoreSettings settings, ElementCorners corners) {
         int y = getPosY(settings, corners.bottom - corners.top);
         if (corners instanceof PaddedElementCorners) {
-            int padding = HudRendererLib.getPadding(settings);
             y -=
-                    switch (settings.elementAnchor) {
-                        case TOP_LEFT, TOP, TOP_RIGHT -> padding * 2;
-                        case LEFT, CENTER, RIGHT -> padding;
-                        default -> 0;
-                    };
+                    HudLayout.editorPaddingY(
+                            settings.elementAnchor, HudRendererLib.getPadding(settings));
         }
         return y;
     }

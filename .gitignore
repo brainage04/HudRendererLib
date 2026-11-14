@@ -49,3 +49,7 @@ replay_*.log
 # other
 
 src/main/generated/.cache
+
+# test tooling
+.jqwik-database
+.gametest.lock
