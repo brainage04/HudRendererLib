@@ -6,7 +6,7 @@ HudRendererLib 1.1.1 targets Minecraft 26.3 on both loaders. The 1.0.x line is f
 
 ### Fabric Loom
 
-HudRendererLib is published on Maven Central. Version 1.1.1 gets there with its tagged release; until then, build it from source and publish it to the sibling Maven repository as shown below. Add it with:
+HudRendererLib is published on Maven Central. Version 1.1.1 gets there with its tagged release; until then, build it from source as shown below. Add it with:
 
 ```groovy
 repositories {
@@ -32,11 +32,22 @@ dependencies {
 }
 ```
 
-For local workspace development, publish both loader artifacts to the sibling Maven repository with:
+To build from source instead of using a Maven Central release, publish both loader artifacts from your clone of this repository into its `build/local-repo` directory:
 
 ```bash
-heavy -- ./gradlew --no-daemon :fabric:publishAllPublicationsToLocalRepository :neoforge:publishAllPublicationsToLocalRepository
+./gradlew :fabric:publishAllPublicationsToLocalRepository :neoforge:publishAllPublicationsToLocalRepository
 ```
+
+Then add that directory to your mod's repositories, next to `mavenCentral()`. The path below assumes the clone sits next to your mod's directory:
+
+```groovy
+repositories {
+    mavenCentral()
+    maven { url = uri("../HudRendererLib/build/local-repo") }
+}
+```
+
+The version you depend on is the `mod_version` in the clone's `gradle.properties`.
 
 The library version and supported Minecraft version are tracked separately in `gradle.properties`, `fabric.mod.json`, and `neoforge.mods.toml`. Check the loader-specific release metadata before using HudRendererLib with another Minecraft version.
 
