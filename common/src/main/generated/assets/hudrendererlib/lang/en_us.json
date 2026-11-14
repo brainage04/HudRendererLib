@@ -3,7 +3,7 @@
   "key.hudrendererlib.openConfig": "Open Config",
   "key.hudrendererlib.openElementEditor": "Open Element Editor",
   "text.autoconfig.hudrendererlib.option.adjustTopRightElementsWithStatusEffects": "Adjust Top Right Elements With Status Effects",
-  "text.autoconfig.hudrendererlib.option.adjustTopRightElementsWithStatusEffects.@Tooltip": "Shifts elements with the \"Top Right\" alignment down by the specified amount of pixels below if potion effects are being overlayed in the top right. Only applies while Show Vanilla Status Effects is on.",
+  "text.autoconfig.hudrendererlib.option.adjustTopRightElementsWithStatusEffects.@Tooltip": "Shifts elements with the \"Top Right\" alignment down while the game's status effect icons are showing in the top right: by the amount below in pixels, and 26 pixels more while a second row of icons (harmful effects) is showing. Only applies while Show Vanilla Status Effects is on.",
   "text.autoconfig.hudrendererlib.option.adjustTopRightElementsWithStatusEffectsAmount": "Adjust Top Right Elements With Status Effects Amount",
   "text.autoconfig.hudrendererlib.option.backdropOpacity": "Backdrop Opacity",
   "text.autoconfig.hudrendererlib.option.elementPadding": "Element Padding",
