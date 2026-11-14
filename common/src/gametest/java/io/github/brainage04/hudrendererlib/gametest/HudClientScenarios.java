@@ -28,6 +28,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
@@ -672,6 +673,20 @@ public final class HudClientScenarios {
                         check(
                                 HudRenderer.getPosY(settings, 16) == base + 21 + 26,
                                 "A harmful effect icon alone must still clear its row");
+                        // the inventory lists the effects beside it and the HUD draws no icons
+                        // (Hud.java:491)
+                        InventoryScreen inventory = new InventoryScreen(client.player);
+                        client.setScreenAndShow(inventory);
+                        try {
+                            check(
+                                    inventory.showsActiveEffects(),
+                                    "The inventory must have room to list the effects");
+                            check(
+                                    HudRenderer.getPosY(settings, 16) == base,
+                                    "With the inventory listing the effects, top-right elements must not shift");
+                        } finally {
+                            client.setScreenAndShow(null);
+                        }
                         client.player.addEffect(
                                 new MobEffectInstance(
                                         MobEffects.SPEED, 200, 0, false, false, true));
