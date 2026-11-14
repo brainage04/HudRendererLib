@@ -114,7 +114,7 @@ public final class HudClientScenarios {
             editorLifecycle(driver);
             statusEffects(driver);
             System.out.println(
-                    "HUD_CLIENT_SCENARIOS_PASS: registration/order, F1, enabled, commands/keys, editor, mouse buttons, resize, modifier keys, save/undo, text wrapping, padded/unpadded anchor cycles, max width handle and keys, status effects");
+                    "HUD_CLIENT_SCENARIOS_PASS: registration/order, F1, enabled, commands/keys, editor, mouse buttons, resize, modifier keys, save/undo, editor replaced, text wrapping, padded/unpadded anchor cycles, max width handle and keys, status effects");
         } finally {
             driver.onClient(
                     client -> {
@@ -542,6 +542,26 @@ public final class HudClientScenarios {
                             "Empty text must not leave a selectable stale rectangle");
                     editor.closeWithoutSaving();
                     TEXT.empty = false;
+                });
+        driver.onClient(
+                client -> {
+                    ConfigUtils.saveConfigClasses();
+                    int savedX = BEFORE_FIRST.getElementConfig().getCoreSettings().x;
+                    client.setScreenAndShow(new HudElementEditor());
+                    BEFORE_FIRST.getElementConfig().getCoreSettings().x = savedX + 37;
+                    // what a death screen or a disconnect does: removed() without onClose()
+                    client.setScreenAndShow(null);
+                    check(
+                            BEFORE_FIRST.getElementConfig().getCoreSettings().x == savedX,
+                            "An editor that another screen replaces must undo its unsaved moves");
+                    client.setScreenAndShow(new HudElementEditor());
+                    BEFORE_FIRST.getElementConfig().getCoreSettings().x = savedX + 37;
+                    ((HudElementEditor) client.gui.screen()).onClose();
+                    check(
+                            BEFORE_FIRST.getElementConfig().getCoreSettings().x == savedX + 37,
+                            "Save & Close must keep the moves");
+                    BEFORE_FIRST.getElementConfig().getCoreSettings().x = savedX;
+                    ConfigUtils.saveConfigClasses();
                 });
     }
 
