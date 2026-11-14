@@ -248,8 +248,7 @@ The icons are hidden while any registered supplier returns true, and top-right e
 ## Building and running tests
 
 ```bash
-heavy status
-heavy --mem 6G --label hudrendererlib-tests -- ./gradlew --no-daemon build runAllGameTests
+./gradlew build runAllGameTests
 ```
 
 `runAllGameTests` includes the Fabric production client suite and the NeoForge integrated-world client suite.
