@@ -3,7 +3,6 @@ package io.github.brainage04.hudrendererlib;
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.brainage04.hudrendererlib.command.ModCommands;
 import io.github.brainage04.hudrendererlib.config.core.CoreSettings;
-import io.github.brainage04.hudrendererlib.config.core.CoreSettingsIdAssigner;
 import io.github.brainage04.hudrendererlib.config.core.HudRendererLibConfig;
 import io.github.brainage04.hudrendererlib.config.core.ICoreSettingsContainer;
 import io.github.brainage04.hudrendererlib.config.overrides.core.IntegerOverride;
@@ -81,7 +80,9 @@ public class HudRendererLib {
         AutoConfig.register(configClass, serializerFactory);
         ConfigUtils.addConfigClass(configClass);
 
-        CoreSettingsIdAssigner.assignElementIds(
+        // AutoConfig.register has already loaded the file, before the load listener below exists.
+        ConfigUtils.onLoad(
+                AutoConfig.getConfigHolder(configClass),
                 AutoConfig.getConfigHolder(configClass).getConfig());
 
         AutoConfig.getConfigHolder(configClass).registerSaveListener(ConfigUtils::onSave);

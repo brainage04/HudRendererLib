@@ -1,5 +1,6 @@
 package io.github.brainage04.hudrendererlib.util;
 
+import io.github.brainage04.hudrendererlib.config.core.CoreSettingsDefaults;
 import io.github.brainage04.hudrendererlib.config.core.CoreSettingsIdAssigner;
 import io.github.brainage04.hudrendererlib.config.core.HudRendererLibConfig;
 import io.github.brainage04.hudrendererlib.hud.core.HudElementEditor;
@@ -27,14 +28,16 @@ public class ConfigUtils {
     }
 
     /**
-     * Gives the freshly loaded config's elements their IDs. The editor's element map is not rebuilt
-     * here: AutoConfig calls load listeners before it replaces the holder's config, so the
-     * registered elements would still report the old config's settings. Callers of {@code load()}
-     * rebuild the map afterwards (see {@link #loadConfigClasses()}).
+     * Puts the code defaults back where the file left an element's settings null (see {@link
+     * CoreSettingsDefaults}) and gives the freshly loaded config's elements their IDs. The editor's
+     * element map is not rebuilt here: AutoConfig calls load listeners before it replaces the
+     * holder's config, so the registered elements would still report the old config's settings.
+     * Callers of {@code load()} rebuild the map afterwards (see {@link #loadConfigClasses()}).
      */
     @SuppressWarnings({"SameReturnValue", "unused"})
     public static <T extends ConfigData> InteractionResult onLoad(
             ConfigHolder<T> configHolder, T config) {
+        CoreSettingsDefaults.applyTo(config);
         CoreSettingsIdAssigner.assignElementIds(config);
 
         return InteractionResult.SUCCESS;
