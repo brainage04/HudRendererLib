@@ -114,6 +114,29 @@ class ConfigUtilsLoadTest {
         assertNotNull(config.keys.coreSettings);
     }
 
+    @Test
+    void aMissingNameFallsBackToTheElementDefaultAndKeepsTheSettings() {
+        // The editor shows the name as Component.literal(name) when the element is hovered.
+        TestConfig config =
+                load(
+                        """
+                        { "keys": { "coreSettings": {
+                          "enabled": false, "x": 3, "y": 4, "elementAnchor": "BOTTOM",
+                          "elementOverrides": { "padding": { "enabled": true, "value": 6 } }
+                        } } }
+                        """);
+
+        CoreSettings settings = config.keys.coreSettings;
+        assertEquals("Keys", settings.elementName);
+        assertFalse(settings.enabled);
+        assertEquals(3, settings.x);
+        assertEquals(4, settings.y);
+        assertEquals(ElementAnchor.BOTTOM, settings.elementAnchor);
+        assertTrue(settings.elementOverrides.padding.enabled);
+        assertEquals(6, settings.elementOverrides.padding.value);
+        assertNotNull(settings.elementOverrides.maxWidth);
+    }
+
     private static TestConfig load(String json) {
         TestConfig config = GSON.fromJson(json, TestConfig.class);
         ConfigUtils.onLoad(null, config);
