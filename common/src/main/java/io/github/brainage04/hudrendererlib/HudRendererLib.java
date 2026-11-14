@@ -55,7 +55,9 @@ public class HudRendererLib {
 
         LOGGER.info(MOD_NAME + " initialising...");
 
-        AutoConfig.register(HudRendererLibConfig.class, GsonConfigSerializer::new);
+        AutoConfig.register(
+                HudRendererLibConfig.class,
+                EmptyFileDefaultsSerializer.wrap(GsonConfigSerializer::new));
 
         ModCommands.initialize();
         registerConfigCommand(HudRendererLibConfig.class, MOD_ID);
@@ -78,7 +80,7 @@ public class HudRendererLib {
     @SuppressWarnings("unused")
     public static <T extends ConfigData> void register(
             Class<T> configClass, ConfigSerializer.Factory<T> serializerFactory) {
-        AutoConfig.register(configClass, serializerFactory);
+        AutoConfig.register(configClass, EmptyFileDefaultsSerializer.wrap(serializerFactory));
         ConfigUtils.addConfigClass(configClass);
 
         CoreSettingsIdAssigner.assignElementIds(
