@@ -305,17 +305,18 @@ class HudLayoutTest {
     }
 
     /**
-     * The y a drag below the effect icons saves still keeps the element inside the screen margin
-     * once the icons are gone, also when the element is too tall to fit below them.
+     * The y a drag below the effect icons saves still keeps a top-right element inside the screen
+     * margin once the icons are gone, also when the element is too tall to fit below them. The
+     * offset goes past the icon rows because the configured amount has no upper bound.
      */
     @Property
     void aDragBelowTheEffectIconsStaysInsideTheMarginOnceTheIconsGo(
-            @ForAll ElementAnchor anchor,
             @ForAll("screens") Screen screen,
             @ForAll("contents") Content content,
             @ForAll @IntRange(min = 0, max = 20) int margin,
             @ForAll @IntRange(min = -5000, max = 5000) int wantedY,
-            @ForAll @IntRange(min = 0, max = 80) int iconOffset) {
+            @ForAll @IntRange(min = 0, max = 400) int iconOffset) {
+        ElementAnchor anchor = ElementAnchor.TOP_RIGHT;
         Assume.that(fits(screen, content, margin));
         Bounds last = render(anchor, 0, 0, screen, content, iconOffset);
         int y =
