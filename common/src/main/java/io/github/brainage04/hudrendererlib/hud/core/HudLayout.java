@@ -86,7 +86,10 @@ final class HudLayout {
     static int editorY(
             ElementAnchor anchor, double y, int margin, int screenHeight, int height, int shift) {
         int minY = editorMinY(anchor, margin, screenHeight, height);
-        return (int) clamp(y, minY, minY + screenHeight - height - margin * 2 - shift);
+        int maxY = minY + screenHeight - height - margin * 2;
+        // An element too tall for the room below the icons keeps a y that fits once they go; one
+        // too tall for the screen keeps the unshifted maximum.
+        return (int) clamp(y, minY, Math.max(maxY - shift, Math.min(maxY, minY)));
     }
 
     private static int editorMinX(ElementAnchor anchor, int margin, int screenWidth, int width) {
