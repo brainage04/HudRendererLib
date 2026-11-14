@@ -2,11 +2,11 @@
 
 ## Setup
 
-HudRendererLib 1.1.0 targets Minecraft 26.3 on both loaders. The 1.0.x line is for Minecraft 26.2 and the 1.1.x line for Minecraft 26.3; see [Upgrading from 1.0.x](#upgrading-from-10x-minecraft-262) when moving a mod across.
+HudRendererLib 1.1.1 targets Minecraft 26.3 on both loaders. The 1.0.x line is for Minecraft 26.2 and the 1.1.x line for Minecraft 26.3; see [Upgrading from 1.0.x](#upgrading-from-10x-minecraft-262) when moving a mod across.
 
 ### Fabric Loom
 
-HudRendererLib 1.1.0 is published on Maven Central:
+HudRendererLib is published on Maven Central. Version 1.1.1 gets there with its tagged release; until then, build it from source and publish it to the sibling Maven repository as shown below. Add it with:
 
 ```groovy
 repositories {
@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    modImplementation "io.github.brainage04:hudrendererlib:1.1.0"
+    modImplementation "io.github.brainage04:hudrendererlib:1.1.1"
 }
 ```
 
@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    implementation "io.github.brainage04:hudrendererlib-neoforge:1.1.0"
+    implementation "io.github.brainage04:hudrendererlib-neoforge:1.1.1"
 }
 ```
 
