@@ -115,8 +115,9 @@ public final class HudClientScenarios {
             editorLifecycle(driver);
             statusEffects(driver);
             dragBelowEffectIcons(driver);
+            dragTallElementBelowEffectIcons(driver);
             System.out.println(
-                    "HUD_CLIENT_SCENARIOS_PASS: registration/order, F1, enabled, commands/keys, editor, mouse buttons, resize, modifier keys, save/undo, text wrapping, padded/unpadded anchor cycles, max width handle and keys, status effects, dragging below effect icons");
+                    "HUD_CLIENT_SCENARIOS_PASS: registration/order, F1, enabled, commands/keys, editor, mouse buttons, resize, modifier keys, save/undo, text wrapping, padded/unpadded anchor cycles, max width handle and keys, status effects, dragging below effect icons, a tall element below effect icons");
         } finally {
             driver.onClient(
                     client -> {
@@ -729,6 +730,78 @@ public final class HudClientScenarios {
                                 bounds.bottom
                                         <= HudRenderer.getScaledHeight() - config.screenMargin,
                                 "A top-right element dragged down below the effect icons must stay inside the screen margin, bottom "
+                                        + bounds.bottom
+                                        + " on a screen "
+                                        + HudRenderer.getScaledHeight()
+                                        + " high");
+                    });
+        } finally {
+            driver.onClient(
+                    client -> {
+                        if (client.gui.screen() instanceof HudElementEditor editor)
+                            editor.closeWithoutSaving();
+                        config.showVanillaStatusEffects = show;
+                        config.adjustTopRightElementsWithStatusEffects = adjust;
+                        config.adjustTopRightElementsWithStatusEffectsAmount = amount;
+                        client.player.removeEffect(MobEffects.SLOWNESS);
+                    });
+        }
+    }
+
+    /**
+     * A top-right element too tall to fit below the effect icons, dragged to the bottom, stays
+     * inside the screen margin once the icons are gone.
+     */
+    private static void dragTallElementBelowEffectIcons(Driver driver) {
+        var config = ConfigUtils.getConfig();
+        boolean show = config.showVanillaStatusEffects;
+        boolean adjust = config.adjustTopRightElementsWithStatusEffects;
+        int amount = config.adjustTopRightElementsWithStatusEffectsAmount;
+        try {
+            driver.onClient(
+                    client -> {
+                        config.showVanillaStatusEffects = true;
+                        config.adjustTopRightElementsWithStatusEffects = true;
+                        // Leaves less room below the icons than the element is high.
+                        config.adjustTopRightElementsWithStatusEffectsAmount =
+                                HudRenderer.getScaledHeight();
+                        client.player.addEffect(
+                                new MobEffectInstance(
+                                        MobEffects.SLOWNESS, 600, 0, false, false, true));
+                        TEXT.empty = false;
+                        CoreSettings settings = TEXT.getElementConfig().getCoreSettings();
+                        settings.enabled = true;
+                        settings.elementAnchor = ElementAnchor.TOP_RIGHT;
+                        settings.x = 0;
+                        settings.y = 0;
+                        client.setScreenAndShow(new HudElementEditor());
+                    });
+            driver.waitTicks(4);
+            driver.onClient(
+                    client -> {
+                        HudElementEditor editor = (HudElementEditor) client.gui.screen();
+                        CoreSettings settings = TEXT.getElementConfig().getCoreSettings();
+                        editor.selectedElementIndex = settings.elementId;
+                        editor.selectedElementX = settings.x;
+                        editor.selectedElementY = settings.y;
+                        editor.updateElementPosition(0, -100_000);
+                        client.player.removeEffect(MobEffects.SLOWNESS);
+                    });
+            driver.waitTicks(4);
+            driver.onClient(
+                    client -> {
+                        CoreSettings settings = TEXT.getElementConfig().getCoreSettings();
+                        ElementCorners bounds =
+                                HudElementEditor.CORE_SETTINGS_ELEMENTS.get(settings.elementId)
+                                        .corners;
+                        check(
+                                bounds.top >= config.screenMargin
+                                        && bounds.bottom
+                                                <= HudRenderer.getScaledHeight()
+                                                        - config.screenMargin,
+                                "A top-right element too tall for the room below the effect icons, dragged down, must be inside the screen margin once they are gone, bounds "
+                                        + bounds.top
+                                        + " to "
                                         + bounds.bottom
                                         + " on a screen "
                                         + HudRenderer.getScaledHeight()
