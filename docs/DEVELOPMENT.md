@@ -2,11 +2,11 @@
 
 ## Setup
 
-HudRendererLib 1.1.0 targets Minecraft 26.3 on both loaders. The 1.0.x line is for Minecraft 26.2 and the 1.1.x line for Minecraft 26.3; see [Upgrading from 1.0.x](#upgrading-from-10x-minecraft-262) when moving a mod across.
+HudRendererLib 1.1.1 targets Minecraft 26.3 on both loaders. The 1.0.x line is for Minecraft 26.2 and the 1.1.x line for Minecraft 26.3; see [Upgrading from 1.0.x](#upgrading-from-10x-minecraft-262) when moving a mod across.
 
 ### Fabric Loom
 
-HudRendererLib 1.1.0 is published on Maven Central:
+HudRendererLib is published on Maven Central. Version 1.1.1 gets there with its tagged release; until then, build it from source and publish it to the sibling Maven repository as shown below. Add it with:
 
 ```groovy
 repositories {
@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    modImplementation "io.github.brainage04:hudrendererlib:1.1.0"
+    modImplementation "io.github.brainage04:hudrendererlib:1.1.1"
 }
 ```
 
@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    implementation "io.github.brainage04:hudrendererlib-neoforge:1.1.0"
+    implementation "io.github.brainage04:hudrendererlib-neoforge:1.1.1"
 }
 ```
 
@@ -124,6 +124,21 @@ public class ExampleHud implements CoreHudElement<ExampleHudConfig> {
 Call `HudRenderer.setElementBounds(...)` on every rendered frame with the element's current screen-space bounds, including any padding.
 The HUD Element Editor uses those bounds to select and drag custom elements; text-only elements set them automatically.
 For padded custom layouts, pass the `ElementCorners` returned by `HudRenderer.getCornersWithPadding(...)` directly to `setElementBounds(...)`; it retains the padding information the editor needs when cycling alignment.
+
+Every element has an optional max width (`HudRendererLib.getMaxWidth(element)`): the element's Style Overrides > Max Width, else the global Max Element Width, else the element's `getDefaultMaxWidth()`; `0`, the default of all three, means none.
+An element that would otherwise run into its neighbours at common GUI sizes, such as a long list, overrides `getDefaultMaxWidth()` with a width in GUI pixels.
+Users set it in the config editor or in the HUD Element Editor, where a selected element that wraps shows an orange handle on its free edge (`[`/`]` adjust it, Backspace resets it).
+A text element's lines wrap at it between words (`TextWrapper.wrapWords`), never inside one; a word wider than the max width stays whole on its own line.
+Every line keeps the element's alignment, so a right-anchored element still ends at its right edge.
+
+An element whose lines have their own break points (lists, `name: value` pairs) wraps them itself with `TextWrapper.wrapParts(prefix, parts, separator, maxWidth, TextWrapper.widthOf(font))`, which breaks only between parts and leaves the separator's visible part at the end of a wrapped line (`", "` leaves `","`, `" / "` leaves `" /"`), and says so:
+```java
+    @Override
+    public boolean wrapsOwnLines() {
+        return true;
+    }
+```
+A custom element that reads the max width overrides `supportsMaxWidth()` to return `true`, so that the editor offers its handle.
 
 If you wish to change the layer that a given element (basic or custom) is rendered with:
 ```java

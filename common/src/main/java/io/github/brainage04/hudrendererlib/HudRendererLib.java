@@ -6,6 +6,7 @@ import io.github.brainage04.hudrendererlib.config.core.CoreSettings;
 import io.github.brainage04.hudrendererlib.config.core.CoreSettingsIdAssigner;
 import io.github.brainage04.hudrendererlib.config.core.HudRendererLibConfig;
 import io.github.brainage04.hudrendererlib.config.core.ICoreSettingsContainer;
+import io.github.brainage04.hudrendererlib.config.overrides.core.IntegerOverride;
 import io.github.brainage04.hudrendererlib.hud.core.CoreHudElement;
 import io.github.brainage04.hudrendererlib.hud.core.HudRenderer;
 import io.github.brainage04.hudrendererlib.keys.ModKeys;
@@ -192,12 +193,36 @@ public class HudRendererLib {
         }
     }
 
+    /**
+     * {@link #getMaxWidth(CoreHudElement)} for the registered element these settings belong to;
+     * settings no registered element uses have no default.
+     */
     public static int getMaxWidth(CoreSettings coreSettings) {
-        if (coreSettings.elementOverrides.maxWidth.enabled) {
-            return coreSettings.elementOverrides.maxWidth.value;
-        } else {
-            return ConfigUtils.getConfig().maxElementWidth;
+        IntegerOverride override = coreSettings.elementOverrides.maxWidth;
+        int globalMaxWidth = ConfigUtils.getConfig().maxElementWidth;
+        if (override.enabled || globalMaxWidth > 0) {
+            return getMaxWidth(override, globalMaxWidth, 0);
         }
+        CoreHudElement<? extends ICoreSettingsContainer> element =
+                HudRenderer.findElement(coreSettings.elementId);
+        return element != null ? element.getDefaultMaxWidth() : 0;
+    }
+
+    /**
+     * The element's max width in GUI pixels: its own Max Width override when enabled (where {@code
+     * 0} turns wrapping off), else the global Max Element Width when set, else the element's {@link
+     * CoreHudElement#getDefaultMaxWidth()}. {@code 0} or less means none.
+     */
+    public static int getMaxWidth(CoreHudElement<?> element) {
+        return getMaxWidth(
+                element.getElementConfig().getCoreSettings().elementOverrides.maxWidth,
+                ConfigUtils.getConfig().maxElementWidth,
+                element.getDefaultMaxWidth());
+    }
+
+    static int getMaxWidth(IntegerOverride override, int globalMaxWidth, int defaultMaxWidth) {
+        if (override.enabled) return override.value;
+        return globalMaxWidth > 0 ? globalMaxWidth : defaultMaxWidth;
     }
 
     public static boolean getTextShadows(CoreSettings coreSettings) {

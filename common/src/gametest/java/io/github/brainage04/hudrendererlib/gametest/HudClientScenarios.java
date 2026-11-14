@@ -3,6 +3,7 @@ package io.github.brainage04.hudrendererlib.gametest;
 import com.mojang.blaze3d.platform.InputConstants;
 import io.github.brainage04.hudrendererlib.HudRendererLib;
 import io.github.brainage04.hudrendererlib.config.core.CoreSettings;
+import io.github.brainage04.hudrendererlib.config.core.CoreSettingsElement;
 import io.github.brainage04.hudrendererlib.config.core.CoreSettingsIdAssigner;
 import io.github.brainage04.hudrendererlib.config.core.ElementAnchor;
 import io.github.brainage04.hudrendererlib.config.core.ElementCorners;
@@ -109,10 +110,11 @@ public final class HudClientScenarios {
             configSaveAndUndo(driver);
             textWrapping(driver);
             anchorCycles(driver);
+            maxWidthEditor(driver);
             editorLifecycle(driver);
             statusEffects(driver);
             System.out.println(
-                    "HUD_CLIENT_SCENARIOS_PASS: registration/order, F1, enabled, commands/keys, editor, mouse buttons, resize, modifier keys, save/undo, text wrapping, padded/unpadded anchor cycles, status effects");
+                    "HUD_CLIENT_SCENARIOS_PASS: registration/order, F1, enabled, commands/keys, editor, mouse buttons, resize, modifier keys, save/undo, text wrapping, padded/unpadded anchor cycles, max width handle and keys, status effects");
         } finally {
             driver.onClient(
                     client -> {
@@ -178,6 +180,129 @@ public final class HudClientScenarios {
                             "Resizing the editor must move the Undo and Save buttons with the screen");
                     editor.closeWithoutSaving();
                 });
+    }
+
+    /**
+     * The editor's max width handle and keys on a text element, for a left, a right and a centre
+     * anchor: the element keeps the edge (or centre) its anchor holds while it narrows and wraps.
+     */
+    private static void maxWidthEditor(Driver driver) {
+        for (ElementAnchor anchor :
+                List.of(ElementAnchor.TOP_LEFT, ElementAnchor.TOP_RIGHT, ElementAnchor.TOP)) {
+            int[] before = new int[5];
+            driver.onClient(
+                    client -> {
+                        CoreSettings settings = TEXT.getElementConfig().getCoreSettings();
+                        settings.elementAnchor = anchor;
+                        settings.x =
+                                switch (anchor) {
+                                    case TOP_RIGHT -> -20;
+                                    case TOP -> 0;
+                                    default -> 130;
+                                };
+                        settings.y = 60;
+                        settings.elementOverrides.padding.enabled = true;
+                        settings.elementOverrides.padding.value = 2;
+                        HudElementEditor.clearMaxWidth(settings);
+                        client.setScreenAndShow(new HudElementEditor());
+                    });
+            driver.waitTicks(4);
+            driver.onClient(
+                    client -> {
+                        HudElementEditor editor = (HudElementEditor) client.gui.screen();
+                        CoreSettings settings = TEXT.getElementConfig().getCoreSettings();
+                        CoreSettingsElement element =
+                                HudElementEditor.CORE_SETTINGS_ELEMENTS.get(settings.elementId);
+                        ElementCorners bounds = element.corners;
+                        before[0] = bounds.left;
+                        before[1] = bounds.right;
+                        before[2] = bounds.bottom - bounds.top;
+                        int contentWidth = bounds.right - bounds.left - 8;
+                        check(
+                                HudRendererLib.getMaxWidth(settings) == 0,
+                                "The max width must be off by default");
+                        editor.mouseClicked(
+                                mouse((bounds.left + bounds.right) / 2.0, bounds.top + 2), false);
+                        check(
+                                editor.selectedElementIndex == settings.elementId,
+                                "Click must select the text element");
+                        int handleX = HudElementEditor.getMaxWidthHandleX(element);
+                        boolean right = anchor == ElementAnchor.TOP_RIGHT;
+                        check(
+                                handleX == (right ? bounds.left : bounds.right),
+                                "Without a max width the handle must sit on the free edge at "
+                                        + anchor);
+                        editor.mouseClicked(mouse(handleX, bounds.top + 2), false);
+                        check(editor.resizingMaxWidth, "Clicking the handle must grab it");
+                        double dragX =
+                                switch (anchor) {
+                                    case TOP_RIGHT -> handleX + 100;
+                                    case TOP -> handleX - 50;
+                                    default -> handleX - 100;
+                                };
+                        editor.mouseDragged(mouse(dragX, bounds.top + 2), 0, 0);
+                        editor.mouseReleased(mouse(dragX, bounds.top + 2));
+                        check(!editor.resizingMaxWidth, "Releasing must let go of the handle");
+                        int maxWidth = HudRendererLib.getMaxWidth(settings);
+                        before[3] = maxWidth;
+                        check(
+                                settings.elementOverrides.maxWidth.enabled
+                                        && Math.abs(maxWidth - (contentWidth - 100)) <= 1,
+                                "Dragging the handle 100 pixels in must set the max width to "
+                                        + (contentWidth - 100)
+                                        + ", got "
+                                        + maxWidth
+                                        + " at "
+                                        + anchor);
+                        before[4] = (bounds.left + bounds.right) / 2;
+                    });
+            driver.waitTicks(4);
+            driver.onClient(
+                    client -> {
+                        HudElementEditor editor = (HudElementEditor) client.gui.screen();
+                        CoreSettings settings = TEXT.getElementConfig().getCoreSettings();
+                        ElementCorners bounds =
+                                HudElementEditor.CORE_SETTINGS_ELEMENTS.get(settings.elementId)
+                                        .corners;
+                        check(
+                                bounds.right - bounds.left - 8 <= before[3],
+                                "The wrapped element must fit its max width at " + anchor);
+                        check(
+                                bounds.bottom - bounds.top > before[2],
+                                "Wrapping must make the element taller at " + anchor);
+                        switch (anchor) {
+                            case TOP_RIGHT ->
+                                    check(
+                                            bounds.right == before[1],
+                                            "A right-anchored element must keep its right edge");
+                            case TOP ->
+                                    check(
+                                            Math.abs((bounds.left + bounds.right) / 2 - before[4])
+                                                    <= 1,
+                                            "A centred element must keep its centre");
+                            default ->
+                                    check(
+                                            bounds.left == before[0],
+                                            "A left-anchored element must keep its left edge");
+                        }
+                        editor.keyPressed(new KeyEvent(InputConstants.KEY_RBRACKET, 0, 0));
+                        check(
+                                HudRendererLib.getMaxWidth(settings) == before[3] + 1,
+                                "] must widen the max width by 1");
+                        editor.keyPressed(
+                                new KeyEvent(
+                                        InputConstants.KEY_LBRACKET, 0, InputConstants.MOD_SHIFT));
+                        check(
+                                HudRendererLib.getMaxWidth(settings) == before[3] - 9,
+                                "Shift+[ must narrow the max width by 10");
+                        editor.keyPressed(new KeyEvent(InputConstants.KEY_BACKSPACE, 0, 0));
+                        check(
+                                !settings.elementOverrides.maxWidth.enabled
+                                        && HudRendererLib.getMaxWidth(settings) == 0,
+                                "Backspace must turn the max width off");
+                        editor.closeWithoutSaving();
+                    });
+        }
     }
 
     private static MouseButtonEvent mouse(double x, double y) {

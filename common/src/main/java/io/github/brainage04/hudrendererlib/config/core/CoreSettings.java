@@ -29,8 +29,8 @@ public class CoreSettings {
 
     /**
      * Without it Gson allocates through Unsafe and skips the field initialisers above (Gson 2.14.0
-     * {@code ConstructorConstructor#newUnsafeAllocator}), so a config file that leaves
-     * {@code elementOverrides} out would load it null. The name is only ever read from the file.
+     * {@code ConstructorConstructor#newUnsafeAllocator}), so a config file that leaves {@code
+     * elementOverrides} out would load it null. The name is only ever read from the file.
      */
     private CoreSettings() {
         this.elementName = null;
