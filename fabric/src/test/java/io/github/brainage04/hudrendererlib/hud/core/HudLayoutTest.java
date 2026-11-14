@@ -380,6 +380,21 @@ class HudLayoutTest {
         }
     }
 
+    /**
+     * The config file can hold a negative amount. A negative shift would let the editor save a y
+     * below the bottom margin, where the element sits once the icons go.
+     */
+    @Property
+    void aNegativeAmountMovesTopRightElementsLikeZero(
+            @ForAll @IntRange(min = -1000, max = -1) int amount,
+            @ForAll boolean anyIcon,
+            @ForAll boolean harmfulIcon,
+            @ForAll boolean demo) {
+        assertEquals(
+                HudLayout.effectIconOffset(0, anyIcon, harmfulIcon, demo),
+                HudLayout.effectIconOffset(amount, anyIcon, harmfulIcon, demo));
+    }
+
     @Provide
     Arbitrary<Effect> effects() {
         return Combinators.combine(Arbitraries.of(true, false), Arbitraries.of(true, false))
