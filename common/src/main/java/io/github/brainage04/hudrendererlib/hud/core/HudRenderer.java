@@ -16,6 +16,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
@@ -195,12 +196,16 @@ public class HudRenderer {
     }
 
     /**
-     * How far top-right elements move down for the vanilla status effect icons: {@code amount}, and
-     * the second row's 26 px more while that row is drawn; none without a visible icon.
+     * How far top-right elements move down for the vanilla status effect icons: {@code amount}, the
+     * second row's 26 px more while that row is drawn, and 15 px more in demo mode; none while no
+     * icon is drawn, also while a screen such as the inventory lists the effects instead.
      */
     private static int getEffectIconOffset(int amount) {
-        LocalPlayer player = Minecraft.getInstance().player;
+        Minecraft minecraft = Minecraft.getInstance();
+        LocalPlayer player = minecraft.player;
         if (player == null) return 0;
+        Screen screen = minecraft.gui.screen();
+        if (screen != null && screen.showsActiveEffects()) return 0;
 
         boolean anyIcon = false;
         boolean harmfulIcon = false;
@@ -209,11 +214,15 @@ public class HudRenderer {
             anyIcon = true;
             if (!effect.getEffect().value().isBeneficial()) harmfulIcon = true;
         }
+        return getEffectIconOffset(amount, anyIcon, harmfulIcon, minecraft.isDemo());
+    }
+
+    static int getEffectIconOffset(int amount, boolean anyIcon, boolean harmfulIcon, boolean demo) {
         if (!anyIcon) return 0;
 
-        // Hud.extractEffects (26.3 Hud.java:504-510) hardcodes the second row: every icon that is
-        // not beneficial is drawn 26 px below the first row.
-        return harmfulIcon ? amount + 26 : amount;
+        // Hud.extractEffects (26.3 Hud.java:500-510) hardcodes the rows: demo mode moves both 15 px
+        // lower, and every icon that is not beneficial is drawn 26 px below the first row.
+        return amount + (harmfulIcon ? 26 : 0) + (demo ? 15 : 0);
     }
 
     public static void render(
