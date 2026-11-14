@@ -563,6 +563,26 @@ public final class HudClientScenarios {
                     BEFORE_FIRST.getElementConfig().getCoreSettings().x = savedX;
                     ConfigUtils.saveConfigClasses();
                 });
+        driver.onClient(
+                client -> {
+                    // another mod's screen that returns to the editor it replaced: the editor
+                    // reloaded the config when it was replaced, so its selection is gone
+                    HudElementEditor editor = new HudElementEditor();
+                    client.setScreenAndShow(editor);
+                    editor.selectedElementIndex =
+                            BEFORE_FIRST.getElementConfig().getCoreSettings().elementId;
+                    client.setScreenAndShow(null);
+                    try {
+                        client.setScreenAndShow(editor);
+                    } catch (RuntimeException exception) {
+                        throw new AssertionError(
+                                "An editor shown again after another screen replaced it must not"
+                                        + " crash",
+                                exception);
+                    } finally {
+                        client.setScreenAndShow(null);
+                    }
+                });
     }
 
     private static void anchorCycles(Driver driver) {
