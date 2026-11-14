@@ -55,6 +55,9 @@ public class HudElementEditor extends Screen {
 
     private Integer previousMenuBackgroundBlurriness;
 
+    /** Whether Save & Close or Undo & Close has settled this editor's changes. */
+    private boolean settled;
+
     public HudElementEditor() {
         super(Component.literal("HUD Element Editor"));
 
@@ -289,20 +292,41 @@ public class HudElementEditor extends Screen {
     }
 
     @Override
+    public void added() {
+        settled = false;
+        // A screen that returns to this editor may come after its reload (removed() or Undo), which
+        // gave every element a new ID, so a selection from before would point at no element.
+        selectedElementIndex = INVALID_ID;
+        highlightedElementIndex = INVALID_ID;
+        resizingMaxWidth = false;
+        super.added();
+    }
+
+    @Override
     public void onClose() {
         ConfigUtils.saveConfigClasses();
+        settled = true;
         revertBlur();
         super.onClose();
     }
 
+    /**
+     * Undoes the unsaved changes when another screen replaces the editor (a death screen, a
+     * disconnect), as Escape does, so a later unrelated save cannot write them.
+     */
     @Override
     public void removed() {
+        if (!settled) {
+            settled = true;
+            ConfigUtils.loadConfigClasses();
+        }
         revertBlur();
         super.removed();
     }
 
     public void closeWithoutSaving() {
         ConfigUtils.loadConfigClasses();
+        settled = true;
         revertBlur();
         super.onClose();
     }
