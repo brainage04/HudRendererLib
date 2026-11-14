@@ -69,6 +69,12 @@ tasks.named('runClientGameTest') {
 		if (!log.exists() || !log.text.contains('HUD_NEOFORGE_CLIENT_GAMETEST_PASS')) {
 			throw new GradleException('NeoForge client GameTest did not complete its assertions.')
 		}
+		// The conventions' useX11 (applied to every loader run task named *GameTest) keeps SDL3 on Xvfb. Any other
+		// driver means the client could have opened on a desktop session instead (Minecraft workspace CLAUDE.md).
+		def drivers = (log.text =~ /Created window using SDL video driver: (\S+)/).collect { it[1] }
+		if (drivers != ['x11']) {
+			throw new GradleException("NeoForge client GameTest opened its window with SDL video drivers ${drivers}, not x11; see ${log}.")
+		}
 	}
 }
 
