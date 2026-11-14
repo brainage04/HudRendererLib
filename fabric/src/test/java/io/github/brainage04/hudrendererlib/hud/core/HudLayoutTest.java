@@ -281,12 +281,16 @@ class HudLayoutTest {
             @ForAll("contents") Content content,
             @ForAll @IntRange(min = 0, max = 20) int margin,
             @ForAll @IntRange(min = -5000, max = 5000) int wantedX,
-            @ForAll @IntRange(min = -5000, max = 5000) int wantedY) {
+            @ForAll @IntRange(min = -5000, max = 5000) int wantedY,
+            @ForAll @IntRange(min = 0, max = 80) int iconOffset) {
         Assume.that(fits(screen, content, margin));
-        Bounds last = render(anchor, 0, 0, screen, content, 0);
+        // The editor measures the bounds of the last frame, which top-right elements draw below
+        // the effect icons.
+        Bounds last = render(anchor, 0, 0, screen, content, iconOffset);
+        Assume.that(last.height() + shift(anchor, iconOffset) <= screen.height() - margin * 2);
         int x = HudLayout.editorX(anchor, wantedX, margin, screen.width(), last.width());
         int y = HudLayout.editorY(anchor, wantedY, margin, screen.height(), last.height());
-        Bounds dragged = render(anchor, x, y, screen, content, 0);
+        Bounds dragged = render(anchor, x, y, screen, content, iconOffset);
         assertTrue(dragged.left() >= margin, dragged + " on " + screen);
         assertTrue(dragged.right() <= screen.width() - margin, dragged + " on " + screen);
         assertTrue(dragged.top() >= margin, dragged + " on " + screen);
