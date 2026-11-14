@@ -44,15 +44,15 @@ final class HudLayout {
 
     /**
      * How far top-right elements move down for the vanilla status effect icons that are drawn:
-     * {@code amount}, the second row's 26 px more while that row is drawn, and 15 px more in demo
-     * mode; none without an icon.
+     * {@code amount} (none if it is negative), the second row's 26 px more while that row is drawn,
+     * and 15 px more in demo mode; none without an icon.
      */
     static int effectIconOffset(int amount, boolean anyIcon, boolean harmfulIcon, boolean demo) {
         if (!anyIcon) return 0;
 
         // Hud.extractEffects (26.3 Hud.java:500-510) hardcodes the rows: demo mode moves both 15 px
         // lower, and every icon that is not beneficial is drawn 26 px below the first row.
-        return amount + (harmfulIcon ? 26 : 0) + (demo ? 15 : 0);
+        return Math.max(0, amount) + (harmfulIcon ? 26 : 0) + (demo ? 15 : 0);
     }
 
     static int alignContentX(
