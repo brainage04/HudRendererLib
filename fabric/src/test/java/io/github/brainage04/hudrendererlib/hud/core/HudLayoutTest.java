@@ -10,6 +10,7 @@ import net.jqwik.api.Arbitrary;
 import net.jqwik.api.Assume;
 import net.jqwik.api.Combinators;
 import net.jqwik.api.ForAll;
+import net.jqwik.api.From;
 import net.jqwik.api.Property;
 import net.jqwik.api.Provide;
 import net.jqwik.api.constraints.IntRange;
@@ -291,7 +292,7 @@ class HudLayoutTest {
 
     @Property
     void topRightElementsMoveDownByTheLowestIconRowTheGameDraws(
-            @ForAll List<@ForAll("effects") Effect> effects,
+            @ForAll List<@From("effects") Effect> effects,
             @ForAll boolean demo,
             @ForAll @IntRange(min = 0, max = 100) int amount) {
         boolean anyIcon = false;
