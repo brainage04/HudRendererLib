@@ -313,16 +313,56 @@ class HudLayoutTest {
             @ForAll("contents") Content content,
             @ForAll @IntRange(min = 0, max = 20) int margin,
             @ForAll @IntRange(min = -5000, max = 5000) int wantedX,
-            @ForAll @IntRange(min = -5000, max = 5000) int wantedY) {
+            @ForAll @IntRange(min = -5000, max = 5000) int wantedY,
+            @ForAll @IntRange(min = 0, max = 80) int iconOffset) {
         Assume.that(fits(screen, content, margin));
-        Bounds last = render(anchor, 0, 0, screen, content, 0);
+        // The editor measures the bounds of the last frame, which top-right elements draw below
+        // the effect icons.
+        Bounds last = render(anchor, 0, 0, screen, content, iconOffset);
+        Assume.that(last.height() + shift(anchor, iconOffset) <= screen.height() - margin * 2);
         int x = HudLayout.editorX(anchor, wantedX, margin, screen.width(), last.width());
-        int y = HudLayout.editorY(anchor, wantedY, margin, screen.height(), last.height());
-        Bounds dragged = render(anchor, x, y, screen, content, 0);
+        int y =
+                HudLayout.editorY(
+                        anchor,
+                        wantedY,
+                        margin,
+                        screen.height(),
+                        last.height(),
+                        shift(anchor, iconOffset));
+        Bounds dragged = render(anchor, x, y, screen, content, iconOffset);
         assertTrue(dragged.left() >= margin, dragged + " on " + screen);
         assertTrue(dragged.right() <= screen.width() - margin, dragged + " on " + screen);
         assertTrue(dragged.top() >= margin, dragged + " on " + screen);
         assertTrue(dragged.bottom() <= screen.height() - margin, dragged + " on " + screen);
+    }
+
+    /**
+     * The y a drag below the effect icons saves still keeps a top-right element inside the screen
+     * margin once the icons are gone, also when the element is too tall to fit below them. The
+     * offset goes past the icon rows because the configured amount has no upper bound.
+     */
+    @Property
+    void aDragBelowTheEffectIconsStaysInsideTheMarginOnceTheIconsGo(
+            @ForAll("screens") Screen screen,
+            @ForAll("contents") Content content,
+            @ForAll @IntRange(min = 0, max = 20) int margin,
+            @ForAll @IntRange(min = -5000, max = 5000) int wantedY,
+            @ForAll @IntRange(min = 0, max = 400) int iconOffset) {
+        ElementAnchor anchor = ElementAnchor.TOP_RIGHT;
+        Assume.that(fits(screen, content, margin));
+        Bounds last = render(anchor, 0, 0, screen, content, iconOffset);
+        int y =
+                HudLayout.editorY(
+                        anchor,
+                        wantedY,
+                        margin,
+                        screen.height(),
+                        last.height(),
+                        shift(anchor, iconOffset));
+        Bounds withoutIcons = render(anchor, 0, y, screen, content, 0);
+        assertTrue(withoutIcons.top() >= margin, withoutIcons + " on " + screen);
+        assertTrue(
+                withoutIcons.bottom() <= screen.height() - margin, withoutIcons + " on " + screen);
     }
 
     @Property
@@ -337,7 +377,7 @@ class HudLayoutTest {
         Bounds last = render(anchor, 0, 0, screen, content, 0);
         Bounds wanted = render(anchor, wantedX, wantedY, screen, content, 0);
         int x = HudLayout.editorX(anchor, wantedX, margin, screen.width(), last.width());
-        int y = HudLayout.editorY(anchor, wantedY, margin, screen.height(), last.height());
+        int y = HudLayout.editorY(anchor, wantedY, margin, screen.height(), last.height(), 0);
         if (wanted.left() >= margin && wanted.right() <= screen.width() - margin) {
             assertEquals(wantedX, x);
         }
@@ -403,6 +443,21 @@ class HudLayoutTest {
             // amount places an element below the first row of a game outside demo mode.
             assertEquals(lowestRowY - vanillaIconY(true, false), offset - amount);
         }
+    }
+
+    /**
+     * The config file can hold a negative amount. A negative shift would let the editor save a y
+     * below the bottom margin, where the element sits once the icons go.
+     */
+    @Property
+    void aNegativeAmountMovesTopRightElementsLikeZero(
+            @ForAll @IntRange(min = -1000, max = -1) int amount,
+            @ForAll boolean anyIcon,
+            @ForAll boolean harmfulIcon,
+            @ForAll boolean demo) {
+        assertEquals(
+                HudLayout.effectIconOffset(0, anyIcon, harmfulIcon, demo),
+                HudLayout.effectIconOffset(amount, anyIcon, harmfulIcon, demo));
     }
 
     @Provide

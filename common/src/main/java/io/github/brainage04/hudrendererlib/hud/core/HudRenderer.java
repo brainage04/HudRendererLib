@@ -170,15 +170,19 @@ public class HudRenderer {
     }
 
     public static int getPosY(CoreSettings coreSettings, int elementHeight) {
-        int posY = coreSettings.y + getYOffset(coreSettings, elementHeight);
+        return coreSettings.y
+                + getYOffset(coreSettings, elementHeight)
+                + getEffectIconShift(coreSettings.elementAnchor);
+    }
 
-        if (coreSettings.elementAnchor == ElementAnchor.TOP_RIGHT
+    /** How far elements anchored at {@code anchor} move down below the vanilla effect icons. */
+    static int getEffectIconShift(ElementAnchor anchor) {
+        if (anchor == ElementAnchor.TOP_RIGHT
                 && !HudRendererLib.shouldHideVanillaStatusEffects()
                 && getConfig().adjustTopRightElementsWithStatusEffects) {
-            posY += getEffectIconOffset(getConfig().adjustTopRightElementsWithStatusEffectsAmount);
+            return getEffectIconOffset(getConfig().adjustTopRightElementsWithStatusEffectsAmount);
         }
-
-        return posY;
+        return 0;
     }
 
     /**

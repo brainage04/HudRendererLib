@@ -48,15 +48,15 @@ final class HudLayout {
 
     /**
      * How far top-right elements move down for the vanilla status effect icons that are drawn:
-     * {@code amount}, the second row's 26 px more while that row is drawn, and 15 px more in demo
-     * mode; none without an icon.
+     * {@code amount} (none if it is negative), the second row's 26 px more while that row is drawn,
+     * and 15 px more in demo mode; none without an icon.
      */
     static int effectIconOffset(int amount, boolean anyIcon, boolean harmfulIcon, boolean demo) {
         if (!anyIcon) return 0;
 
         // Hud.extractEffects (26.3 Hud.java:500-510) hardcodes the rows: demo mode moves both 15 px
         // lower, and every icon that is not beneficial is drawn 26 px below the first row.
-        return amount + (harmfulIcon ? 26 : 0) + (demo ? 15 : 0);
+        return Math.max(0, amount) + (harmfulIcon ? 26 : 0) + (demo ? 15 : 0);
     }
 
     static int alignContentX(
@@ -83,10 +83,17 @@ final class HudLayout {
         return (int) clamp(x, minX, minX + screenWidth - width - margin * 2);
     }
 
-    /** The y the editor gives an element of bounds {@code height} high dragged to {@code y}. */
-    static int editorY(ElementAnchor anchor, double y, int margin, int screenHeight, int height) {
+    /**
+     * The y the editor gives an element of bounds {@code height} high dragged to {@code y}, where
+     * the element is drawn {@code shift} lower than its y says, below the effect icons.
+     */
+    static int editorY(
+            ElementAnchor anchor, double y, int margin, int screenHeight, int height, int shift) {
         int minY = editorMinY(anchor, margin, screenHeight, height);
-        return (int) clamp(y, minY, minY + screenHeight - height - margin * 2);
+        int maxY = minY + screenHeight - height - margin * 2;
+        // An element too tall for the room below the icons keeps a y that fits once they go; one
+        // too tall for the screen keeps the unshifted maximum.
+        return (int) clamp(y, minY, Math.max(maxY - shift, Math.min(maxY, minY)));
     }
 
     private static int editorMinX(ElementAnchor anchor, int margin, int screenWidth, int width) {

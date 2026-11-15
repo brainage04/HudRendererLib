@@ -250,7 +250,8 @@ public class HudElementEditor extends Screen {
                         selectedElementY - deltaY,
                         getConfig().screenMargin,
                         HudRenderer.getScaledHeight(),
-                        elementHeight);
+                        elementHeight,
+                        HudRenderer.getEffectIconShift(coreSettings.elementAnchor));
     }
 
     @Override
