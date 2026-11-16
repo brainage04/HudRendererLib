@@ -4,7 +4,7 @@
 
 HudRendererLib 1.1.0 targets Minecraft 26.3 on both loaders. The 1.0.x line is for Minecraft 26.2 and the 1.1.x line for Minecraft 26.3; see [Upgrading from 1.0.x](#upgrading-from-10x-minecraft-262) when moving a mod across.
 
-### Fabric Loom
+### Fabric: `io.github.brainage04:hudrendererlib`
 
 HudRendererLib 1.1.0 is published on Maven Central:
 
@@ -18,7 +18,7 @@ dependencies {
 }
 ```
 
-### NeoForge with Architectury Loom
+### NeoForge: `io.github.brainage04:hudrendererlib-neoforge`
 
 The NeoForge artifact is also published on Maven Central:
 
@@ -31,6 +31,8 @@ dependencies {
     implementation "io.github.brainage04:hudrendererlib-neoforge:1.1.0"
 }
 ```
+
+### Universal
 
 For local workspace development, publish both loader artifacts to the sibling Maven repository with:
 
