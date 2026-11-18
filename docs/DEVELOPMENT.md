@@ -4,6 +4,8 @@
 
 HudRendererLib 1.1.0 targets Minecraft 26.3 on both loaders. The 1.0.x line is for Minecraft 26.2 and the 1.1.x line for Minecraft 26.3; see [Upgrading from 1.0.x](#upgrading-from-10x-minecraft-262) when moving a mod across.
 
+Plugins come from Maven Central at `minecraftmodconventions_version` in `gradle.properties`. A `../MinecraftModConventions` checkout beside the project is used only with `-PuseLocalConventions`; without it a stale checkout cannot replace that version.
+
 ### Fabric Loom
 
 HudRendererLib 1.1.0 is published on Maven Central:
