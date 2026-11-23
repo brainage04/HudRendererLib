@@ -18,9 +18,9 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 
 /**
- * Checks that the HUD editor's two buttons sit on one row: one width, one y, one gap, and the pair centred on the
- * screen. When {@value #DIRECTORY_ENV} names a directory, it also writes the geometry and a screenshot there, so a
- * guide-line overlay can be drawn from the layout the game computed.
+ * Writes the HUD editor's geometry and a screenshot when {@value #DIRECTORY_ENV} names a directory, so a guide-line
+ * overlay can be drawn from the layout the game computed. The row itself is checked by {@code HudClientScenarios},
+ * which both loaders run.
  */
 @SuppressWarnings("UnstableApiUsage")
 public final class GridlinesClientGameTest implements FabricClientGameTest {
@@ -30,7 +30,10 @@ public final class GridlinesClientGameTest implements FabricClientGameTest {
     public void runTest(ClientGameTestContext context) {
         String directory = System.getenv(DIRECTORY_ENV);
         String name = directory == null ? "" : directory.strip();
-        Path output = name.isEmpty() ? null : Path.of(name);
+        if (name.isEmpty()) {
+            return;
+        }
+        Path output = Path.of(name);
         ClientGameTestServers.withDedicatedServer(
                 context,
                 ClientGameTestServers.flatServerProperties(),
@@ -41,21 +44,17 @@ public final class GridlinesClientGameTest implements FabricClientGameTest {
                     context.runOnClient(client -> client.setScreenAndShow(new HudElementEditor()));
                     context.waitForScreen(HudElementEditor.class);
                     context.waitTicks(10);
-                    if (output != null) {
-                        try {
-                            Files.createDirectories(output);
-                            Files.writeString(
-                                    output.resolve("geometry.json"),
-                                    geometry(context),
-                                    StandardCharsets.UTF_8);
-                        } catch (IOException exception) {
-                            throw new AssertionError("Could not write the gridlines geometry", exception);
-                        }
-                        context.takeScreenshot(
-                                TestScreenshotOptions.of("hud-editor-screen")
-                                        .disableCounterPrefix()
-                                        .withDestinationDir(output));
+                    try {
+                        Files.createDirectories(output);
+                        Files.writeString(
+                                output.resolve("geometry.json"), geometry(context), StandardCharsets.UTF_8);
+                    } catch (IOException exception) {
+                        throw new AssertionError("Could not write the gridlines geometry", exception);
                     }
+                    context.takeScreenshot(
+                            TestScreenshotOptions.of("hud-editor-screen")
+                                    .disableCounterPrefix()
+                                    .withDestinationDir(output));
                 });
     }
 

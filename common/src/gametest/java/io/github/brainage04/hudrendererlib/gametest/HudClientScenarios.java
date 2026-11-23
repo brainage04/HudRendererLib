@@ -177,9 +177,9 @@ public final class HudClientScenarios {
                                     && editor.button2.getX() == 310
                                     && editor.button2.getY() == 360,
                             "Resizing the editor must move the Undo and Save buttons with the screen");
-                    checkButtonsShareOneRow(editor, 600);
+                    checkButtonsShareOneRow(editor);
                     editor.resize(320, 240);
-                    checkButtonsShareOneRow(editor, 320);
+                    checkButtonsShareOneRow(editor);
                     editor.closeWithoutSaving();
                 });
     }
@@ -188,9 +188,13 @@ public final class HudClientScenarios {
      * The editor's two buttons sit on one row: one width, one y, one gap, the pair centred, and both inside the
      * screen. At the default width the pair keeps vanilla's 200 px button width; below that each button shrinks.
      */
-    private static void checkButtonsShareOneRow(HudElementEditor editor, int screenWidth) {
+    private static void checkButtonsShareOneRow(HudElementEditor editor) {
+        int screenWidth = editor.width;
         Button left = editor.button1;
         Button right = editor.button2;
+        check(
+                editor.children().contains(left) && editor.children().contains(right),
+                "The editor buttons must be on the screen");
         check(
                 left.getWidth() == right.getWidth(),
                 "The editor buttons must be one width, found " + left.getWidth() + " and " + right.getWidth());
@@ -198,9 +202,7 @@ public final class HudClientScenarios {
                 left.getY() == right.getY(),
                 "The editor buttons must sit on one row, found y " + left.getY() + " and " + right.getY());
         int gap = right.getX() - (left.getX() + left.getWidth());
-        check(
-                gap == HudElementEditor.BUTTON_GAP,
-                "The gap between the editor buttons is " + gap + " px, expected " + HudElementEditor.BUTTON_GAP);
+        check(gap == 20, "The gap between the editor buttons is " + gap + " px, expected 20");
         int pairCentre = left.getX() + (right.getX() + right.getWidth() - left.getX()) / 2;
         check(
                 Math.abs(pairCentre - screenWidth / 2) <= 1,
@@ -209,7 +211,7 @@ public final class HudClientScenarios {
                 left.getX() >= 0 && right.getX() + right.getWidth() <= screenWidth,
                 "The editor buttons span " + left.getX() + " to " + (right.getX() + right.getWidth())
                         + " px, the screen is " + screenWidth + " wide");
-        int expectedWidth = Math.min(Button.BIG_WIDTH, (screenWidth - HudElementEditor.BUTTON_GAP) / 2);
+        int expectedWidth = Math.min(200, (screenWidth - 20) / 2);
         check(
                 left.getWidth() == expectedWidth,
                 "The editor buttons are " + left.getWidth() + " px wide at " + screenWidth

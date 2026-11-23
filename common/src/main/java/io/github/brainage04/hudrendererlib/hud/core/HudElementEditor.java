@@ -25,7 +25,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
 public class HudElementEditor extends Screen {
-    public static final int BUTTON_GAP = 20;
+    private static final int BUTTON_GAP = 20;
     public static final Map<Integer, CoreSettingsElement> CORE_SETTINGS_ELEMENTS = new HashMap<>();
 
     static {
