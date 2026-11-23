@@ -187,6 +187,10 @@ public final class HudClientScenarios {
     /**
      * The editor's two buttons sit on one row: one width, one y, one gap, the pair centred, and both inside the
      * screen. At the default width the pair keeps vanilla's 200 px button width; below that each button shrinks.
+     *
+     * <p>The 20 px gap and 200 px width are literals on purpose. Reading {@code HudElementEditor.BUTTON_GAP} makes
+     * the check compile only against the fixed editor and turns it into a tautology, so the old layout could never
+     * be shown failing; a reader who swaps these back for the constant loses the reproduction.
      */
     private static void checkButtonsShareOneRow(HudElementEditor editor) {
         int screenWidth = editor.width;
