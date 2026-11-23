@@ -25,6 +25,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
 public class HudElementEditor extends Screen {
+    private static final int BUTTON_GAP = 20;
     public static final Map<Integer, CoreSettingsElement> CORE_SETTINGS_ELEMENTS = new HashMap<>();
 
     static {
@@ -169,9 +170,14 @@ public class HudElementEditor extends Screen {
     @Override
     protected void init() {
         disableBlur();
-        // init() runs again on every resize and GUI scale change, so place the buttons here.
-        button1.setPosition(width / 2 - 210, height - 40);
-        button2.setPosition(width / 2 + 10, height - 40);
+        // init() runs again on every resize and GUI scale change, so place the buttons here. The pair is 420 px
+        // wide with its gap, so on a narrower screen each button shrinks to keep the pair inside the screen.
+        int buttonWidth = Math.min(200, (width - BUTTON_GAP) / 2);
+        int left = (width - (buttonWidth * 2 + BUTTON_GAP)) / 2;
+        button1.setWidth(buttonWidth);
+        button2.setWidth(buttonWidth);
+        button1.setPosition(left, height - 40);
+        button2.setPosition(left + buttonWidth + BUTTON_GAP, height - 40);
         addRenderableWidget(button1);
         addRenderableWidget(button2);
     }
