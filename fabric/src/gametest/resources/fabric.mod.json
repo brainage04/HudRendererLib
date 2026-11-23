@@ -7,7 +7,8 @@
 	"environment": "*",
 	"entrypoints": {
 		"fabric-client-gametest": [
-			"io.github.brainage04.hudrendererlib.gametest.HudRendererLibClientGameTest"
+			"io.github.brainage04.hudrendererlib.gametest.HudRendererLibClientGameTest",
+			"io.github.brainage04.hudrendererlib.gametest.GridlinesClientGameTest"
 		]
 	}
 }
