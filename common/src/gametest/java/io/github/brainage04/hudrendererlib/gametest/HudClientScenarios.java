@@ -27,6 +27,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
@@ -176,8 +177,49 @@ public final class HudClientScenarios {
                                     && editor.button2.getX() == 310
                                     && editor.button2.getY() == 360,
                             "Resizing the editor must move the Undo and Save buttons with the screen");
+                    checkButtonsShareOneRow(editor);
+                    editor.resize(320, 240);
+                    checkButtonsShareOneRow(editor);
                     editor.closeWithoutSaving();
                 });
+    }
+
+    /**
+     * The editor's two buttons sit on one row: one width, one y, one gap, the pair centred, and both inside the
+     * screen. At the default width the pair keeps vanilla's 200 px button width; below that each button shrinks.
+     *
+     * <p>The 20 px gap and 200 px width are literals on purpose. Reading {@code HudElementEditor.BUTTON_GAP} makes
+     * the check compile only against the fixed editor and turns it into a tautology, so the old layout could never
+     * be shown failing; a reader who swaps these back for the constant loses the reproduction.
+     */
+    private static void checkButtonsShareOneRow(HudElementEditor editor) {
+        int screenWidth = editor.width;
+        Button left = editor.button1;
+        Button right = editor.button2;
+        check(
+                editor.children().contains(left) && editor.children().contains(right),
+                "The editor buttons must be on the screen");
+        check(
+                left.getWidth() == right.getWidth(),
+                "The editor buttons must be one width, found " + left.getWidth() + " and " + right.getWidth());
+        check(
+                left.getY() == right.getY(),
+                "The editor buttons must sit on one row, found y " + left.getY() + " and " + right.getY());
+        int gap = right.getX() - (left.getX() + left.getWidth());
+        check(gap == 20, "The gap between the editor buttons is " + gap + " px, expected 20");
+        int pairCentre = left.getX() + (right.getX() + right.getWidth() - left.getX()) / 2;
+        check(
+                Math.abs(pairCentre - screenWidth / 2) <= 1,
+                "The editor buttons are centred at " + pairCentre + " px, the screen at " + screenWidth / 2);
+        check(
+                left.getX() >= 0 && right.getX() + right.getWidth() <= screenWidth,
+                "The editor buttons span " + left.getX() + " to " + (right.getX() + right.getWidth())
+                        + " px, the screen is " + screenWidth + " wide");
+        int expectedWidth = Math.min(200, (screenWidth - 20) / 2);
+        check(
+                left.getWidth() == expectedWidth,
+                "The editor buttons are " + left.getWidth() + " px wide at " + screenWidth
+                        + " px, expected " + expectedWidth);
     }
 
     private static MouseButtonEvent mouse(double x, double y) {
