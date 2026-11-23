@@ -15,7 +15,6 @@ import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.screenshot.TestScreenshotOptions;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 
 /**
@@ -26,8 +25,6 @@ import net.minecraft.client.gui.components.events.ContainerEventHandler;
 @SuppressWarnings("UnstableApiUsage")
 public final class GridlinesClientGameTest implements FabricClientGameTest {
     public static final String DIRECTORY_ENV = "HUDRENDERERLIB_GRIDLINES_DIR";
-
-    private static final int BUTTON_GAP = 20;
 
     @Override
     public void runTest(ClientGameTestContext context) {
@@ -58,58 +55,6 @@ public final class GridlinesClientGameTest implements FabricClientGameTest {
                                 TestScreenshotOptions.of("hud-editor-screen")
                                         .disableCounterPrefix()
                                         .withDestinationDir(output));
-                    }
-                    assertButtonsShareOneRow(context);
-                    int[] original = context.computeOnClient(
-                            client -> new int[] {
-                                client.getWindow().getWidth(), client.getWindow().getHeight()
-                            });
-                    context.getInput().resizeWindow(640, 480);
-                    context.waitTicks(5);
-                    assertButtonsShareOneRow(context);
-                    context.getInput().resizeWindow(original[0], original[1]);
-                    context.waitTicks(5);
-                });
-    }
-
-    private static void assertButtonsShareOneRow(ClientGameTestContext context) {
-        context.runOnClient(
-                client -> {
-                    List<AbstractWidget> widgets = new ArrayList<>();
-                    collect(client.gui.screen(), widgets);
-                    List<Button> buttons = widgets.stream()
-                            .filter(Button.class::isInstance)
-                            .map(Button.class::cast)
-                            .toList();
-                    if (buttons.size() != 2) {
-                        throw new AssertionError("Expected 2 buttons, found " + buttons.size());
-                    }
-                    Button left = buttons.getFirst();
-                    Button right = buttons.getLast();
-                    if (left.getWidth() != right.getWidth()) {
-                        throw new AssertionError("'" + left.getMessage().getString() + "' is "
-                                + left.getWidth() + " px wide, '" + right.getMessage().getString()
-                                + "' is " + right.getWidth());
-                    }
-                    if (left.getY() != right.getY()) {
-                        throw new AssertionError("The buttons sit at y " + left.getY() + " and "
-                                + right.getY());
-                    }
-                    int gap = right.getX() - (left.getX() + left.getWidth());
-                    if (gap != BUTTON_GAP) {
-                        throw new AssertionError("The gap between the buttons is " + gap
-                                + " px, expected " + BUTTON_GAP);
-                    }
-                    int pairCentre = left.getX() + (right.getX() + right.getWidth() - left.getX()) / 2;
-                    int screenCentre = client.gui.screen().width / 2;
-                    if (Math.abs(pairCentre - screenCentre) > 1) {
-                        throw new AssertionError("The buttons are centred at " + pairCentre
-                                + " px, the screen at " + screenCentre);
-                    }
-                    if (left.getX() < 0 || right.getX() + right.getWidth() > client.gui.screen().width) {
-                        throw new AssertionError("The buttons span " + left.getX() + " to "
-                                + (right.getX() + right.getWidth()) + " px, the screen is "
-                                + client.gui.screen().width + " wide");
                     }
                 });
     }

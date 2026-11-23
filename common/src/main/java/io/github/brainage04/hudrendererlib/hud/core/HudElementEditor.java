@@ -25,7 +25,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
 public class HudElementEditor extends Screen {
-    private static final int BUTTON_GAP = 20;
+    public static final int BUTTON_GAP = 20;
     public static final Map<Integer, CoreSettingsElement> CORE_SETTINGS_ELEMENTS = new HashMap<>();
 
     static {
@@ -104,7 +104,7 @@ public class HudElementEditor extends Screen {
 
     public final Button button1 =
             Button.builder(Component.literal("Undo & Close"), button -> closeWithoutSaving())
-                    .size(200, 20)
+                    .size(Button.BIG_WIDTH, Button.DEFAULT_HEIGHT)
                     .tooltip(
                             Tooltip.create(
                                     Component.literal(
@@ -112,7 +112,7 @@ public class HudElementEditor extends Screen {
                     .build();
     public final Button button2 =
             Button.builder(Component.literal("Save & Close"), button -> this.onClose())
-                    .size(200, 20)
+                    .size(Button.BIG_WIDTH, Button.DEFAULT_HEIGHT)
                     .tooltip(
                             Tooltip.create(
                                     Component.literal(
@@ -170,9 +170,8 @@ public class HudElementEditor extends Screen {
     @Override
     protected void init() {
         disableBlur();
-        // init() runs again on every resize and GUI scale change, so place the buttons here. The pair is 420 px
-        // wide with its gap, so on a narrower screen each button shrinks to keep the pair inside the screen.
-        int buttonWidth = Math.min(200, (width - BUTTON_GAP) / 2);
+        // init() runs again on every resize and GUI scale change, so place the buttons here.
+        int buttonWidth = Math.min(Button.BIG_WIDTH, (width - BUTTON_GAP) / 2);
         int left = (width - (buttonWidth * 2 + BUTTON_GAP)) / 2;
         button1.setWidth(buttonWidth);
         button2.setWidth(buttonWidth);

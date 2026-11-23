@@ -27,6 +27,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
@@ -176,8 +177,43 @@ public final class HudClientScenarios {
                                     && editor.button2.getX() == 310
                                     && editor.button2.getY() == 360,
                             "Resizing the editor must move the Undo and Save buttons with the screen");
+                    checkButtonsShareOneRow(editor, 600);
+                    editor.resize(320, 240);
+                    checkButtonsShareOneRow(editor, 320);
                     editor.closeWithoutSaving();
                 });
+    }
+
+    /**
+     * The editor's two buttons sit on one row: one width, one y, one gap, the pair centred, and both inside the
+     * screen. At the default width the pair keeps vanilla's 200 px button width; below that each button shrinks.
+     */
+    private static void checkButtonsShareOneRow(HudElementEditor editor, int screenWidth) {
+        Button left = editor.button1;
+        Button right = editor.button2;
+        check(
+                left.getWidth() == right.getWidth(),
+                "The editor buttons must be one width, found " + left.getWidth() + " and " + right.getWidth());
+        check(
+                left.getY() == right.getY(),
+                "The editor buttons must sit on one row, found y " + left.getY() + " and " + right.getY());
+        int gap = right.getX() - (left.getX() + left.getWidth());
+        check(
+                gap == HudElementEditor.BUTTON_GAP,
+                "The gap between the editor buttons is " + gap + " px, expected " + HudElementEditor.BUTTON_GAP);
+        int pairCentre = left.getX() + (right.getX() + right.getWidth() - left.getX()) / 2;
+        check(
+                Math.abs(pairCentre - screenWidth / 2) <= 1,
+                "The editor buttons are centred at " + pairCentre + " px, the screen at " + screenWidth / 2);
+        check(
+                left.getX() >= 0 && right.getX() + right.getWidth() <= screenWidth,
+                "The editor buttons span " + left.getX() + " to " + (right.getX() + right.getWidth())
+                        + " px, the screen is " + screenWidth + " wide");
+        int expectedWidth = Math.min(Button.BIG_WIDTH, (screenWidth - HudElementEditor.BUTTON_GAP) / 2);
+        check(
+                left.getWidth() == expectedWidth,
+                "The editor buttons are " + left.getWidth() + " px wide at " + screenWidth
+                        + " px, expected " + expectedWidth);
     }
 
     private static MouseButtonEvent mouse(double x, double y) {
